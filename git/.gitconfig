@@ -1,0 +1,35 @@
+[filter "lfs"]
+clean = git-lfs clean -- %f
+smudge = git-lfs smudge -- %f
+process = git-lfs filter-process
+required = true
+[user]
+name = Derek
+email = dnellis3456@gmail.com
+[core]
+longpaths = true
+autocrlf = input
+editor = code --wait
+[alias]
+b = !git branch | grep Derek/
+ec = config --global -e
+hist = log --oneline --all --graph --decorate
+co = checkout
+bm = branch -m
+bv = branch -vv
+rv = remote --v
+ao = remote add origin
+so = remote set-url origin
+pu = push -u origin
+ac = !git add -A && git commit -m
+acp = "!f(){ git add -A && git commit -m ${1} && git push; };f"
+save = !git add . && git commit -m 'squash! SAVEPOINT'$RANDOM
+savep = !git add . && git commit -m 'squash! SAVEPOINT'$RANDOM && git push
+wip = commit -am 'WIP'
+rpo = remote prune origin
+undo = reset HEAD~1 --mixed
+amend = commit -a --amend
+upbranch = !git checkout master || git checkout main && git pull && git checkout - && git merge master || git merge main
+cob = "!f(){ git checkout -b ${1} && git push -u origin ${1}; };f"
+bdone = "!f(){ git checkout master && git pull -p && git branch -vv | grep ': gone]'|  grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -d; };f"
+mainbdone = "!f(){ git checkout main && git pull -p && git branch -vv | grep ': gone]'|  grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -d; };f"

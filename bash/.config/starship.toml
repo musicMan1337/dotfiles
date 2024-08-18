@@ -1,0 +1,128 @@
+# ~/.config/starship.toml
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = true
+
+# Change the default prompt format
+format = """\
+($cmd_duration\n)\
+[╭╴](238)$env_var$username $directory $git_branch $git_status $fill$all\
+[╰─](238)$character\
+"""
+
+continuation_prompt = "[](238)"
+
+command_timeout = 1_000_000
+
+# Set 'foo' as custom color palette
+# palette = 'foo'
+
+# Define custom colors
+# [palettes.foo]
+# grey = '238'
+# green = '034'
+# orange = '208'
+# blue = '111'
+# red = '160'
+# beige = '011'
+
+[fill]
+symbol = ' '
+
+[cmd_duration]
+min_time = 500
+format = '[鬒 $duration](bold 011)'
+
+# Change the default prompt characters
+[character]
+success_symbol = "[](238)"
+error_symbol = "[](238)"
+
+# Shows an icon that should be included by zshrc script based on the distribution or os
+[env_var.STARSHIP_DISTRO]
+format = '[$env_value](bold 111)'  # removed space between distro and rest for pwsh
+variable = "STARSHIP_DISTRO"
+disabled = false
+
+# Shows the username
+[username]
+style_user = "white bold"
+style_root = "black bold"
+format = "[$user]($style)"
+disabled = true  # disable in powershell
+show_always = false
+
+[directory]
+truncation_length = 3
+truncation_symbol = "…/"
+home_symbol = " ~"
+read_only_style = "197"
+read_only = "  "
+format = "at [$path]($style)[$read_only]($read_only_style)"
+
+[git_branch]
+symbol = " "
+format = "on [$symbol$branch]($style)"
+# truncation_length = 10
+# truncation_symbol = "…/"
+style = "bold 034"
+
+[git_status]
+format = """\
+$ahead_behind \
+([\\(\
+[$conflicted](160)\
+[$stashed](238)\
+[$deleted](160)\
+[$renamed](011)\
+[$modified](208)\
+[$staged](111)\
+[$untracked](011) \
+\\)]($style))"""
+style = "bold 034"
+up_to_date = "[ ](034)"
+ahead = "[⇡${count}](208)"
+diverged = "[⇕⇡${ahead_count}⇣${behind_count}](208)"
+conflicted = " 🏳${count}"
+untracked = "  ${count}"
+behind = "[⇣${count}](208)"
+stashed = "  ${count}"
+modified = "  ${count}"
+staged = '++\($count\)'
+renamed = " 襁 "
+deleted = "  "
+
+[terraform]
+format = "via [ terraform $version]($style) 壟 [$workspace]($style)"
+
+[vagrant]
+format = "via [ vagrant $version]($style)"
+
+[docker_context]
+format = "via [ $context](bold 111)"
+
+[helm]
+format = "via [ $version](bold purple)"
+
+[python]
+symbol = " "
+python_binary = "python3"
+
+[nodejs]
+format = "[ $version](bold 070)"
+# disabled = true
+
+[package]
+format = "[ $version](bold 208)"
+disabled = true
+
+[ruby]
+format = "[ $version]($style)"
+
+[kubernetes]
+format = 'on [ $context\($namespace\)](bold purple)'
+disabled = false
+[kubernetes.context_aliases]
+"clcreative-k8s-staging" = "cl-k8s-staging"
+"clcreative-k8s-production" = "cl-k8s-prod"
