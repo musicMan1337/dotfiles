@@ -18,7 +18,7 @@ This repository manages dotfiles for both Windows and macOS environments. The do
 
 1. **Clone the repository:**
 
-  You MUST clone into your home/dotfiles directory!
+   You MUST clone into your home/dotfiles directory!
 
    ```bash
    git clone <repository-url> ~/dotfiles
@@ -30,6 +30,59 @@ This repository manages dotfiles for both Windows and macOS environments. The do
    cd ~/dotfiles
    ```
 
+### Node Setup
+
+1. **Install Node.js (fnm):**
+
+   Windows (PowerShell):
+
+   ```bash
+   # installs fnm (Fast Node Manager)
+   winget install Schniz.fnm
+
+   # configure fnm environment (may need to restart terminal)
+   fnm env --use-on-cd | Out-String | Invoke-Expression
+   ```
+
+   macOS:
+
+   ```bash
+   # installs fnm (Fast Node Manager)
+   curl -fsSL https://fnm.vercel.app/install | bash
+
+   # activate fnm
+   source ~/.bashrc
+   ```
+
+   Both:
+
+   ```bash
+   # download and install Node.js (current LTS - this will change!)
+   fnm install --lts
+
+   # switch to the LTS version
+   fnm use 20 # or whatever version you installed (Node v20.16.0 would be '20')
+
+   # verifies the right Node.js version is in the environment
+   node -v
+
+   # verifies the right npm version is in the environment
+   npm -v
+   ```
+
+2. **Install pnpm:**
+
+   ```bash
+   npm install -g pnpm
+   ```
+
+3. **Init global JS packages:**
+
+   ```bash
+   # installs prettier and eslint globally
+   prettierLintG
+   ```
+
 ### Windows Setup
 
 1. **Set up symbolic links:**
@@ -37,10 +90,8 @@ This repository manages dotfiles for both Windows and macOS environments. The do
    Run the `symlinks.cmd` script to create necessary symbolic links:
 
    ```bash
-   npm run windows_symlinks
+   pnpm run windows_symlinks
    ```
-
-2. **Elevate permissions for package handling:**
 
    If `elevate` is not installed, the above command will prompt you to install it:
 
@@ -48,7 +99,7 @@ This repository manages dotfiles for both Windows and macOS environments. The do
    choco install elevate -y
    ```
 
-   ...and then run the above command from step 1 again.
+   ...and then run the the command again.
 
 ### macOS Setup
 
@@ -61,16 +112,22 @@ This repository manages dotfiles for both Windows and macOS environments. The do
 2. **Run symlinks script:**
 
    ```bash
-   npm run mac_symlinks
+   pnpm run mac_symlinks
    ```
-
----
 
 The repo will now have it's files symlinked into your home directory in the proper locations!
 
 ---
 
 ### Shell Configuration
+
+#### Fonts
+
+1. **Install Powerline/Nerd Fonts:**
+
+   ```bash
+   pnpm run install_fonts
+   ```
 
 #### ZSH
 
@@ -80,60 +137,32 @@ The repo will now have it's files symlinked into your home directory in the prop
    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
    ```
 
-2. **Install Powerline Fonts:**
-
-   ```bash
-  # clone
-  git clone https://github.com/powerline/fonts.git --depth=1
-  # install
-  cd fonts
-  ./install.sh
-  # clean-up a bit
-  cd ..
-  rm -rf fonts
-   ```
-
-3. **Source the ZSH configuration:**
-
-   ```bash
-   source ~/.zshrc
-   ```
-
 #### Bash
 
-1. **Copy Bash configurations:**
+1. **Install Bash:**
 
    ```bash
-   cp ~/dotfiles/bash/.bashrc ~/.bashrc
-   cp -r ~/dotfiles/bash/.bashrc.d ~/.bashrc.d
-   ```
-
-2. **Source the Bash configuration:**
-
-   ```bash
-   source ~/.bashrc
+   brew install bash
    ```
 
 ### Additional Configuration
-
-#### Git
-
-1. **Copy Git configurations:**
-
-   ```bash
-   cp ~/dotfiles/git/.gitconfig ~/.gitconfig
-   cp ~/dotfiles/git/.gitattributes ~/.gitattributes
-   ```
 
 #### Editors and IDEs
 
 - **JavaScript:**
 
-  Configuration files for ESLint and Prettier are located under `language-configs/javascript`. Copy them to your project directory if needed:
+  Configuration files for ESLint and Prettier are located under `language-configs/javascript`.
+  Copy them to your project directory if needed:
 
   ```bash
-  cp ~/dotfiles/language-configs/javascript/.eslintrc.json .
-  cp ~/dotfiles/language-configs/javascript/.prettierrc.json .
+  cp ~/language-configs/javascript/.eslintrc.json .
+  cp ~/language-configs/javascript/.prettierrc.json .
+  ```
+
+  ...or init them along with their packages:
+
+  ```bash
+  prettierLintInit
   ```
 
 - **C#:**
@@ -141,13 +170,14 @@ The repo will now have it's files symlinked into your home directory in the prop
   EditorConfig for C# projects is located under `language-configs/csharp`. Ensure your projects reference these files:
 
   ```bash
-  cp ~/dotfiles/language-configs/csharp/.editorconfig .
-  cp ~/dotfiles/language-configs/csharp/Directory.Build.props .
-  cp ~/dotfiles/language-configs/csharp/Directory.Packages.props .
-  cp ~/dotfiles/language-configs/csharp/global.json .
-  cp ~/dotfiles/language-configs/csharp/NuGet.config .
+  cp ~/language-configs/csharp/.editorconfig .
+  cp ~/language-configs/csharp/global.json .
+  cp ~/language-configs/csharp/Directory.Build.props .
+  cp ~/language-configs/csharp/Directory.Packages.props .
+  cp ~/language-configs/csharp/NuGet.config .
   ```
 
 ### Summary
 
-This repository aims to simplify the management of dotfiles across different environments by providing a standardized setup. Ensure you follow the provided steps to correctly set up your environment whether you are on Windows or macOS.
+This repository aims to simplify the management of dotfiles across different environments by providing a standardized setup.
+Ensure you follow the provided steps to correctly set up your environment whether you are on Windows or macOS.

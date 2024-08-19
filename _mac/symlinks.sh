@@ -86,6 +86,8 @@ create_links "$HOME/dotfiles/bash"
 create_links "$HOME/dotfiles/zsh"
 create_links "$HOME/dotfiles/git"
 
+auto_link "$HOME/dotfiles/language-configs/javascript/.eslintrc.json"
+
 auto_directory_link "$HOME/dotfiles/hereDocs"
 auto_directory_link "$HOME/dotfiles/language-configs"
 

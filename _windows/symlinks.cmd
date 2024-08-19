@@ -8,8 +8,10 @@ call :create_links "%USERPROFILE%\dotfiles\bash"
 call :create_links "%USERPROFILE%\dotfiles\zsh"
 call :create_links "%USERPROFILE%\dotfiles\git"
 
-call :AutoDirectoryLink "%USERPROFILE%\hereDocs"
-call :AutoDirectoryLink "%USERPROFILE%\language-configs"
+call :AutoLink "%USERPROFILE%\dotfiles\language-configs\javascript\.eslintrc.json"
+
+call :AutoDirectoryLink "%USERPROFILE%\dotfiles\hereDocs"
+call :AutoDirectoryLink "%USERPROFILE%\dotfiles\language-configs"
 
 REM Keep the command prompt window open
 echo =======================================================================

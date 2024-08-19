@@ -6,6 +6,9 @@ if [ -d ~/.bashrc.d/ ]; then
   unset file
 fi
 
+#~ fnm setup
+eval "$(fnm env --use-on-cd --shell bash)"
+
 #~ Initial Load Message
 eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
 

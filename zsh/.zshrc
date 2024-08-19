@@ -110,6 +110,16 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+#~ Source all .sh files in .zshrc.d
+if [ -d ~/.zshrc.d/ ]; then
+  for file in ~/.zshrc.d/*.sh; do
+    [ -r "$file" ] && source "$file"
+  done
+  unset file
+fi
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+#~ fnm setup
+eval "$(fnm env --use-on-cd --shell zsh)"
+
+#~ Initial Load Message
+eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'

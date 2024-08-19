@@ -15,20 +15,26 @@ alias prettierLint='pnpm install -D \
   @typescript-eslint/eslint-plugin \
   @typescript-eslint/parser'
 
+# Use this in a new project to initialize prettier/eslint
 prettierLintInit() {
-  # check if dir was passed in
-  local DIR="$1"
-  if [[ "$DIR" == "" ]]; then
-    DIR=$(pwd)
+  # check if we're in an npm project (package.json exists)
+  if [[ ! -f "package.json" ]]; then
+    echo "Not in an npm project. Skipping prettier/eslint init."
+    return
   fi
 
-  # check .eslintrc.json
-  if [[ ! -f "$DIR"/.eslintrc.json ]]; then
-    cp "$HOME"/dotfiles/language-configs/javascript/.eslintrc.json "$DIR"/.eslintrc.json
+  local DIR=$(pwd)
+
+  # rename existing config files
+  if [[ -f "$DIR"/.eslintrc.json ]]; then
+    mv "$DIR"/.eslintrc.json "$DIR"/.eslintrc.json.bak
   fi
 
-  # check .prettierrc.json
-  if [[ ! -f "$DIR"/.prettierrc.json ]]; then
-    cp "$HOME"/dotfiles/language-configs/javascript/.prettierrc.json "$DIR"/.prettierrc.json
+  if [[ -f "$DIR"/.prettierrc.json ]]; then
+    mv "$DIR"/.prettierrc.json "$DIR"/.prettierrc.json.bak
   fi
+
+  # copy new config files
+  cp "$HOME"/dotfiles/language-configs/javascript/.eslintrc.json "$DIR"/.eslintrc.json
+  cp "$HOME"/dotfiles/language-configs/javascript/.prettierrc.json "$DIR"/.prettierrc.json
 }
