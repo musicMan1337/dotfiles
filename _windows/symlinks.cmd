@@ -1,18 +1,43 @@
 @echo off
 setlocal
 
-@REM Bash symlinks
+::::::::::
+:: Bash ::
+::::::::::
 set "LINK=\Users\derek\.bashrc"
 set "TARGET=\Users\derek\dotfiles\bash\.bashrc"
 call :CheckAndCreateLink "%LINK%" "%TARGET%"
 
 set "LINK=\Users\derek\.bashrc.d"
 set "TARGET=\Users\derek\dotfiles\bash\.bashrc.d"
-call :CheckAndCreateLink "%LINK%" "%TARGET%" true
+call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
 
 set "LINK=\Users\derek\.config"
 set "TARGET=\Users\derek\dotfiles\bash\.config"
-call :CheckAndCreateLink "%LINK%" "%TARGET%" true
+call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+
+:::::::::
+:: Git ::
+:::::::::
+set "LINK=\Users\derek\.gitconfig"
+set "TARGET=\Users\derek\dotfiles\git\.gitconfig"
+call :CheckAndCreateLink "%LINK%" "%TARGET%"
+
+set "LINK=\Users\derek\.gitattributes"
+set "TARGET=\Users\derek\dotfiles\git\.gitattributes"
+call :CheckAndCreateLink "%LINK%" "%TARGET%"
+
+REM Keep the command prompt window open
+echo =======================================================================
+echo.
+set /p "pause=Symlinks created! Press any key to close this window..."
+
+:::::::::::::::
+:: Functions ::
+:::::::::::::::
+:CheckAndCreateDirectoryLink
+call :CheckAndCreateLink %1 %2 true
+exit /b
 
 :CheckAndCreateLink
 @REM %1 - LINK (the symbolic link path)
@@ -25,27 +50,27 @@ set IS_DIR=%~3
 if "%LINK%" == "" exit /b
 if "%TARGET%" == "" exit /b
 
-echo.
-
 @REM Use PowerShell to check if the LINK points to the TARGET
 for /f %%i in ('powershell -command "(Get-Item -Path \"%LINK%\").Target"') do set LINK_TARGET=%%i
 
 @REM Compare the current link target with the desired target
 if "%LINK_TARGET%" == "%TARGET%" (
   if "%IS_DIR%" == "true" (
-    echo The dirictory %LINK% is already pointing to %TARGET%.
+    echo Linked directory already exists:
   ) else (
-    echo The link %LINK% is already pointing to %TARGET%.
+    echo Linked file already exists:
   )
+  echo     %LINK% ^<===^> %TARGET%
+  echo.
   exit /b
 )
 
 if exist "%LINK%" (
-  echo Deleting existing link: %LINK%
+  echo Deleting %LINK%
   if "%IS_DIR%" == "true" (
     rmdir /s /q "%LINK%"
   ) else (
-    del "%LINK%"
+    del     "%LINK%"
   )
 )
 
@@ -55,4 +80,5 @@ if "%IS_DIR%" == "true" (
 ) else (
   mklink "%LINK%" "%TARGET%"
 )
+echo.
 exit /b
