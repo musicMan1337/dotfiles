@@ -27,6 +27,20 @@ set "LINK=\Users\derek\.gitattributes"
 set "TARGET=\Users\derek\dotfiles\git\.gitattributes"
 call :CheckAndCreateLink "%LINK%" "%TARGET%"
 
+:::::::::::::::
+:: Languages ::
+:::::::::::::::
+set "LINK=\Users\derek\language-configs"
+set "TARGET=\Users\derek\dotfiles\language-configs"
+call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+
+::::::::::
+:: Misc ::
+::::::::::
+set "LINK=\Users\derek\hereDocs"
+set "TARGET=\Users\derek\dotfiles\hereDocs"
+call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+
 REM Keep the command prompt window open
 echo =======================================================================
 echo.
