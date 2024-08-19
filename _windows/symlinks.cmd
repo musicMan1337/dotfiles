@@ -1,45 +1,15 @@
 @echo off
 setlocal
 
-::::::::::
-:: Bash ::
-::::::::::
-set "LINK=\Users\derek\.bashrc"
-set "TARGET=\Users\derek\dotfiles\bash\.bashrc"
-call :CheckAndCreateLink "%LINK%" "%TARGET%"
-
-set "LINK=\Users\derek\.bashrc.d"
-set "TARGET=\Users\derek\dotfiles\bash\.bashrc.d"
-call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
-
-set "LINK=\Users\derek\.config"
-set "TARGET=\Users\derek\dotfiles\bash\.config"
-call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
-
-:::::::::
-:: Git ::
-:::::::::
-set "LINK=\Users\derek\.gitconfig"
-set "TARGET=\Users\derek\dotfiles\git\.gitconfig"
-call :CheckAndCreateLink "%LINK%" "%TARGET%"
-
-set "LINK=\Users\derek\.gitattributes"
-set "TARGET=\Users\derek\dotfiles\git\.gitattributes"
-call :CheckAndCreateLink "%LINK%" "%TARGET%"
-
 :::::::::::::::
-:: Languages ::
+:: Run Links ::
 :::::::::::::::
-set "LINK=\Users\derek\language-configs"
-set "TARGET=\Users\derek\dotfiles\language-configs"
-call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+call :create_links "%USERPROFILE%\dotfiles\bash"
+call :create_links "%USERPROFILE%\dotfiles\zsh"
+call :create_links "%USERPROFILE%\dotfiles\git"
 
-::::::::::
-:: Misc ::
-::::::::::
-set "LINK=\Users\derek\hereDocs"
-set "TARGET=\Users\derek\dotfiles\hereDocs"
-call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+call :AutoDirectoryLink "%USERPROFILE%\hereDocs"
+call :AutoDirectoryLink "%USERPROFILE%\language-configs"
 
 REM Keep the command prompt window open
 echo =======================================================================
@@ -49,9 +19,58 @@ set /p "pause=Symlinks created! Press any key to close this window..."
 :::::::::::::::
 :: Functions ::
 :::::::::::::::
+REM Function to loop over the contents of a directory
+:create_links
+set "SOURCE_DIR=%~1"
+
+for /d %%d in ("%SOURCE_DIR%\*") do (
+  set "LINK=%USERPROFILE%\%%~nxd"
+  set "TARGET=%%d"
+  call :check_and_create_directory_link "%LINK%" "%TARGET%"
+)
+
+for %%f in ("%SOURCE_DIR%\*") do (
+  if not exist "%%f\" (
+    set "LINK=%USERPROFILE%\%%~nxf"
+    set "TARGET=%%f"
+    call :check_and_create_link "%LINK%" "%TARGET%"
+  )
+)
+exit /b
+
+:::::::::::::::::::::::::
+
+:AutoDirectoryLink
+set "TARGET=%~1"
+
+@REM Sets the link to the target path minus the "dotfiles\" part
+for /f "tokens=2,* delims=dotfiles\" %%a in ("%TARGET%") do (
+  set "LINK=%USERPROFILE%\%%b"
+)
+
+call :CheckAndCreateDirectoryLink "%LINK%" "%TARGET%"
+exit /b
+
+:::::::::::::::::::::::::
+
+:AutoLink
+set "TARGET=%~1"
+
+@REM Sets the link to the target path minus the "dotfiles\" part
+for /f "tokens=2,* delims=dotfiles\" %%a in ("%TARGET%") do (
+  set "LINK=%USERPROFILE%\%%b"
+)
+
+call :CheckAndCreateLink "%LINK%" "%TARGET%"
+exit /b
+
+:::::::::::::::::::::::::
+
 :CheckAndCreateDirectoryLink
 call :CheckAndCreateLink %1 %2 true
 exit /b
+
+:::::::::::::::::::::::::
 
 :CheckAndCreateLink
 @REM %1 - LINK (the symbolic link path)

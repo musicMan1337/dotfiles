@@ -50,48 +50,44 @@ function check_and_create_link() {
 }
 
 function create_links() {
-  ##########
-  ## Bash ##
-  ##########
-  local LINK="$HOME/.bashrc"
-  local TARGET="$HOME/dotfiles/bash/.bashrc"
-  check_and_create_link "$LINK" "$TARGET"
+  local SOURCE_DIR="$1"
 
-  local LINK="$HOME/.bashrc.d"
-  local TARGET="$HOME/dotfiles/bash/.bashrc.d"
-  check_and_create_directory_link "$LINK" "$TARGET"
+  for TARGET in "$SOURCE_DIR"/*; do
+    local LINK="$HOME/$(basename "$TARGET")"
 
-  local LINK="$HOME/.config"
-  local TARGET="$HOME/dotfiles/bash/.config"
-  check_and_create_directory_link "$LINK" "$TARGET"
+    if [ -d "$TARGET" ]; then
+      check_and_create_directory_link "$LINK" "$TARGET"
+    elif [ -f "$TARGET" ]; then
+      check_and_create_link "$LINK" "$TARGET"
+    fi
+  done
+}
 
-  #########
-  ## Git ##
-  #########
-  local LINK="$HOME/.gitconfig"
-  local TARGET="$HOME/dotfiles/git/.gitconfig"
-  check_and_create_link "$LINK" "$TARGET"
+function auto_directory_link() {
+  local TARGET="$1"
+  local LINK="${TARGET#*$HOME/dotfiles}"
+  LINK="$HOME$LINK"
 
-  local LINK="$HOME/.gitattributes"
-  local TARGET="$HOME/dotfiles/git/.gitattributes"
-  check_and_create_link "$LINK" "$TARGET"
-
-  ###############
-  ## Languages ##
-  ###############
-  local LINK="$HOME/language-configs"
-  local TARGET="$HOME/dotfiles/language-configs"
-  check_and_create_directory_link "$LINK" "$TARGET"
-
-  ##########
-  ## Misc ##
-  ##########
-  local LINK="$HOME/hereDocs"
-  local TARGET="$HOME/dotfiles/hereDocs"
   check_and_create_directory_link "$LINK" "$TARGET"
 }
 
-create_links
+function auto_link() {
+  local TARGET="$1"
+  local LINK="${TARGET#*$HOME/dotfiles}"
+  LINK="$HOME$LINK"
+
+  check_and_create_link "$LINK" "$TARGET"
+}
+
+###############
+## Run Links ##
+###############
+create_links "$HOME/dotfiles/bash"
+create_links "$HOME/dotfiles/zsh"
+create_links "$HOME/dotfiles/git"
+
+auto_directory_link "$HOME/dotfiles/hereDocs"
+auto_directory_link "$HOME/dotfiles/language-configs"
 
 echo =======================================================================
 echo
