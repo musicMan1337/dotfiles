@@ -2,5 +2,3 @@ node_modules
 
 .config/*
 !.config/starship.toml
-
-zsh/.zshrc.d/exports.sh

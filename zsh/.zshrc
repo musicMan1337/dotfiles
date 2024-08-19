@@ -1,10 +1,16 @@
-source ~/.zshrc.d/exports.sh
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# Path to your oh-my-zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+# export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME="gozilla"
+# ZSH_THEME="cobalt2"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -64,7 +70,20 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git gitignore node nvm npm pnpm npx zsh-autosuggestions golang docker docker-compose docker-machine postgres heroku)
+plugins=(
+  git
+  dotenv
+  macos
+  node
+  nvm
+  npm
+  npx
+  pnpm
+  zsh-autosuggestions
+  docker
+  docker-compose
+  docker-machine
+)
 
 source $ZSH/oh-my-zsh.sh
 
