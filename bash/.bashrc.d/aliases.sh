@@ -11,9 +11,13 @@ alias l.='ls -d .* --color=auto'
 
 #~ navigation
 alias cdcode='cd ~/code'
+alias cddot='cd ~/dotfiles'
 
 #~ open config files
+alias cdot='code-insiders ~/dotfiles'
 alias cbash='code-insiders ~/dotfiles/bash/.bashrc'
+alias cstar='code-insiders ~/dotfiles/bash/.config/starship.toml'
+alias czsh='code-insiders ~/dotfiles/zsh/.zshrc'
 alias cec='code-insiders ~/dotfiles/git/.gitconfig'
 
 #~ tput (fancy stdout)
