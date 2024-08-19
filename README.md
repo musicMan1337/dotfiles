@@ -139,10 +139,18 @@ The repo will now have it's files symlinked into your home directory in the prop
 
 #### Bash
 
-1. **Install Bash:**
+1. **Install Starship:**
+
+   Windows:
 
    ```bash
-   brew install bash
+   choco install starship
+   ```
+
+   macOS:
+
+   ```bash
+   curl -sS https://starship.rs/install.sh | sh
    ```
 
 ### Additional Configuration

@@ -9,9 +9,6 @@ fi
 #~ fnm setup
 eval "$(fnm env --use-on-cd --shell bash)"
 
-#~ Initial Load Message
-eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
-
 #~ Starship PS1 setup (~/.config/starship.toml)
 eval "$(starship init bash)"
 
@@ -28,6 +25,9 @@ case $OSTYPE in
 esac
 
 export STARSHIP_DISTRO=$ICON
+
+#~ Initial Load Message
+eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
 
 #~ Base PS1 (fallback)
 parse_git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'; }
