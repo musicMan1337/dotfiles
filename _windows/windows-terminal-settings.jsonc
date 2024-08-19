@@ -1,0 +1,268 @@
+// ~/AppData/Local/Microsoft/Windows\ Terminal/settings.json
+// ~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema-preview",
+    "actions": [
+        {
+            "command": {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.A6751878",
+            "keys": "alt+shift+d"
+        },
+        {
+            "command": "find",
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{00000000-0000-0000-0000-000000012345}", // This may differ per machine
+    "newTabMenu": [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": {
+        "defaults": {
+            "colorScheme": "xcad",
+            "font": {
+                "face": "Anonymice Nerd Font",
+                "size": 16
+            },
+            "opacity": 70,
+            "padding": "8, 8, 8, 8",
+            "useAcrylic": true
+        },
+        "list": [
+            {
+                "colorScheme": "PowerShell",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell",
+                "tabTitle": "Power Glove"
+            },
+            {
+                "closeOnExit": "graceful",
+                "colorScheme": "Retro",
+                "experimental.retroTerminalEffect": true,
+                "font": {
+                    "face": "PxPlus IBM VGA8",
+                    "size": 24
+                },
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt",
+                "opacity": 90,
+                "suppressApplicationTitle": true,
+                "tabTitle": "The Matrix"
+            },
+            {
+                "closeOnExit": "graceful",
+                "colorScheme": "GitBash",
+                "commandline": "\"%PROGRAMFILES%\\git\\bin\\bash.exe\" --login -i -l",
+                "font": {
+                    "face": "Hack Nerd Font Mono",
+                    "size": 12
+                },
+                "guid": "{00000000-0000-0000-0000-000000012345}",
+                "icon": "%PROGRAMFILES%\\git\\mingw64\\share\\git\\git-for-windows.ico",
+                "name": "Git Bash",
+                "opacity": 70,
+                "snapOnInput": true,
+                "startingDirectory": "C:\\Users\\derek",
+                "suppressApplicationTitle": true,
+                "tabTitle": "Git Bashed",
+                "useAcrylic": true
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "guid": "{53bbcce6-ab32-5bf5-8bc1-d98d0d329622}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022 (2)",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{7bace9ee-2842-5cd7-a3d8-d7d4b0ff9ffc}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022 (2)",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{963ff2f7-6aed-5ce3-9d91-90d99571f53a}",
+                "hidden": true,
+                "name": "Ubuntu-24.04",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{acbafd15-cbbb-5bb3-8a61-bed446ff4b83}",
+                "hidden": false,
+                "name": "Ubuntu 24.04 LTS",
+                "source": "CanonicalGroupLimited.Ubuntu24.04LTS_79rhkp1fndgsc"
+            }
+        ]
+    },
+    "schemes": [
+        {
+            "name": "GitBash",
+            "background": "#2E0000",
+            "black": "#0C0C0C",
+            "blue": "#6060FF",
+            "brightBlack": "#767676",
+            "brightBlue": "#3B78FF",
+            "brightCyan": "#61D6D6",
+            "brightGreen": "#16C60C",
+            "brightPurple": "#B4009E",
+            "brightRed": "#E74856",
+            "brightWhite": "#F2F2F2",
+            "brightYellow": "#F9F1A5",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3A96DD",
+            "foreground": "#BFBFBF",
+            "green": "#00A400",
+            "purple": "#BF00BF",
+            "red": "#BF0000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#FFFFFF",
+            "yellow": "#BFBF00"
+        },
+        {
+            "name": "PowerShell",
+            "background": "#1E1F4A",
+            "black": "#878787",
+            "blue": "#44B4CC",
+            "brightBlack": "#E373C8",
+            "brightBlue": "#0000FF",
+            "brightCyan": "#19D1D8",
+            "brightGreen": "#81EC0D",
+            "brightPurple": "#FF00FF",
+            "brightRed": "#FF0000",
+            "brightWhite": "#E5E5E5",
+            "brightYellow": "#FFD93D",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#19D1D8",
+            "foreground": "#FFFFFF",
+            "green": "#CCFF04",
+            "purple": "#9933CC",
+            "red": "#FF6600",
+            "selectionBackground": "#FFFFFF",
+            "white": "#F5F5F5",
+            "yellow": "#FFD93D"
+        },
+        {
+            "name": "Retro",
+            "background": "#000000",
+            "black": "#00FF00",
+            "blue": "#00FF00",
+            "brightBlack": "#00FF00",
+            "brightBlue": "#00FF00",
+            "brightCyan": "#00FF00",
+            "brightGreen": "#00FF00",
+            "brightPurple": "#00FF00",
+            "brightRed": "#00FF00",
+            "brightWhite": "#00FF00",
+            "brightYellow": "#00FF00",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#00FF00",
+            "foreground": "#00FF00",
+            "green": "#00FF00",
+            "purple": "#00FF00",
+            "red": "#00FF00",
+            "selectionBackground": "#FFFFFF",
+            "white": "#00FF00",
+            "yellow": "#00FF00"
+        },
+        {
+            "name": "UbuntuLegit",
+            "background": "#2C001E",
+            "black": "#333333",
+            "blue": "#3465A4",
+            "brightBlack": "#555753",
+            "brightBlue": "#729FCF",
+            "brightCyan": "#34E2E2",
+            "brightGreen": "#8AE234",
+            "brightPurple": "#AD7FA8",
+            "brightRed": "#EF2929",
+            "brightWhite": "#EEEEEE",
+            "brightYellow": "#FCE94F",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#06989A",
+            "foreground": "#EEEEEE",
+            "green": "#06BA12",
+            "purple": "#75507B",
+            "red": "#CC0000",
+            "selectionBackground": "#FFFFFF",
+            "white": "#D3D7CF",
+            "yellow": "#C4A000"
+        },
+        {
+            "name": "xcad",
+            "background": "#000000",
+            "black": "#000000",
+            "blue": "#6B6B6B",
+            "brightBlack": "#5A6374",
+            "brightBlue": "#9C9C9C",
+            "brightCyan": "#3454E3",
+            "brightGreen": "#1BB8CC",
+            "brightPurple": "#C678DD",
+            "brightRed": "#E06C75",
+            "brightWhite": "#E2E2E2",
+            "brightYellow": "#333333",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3454E3",
+            "foreground": "#E2E2E2",
+            "green": "#1BB8CC",
+            "purple": "#C678DD",
+            "red": "#E06C75",
+            "selectionBackground": "#FFFFFF",
+            "white": "#E2E2E2",
+            "yellow": "#1BB8CC"
+        },
+        {
+            "name": "xcad_ps",
+            "background": "#0F2022",
+            "black": "#000000",
+            "blue": "#2A3EF5",
+            "brightBlack": "#5A6374",
+            "brightBlue": "#3454E3",
+            "brightCyan": "#3454E3",
+            "brightGreen": "#1BB8CC",
+            "brightPurple": "#C678DD",
+            "brightRed": "#E06C75",
+            "brightWhite": "#E2E2E2",
+            "brightYellow": "#3454E3",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#3454E3",
+            "foreground": "#E2E2E2",
+            "green": "#1BB8CC",
+            "purple": "#C678DD",
+            "red": "#E06C75",
+            "selectionBackground": "#FFFFFF",
+            "white": "#E2E2E2",
+            "yellow": "#1BB8CC"
+        }
+    ],
+    "themes": []
+}

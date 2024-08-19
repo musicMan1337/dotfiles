@@ -61,8 +61,15 @@ set LINK=%~1
 set TARGET=%~2
 set IS_DIR=%~3
 
-if "%LINK%" == "" exit /b
-if "%TARGET%" == "" exit /b
+if "%LINK%" == "" (
+  echo Link is missing!
+  exit /b
+)
+
+if "%TARGET%" == "" (
+  echo Target is missing!
+  exit /b
+)
 
 @REM Use PowerShell to check if the LINK points to the TARGET
 for /f %%i in ('powershell -command "(Get-Item -Path \"%LINK%\").Target"') do set LINK_TARGET=%%i

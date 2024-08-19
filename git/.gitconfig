@@ -18,11 +18,79 @@ co = checkout
 bv = branch -vv
 undo = reset HEAD~1 --mixed # reset to previous commit without losing current changes
 amend = commit -a --amend   # amend current changes to last commit
-#
-# Functions in /dotfiles/bash/.bashrc.d/git.sh
-b = "!git_b"
-ac = "!git_ac"
-acp = "!git_acp"
-upbranch = "!git_upbranch"
-cob = "!git_cob"
-bdone = "!git_bdone"
+
+# gets local branches by term (default 'Derek/')
+b = "!f() { \
+  term=\"$1\"; \
+\
+  if [[ -z \"$term\" ]]; then \
+    term='Derek/'; \
+  fi; \
+\
+  git branch | grep Derek/; \
+}; f"
+
+# grabs the default branch name (master, main, etc)
+default = "!f() { \
+  git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'; \
+}; f"
+
+# create new branch and push
+cob = "!f() { \
+  if [ -z \"$1\" ]; then \
+    echo 'Usage: git cob <branch name>'; \
+    return; \
+  fi; \
+\
+  git checkout -b \"$1\"; \
+  git push -u origin \"$1\"; \
+}; f"
+
+# add and commit
+ac = "!f() { \
+  if [ -z \"$1\" ]; then \
+    echo 'Usage: git ac <commit message>'; \
+    return; \
+  fi; \
+\
+  git add -A; \
+  git commit -m \"$1\"; \
+}; f"
+
+# add, commit, and push
+acp = "!f() { \
+  if [ -z \"$1\" ]; then \
+    echo 'Usage: git acp <commit message>'; \
+    return; \
+  fi; \
+\
+  git ac \"$1\"; \
+  git push; \
+}; f"
+
+# merge specified branch into current branch (default 'git default')
+upbranch = "!f() { \
+  branch=\"$1\"; \
+\
+  if [ -z \"$branch\" ]; then \
+    branch=$(git default); \
+  fi; \
+\
+  git checkout \"$branch\"; \
+  git pull; \
+  git checkout -; \
+  git merge \"$branch\"; \
+}; f"
+
+# update specified branch (default 'git default') and prune local merged branches
+bdone = "!f() { \
+  branch=\"$1\"; \
+\
+  if [ -z \"$branch\" ]; then \
+    branch=$(git default); \
+  fi; \
+\
+  git checkout \"$branch\"; \
+  git pull -p; \
+  git branch -vv | grep ': gone]' | grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -d; \
+}; f"
