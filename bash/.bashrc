@@ -30,5 +30,3 @@ export STARSHIP_DISTRO=$ICON
 parse_git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'; }
 
 PS1="\[\033[38;5;9m\]\u\[$(tput sgr0)\]\[\033[38;5;10m\][\[$(tput sgr0)\]\[\033[38;5;33m\]$MSYSTEM\[\033[38;5;10m\]]\[\033[38;5;10m\]:\[$(tput sgr0)\] \[$(tput sgr0)\]\[\033[38;5;3m\]\W\[\033[38;5;9m\]\$(parse_git_branch)\[$(tput sgr0)\] $ "
-
-echo hello
