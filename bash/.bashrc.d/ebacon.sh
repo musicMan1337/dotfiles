@@ -1,7 +1,7 @@
-alias cviper='code-insiders /c/Viper'
-alias csql='code-insiders /c/TAG_SQL'
-alias cint='code-insiders /c/TAG_InterviewQuestions'
-alias cprojects='code-insiders /c/tag-projects'
+alias cdviper='cd /c/Viper'
+alias cdsql='cd /c/TAG_SQL'
+alias cdprojects='cd /c/tag-projects'
+alias cdcore='cd /c/Core'
 
 #~ React Stuff
 REACT_ROOT='public/assets/App/viper/js/react'

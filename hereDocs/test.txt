@@ -1,0 +1,7 @@
+#!/bin/sh
+
+FOO='foo'
+cat << 'EOF' - -- arg1
+  $FOO
+  $arg1
+EOF

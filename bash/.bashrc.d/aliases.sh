@@ -11,23 +11,10 @@ alias l.='ls -d .* --color=auto'
 
 #~ navigation
 alias cdcode='cd ~/code'
-alias cdboiler='cd ~/code/boilerplates'
-alias cdrw='cd ~/code/react-webpack'
-alias cdmpdf='cd /c/mPDF'
-alias cdviper='cd /c/Viper'
-alias cdsql='cd /c/TAG_SQL'
-alias cdint='code-insiders /c/TAG_InterviewQuestions'
-alias cdprojects='cd /c/tag-projects'
-alias cdcore='cd /c/Core'
-#? ...open with IDE
-alias ccode='code-insiders ~/code'
-alias cboiler='code-insiders ~/code/boilerplates'
-alias crw='code-insiders ~/code/react-webpack'
 
 #~ open config files
-alias cbash='code-insiders ~/.bashrc'
-alias cec='code-insiders ~/.gitconfig'
-alias calias='code-insiders ~/.bashrc'
+alias cbash='code-insiders ~/dotfiles/bash/.bashrc'
+alias cec='code-insiders ~/dotfiles/git/.gitconfig'
 
 #~ tput (fancy stdout)
 #? Font Style

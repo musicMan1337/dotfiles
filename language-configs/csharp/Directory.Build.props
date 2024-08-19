@@ -1,0 +1,24 @@
+<Project>
+  <!--  Version variables (used in Packages.props)  -->
+  <PropertyGroup>
+    <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
+    <SwashbuckleAspNetCoreVersion>6.5.0</SwashbuckleAspNetCoreVersion>
+  </PropertyGroup>
+
+  <!--  Global settings  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--  Analyzer enforcement  -->
+  <PropertyGroup>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>All</AnalysisMode>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+</Project>
