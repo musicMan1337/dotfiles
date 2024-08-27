@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+:: Note: mklink exoects the arg order to be "link" (new file/dir) then "target" (existing file/dir)
+
 :::::::::::::::
 :: Run Links ::
 :::::::::::::::

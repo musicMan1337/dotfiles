@@ -3,6 +3,8 @@
 # Run this before running the script:
 #   chmod +x _mac/symlinks.sh
 
+# Note: ln -s expects the arg order to be "target" (existing file/dir) then "link" (new file/dir)
+
 ###############
 ## Functions ##
 ###############

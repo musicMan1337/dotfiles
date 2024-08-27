@@ -6,7 +6,8 @@
     "install_fonts": "bash fonts/install.sh",
     "mac_symlinks": "bash _mac/symlinks.sh",
     "prewindows_symlinks": "bash _windows/packages-check.sh",
-    "windows_symlinks": "el cmd /c _windows\\symlinks.cmd"
+    "windows_symlinks": "el powershell -ExecutionPolicy Bypass -File _windows\\symlinks.ps1",
+    "_windows_symlinks": "el cmd /c _windows\\symlinks.cmd"
   },
   "keywords": [],
   "author": "musicMan1337",
