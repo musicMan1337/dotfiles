@@ -57,6 +57,7 @@ show_always = false
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "\uf015 ~"
+style = "bold 135"
 read_only_style = "197"
 read_only = " \ue0a2 "
 format = "at [$path]($style)[$read_only]($read_only_style)"

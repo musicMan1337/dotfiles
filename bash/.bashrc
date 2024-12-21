@@ -13,14 +13,14 @@ eval "$(fnm env --use-on-cd --shell bash)"
 eval "$(starship init bash)"
 
 case $OSTYPE in
-*kali*) ICON="\uf327 " ;;
+*kali*) ICON=" " ;;
 *darwin*) ICON="darwin " ;;
-*arch*) ICON="\uf31e " ;;
-*linux*) ICON="\ue712 " ;;
+*arch*) ICON=" " ;;
+*linux*) ICON=" " ;;
 *cygwin*) ICON="cygwin " ;;
-*debian*) ICON="\ue77d " ;;
-*ubuntu*) ICON="\uef72 " ;;
-*msys*) ICON="\udb81\uddb3 " ;;
+*debian*) ICON=" " ;;
+*ubuntu*) ICON=" " ;;
+*msys*) ICON="󰖳 " ;;
 *) ICON="" ;;
 esac
 
