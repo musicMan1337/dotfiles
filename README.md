@@ -21,7 +21,7 @@ This repository manages dotfiles for both Windows and macOS environments. The do
    You MUST clone into your home/dotfiles directory!
 
    ```bash
-   git clone <repository-url> ~/dotfiles
+   git clone https://github.com/musicMan1337/dotfiles.git ~/dotfiles
    ```
 
 2. **Navigate to the repository:**
@@ -40,7 +40,7 @@ This repository manages dotfiles for both Windows and macOS environments. The do
    # installs fnm (Fast Node Manager)
    winget install Schniz.fnm
 
-   # configure fnm environment (may need to restart terminal)
+   # configure fnm environment (may need to restart terminal before this)
    fnm env --use-on-cd | Out-String | Invoke-Expression
    ```
 
@@ -80,6 +80,7 @@ This repository manages dotfiles for both Windows and macOS environments. The do
 
    ```bash
    # installs prettier and eslint globally
+   # NOTE: you will need to setup symlinks (below) first!
    prettierLintG
    ```
 
@@ -87,7 +88,8 @@ This repository manages dotfiles for both Windows and macOS environments. The do
 
 1. **Set up symbolic links:**
 
-   Run the `symlinks.cmd` script to create necessary symbolic links:
+   Run the `symlinks.ps1` script to create necessary symbolic links. Open
+   bash in Admin mode and run the following command:
 
    ```bash
    pnpm run windows_symlinks
@@ -95,13 +97,17 @@ This repository manages dotfiles for both Windows and macOS environments. The do
 
    If `elevate` is not installed, the above command will prompt you to install it:
 
-   ```cmd
+   ```bash
    choco install elevate -y
    ```
 
-   ...and then run the the command again.
+   ...and then run the the command again. Note that the zsh symlinks may
+   fail, but that's okay. If you want to setup zsh using WSL, you can
+   do that separately.
 
 ### macOS Setup
+
+Open a new terminal and run the following commands:
 
 1. **Add permissions to run scripts:**
 
