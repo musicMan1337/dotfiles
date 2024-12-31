@@ -10,6 +10,7 @@ alias exp='explorer.exe .'
 alias c.='code .'
 alias c='clear'
 alias l.='ls -d .* --color=auto'
+alias code='code-insiders'
 
 #~ navigation
 alias cdcode='cd ~/code'

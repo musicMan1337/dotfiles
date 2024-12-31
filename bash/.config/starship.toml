@@ -7,11 +7,11 @@ add_newline = true
 # Change the default prompt format
 format = """\
 ($cmd_duration\n)\
-[╭╴](238)$env_var$username $directory $git_branch $git_status $fill$all\
+[╭╴](238)$env_var$username$directory $git_branch $git_status $fill$all\
 [╰─](238)$character\
 """
 
-continuation_prompt = "[](238)"
+continuation_prompt = "[\ue602 \ue602](238)"
 
 command_timeout = 1_000_000
 
@@ -32,12 +32,12 @@ symbol = ' '
 
 [cmd_duration]
 min_time = 500
-format = '[鬒 $duration](bold 011)'
+format = "[\uf017 $duration](bold 011)"
 
 # Change the default prompt characters
 [character]
-success_symbol = "[](238)"
-error_symbol = "[](238)"
+success_symbol = "[\ue602](238)"
+error_symbol = "[\ue602](238)"
 
 # Shows an icon that should be included by zshrc script based on the distribution or os
 [env_var.STARSHIP_DISTRO]
@@ -49,20 +49,21 @@ disabled = false
 [username]
 style_user = "white bold"
 style_root = "black bold"
-format = "[$user]($style)"
-disabled = true  # disable in powershell
+format = "[$user]($style) "
+disabled = false  # disable in powershell
 show_always = false
 
 [directory]
 truncation_length = 3
 truncation_symbol = "…/"
-home_symbol = " ~"
+home_symbol = "\uf015 ~"
+style = "bold 135"
 read_only_style = "197"
-read_only = "  "
+read_only = " \ue0a2 "
 format = "at [$path]($style)[$read_only]($read_only_style)"
 
 [git_branch]
-symbol = " "
+symbol = "\uf418 "
 format = "on [$symbol$branch]($style)"
 # truncation_length = 10
 # truncation_symbol = "…/"
@@ -81,47 +82,47 @@ $ahead_behind \
 [$untracked](011) \
 \\)]($style))"""
 style = "bold 034"
-up_to_date = "[ ](034)"
+up_to_date = "[\uf00c](034)"
 ahead = "[⇡${count}](208)"
 diverged = "[⇕⇡${ahead_count}⇣${behind_count}](208)"
 conflicted = " 🏳${count}"
-untracked = "  ${count}"
+untracked = " \uec0c${count}"
 behind = "[⇣${count}](208)"
-stashed = "  ${count}"
-modified = "  ${count}"
-staged = '++\($count\)'
-renamed = " 襁 "
-deleted = "  "
+stashed = " \uf187${count}"
+modified = " \ueb43${count}"
+staged = '++${count}'
+renamed = " T${count}"
+deleted = " \uea81${count}"
 
 [terraform]
-format = "via [ terraform $version]($style) 壟 [$workspace]($style)"
+format = "via [\ue8bd terraform $version]($style) 壟 [$workspace]($style)"
 
 [vagrant]
-format = "via [ vagrant $version]($style)"
+format = "via [\ue8d0 vagrant $version]($style)"
 
 [docker_context]
-format = "via [ $context](bold 111)"
+format = "via [\uf21f $context](bold 111)"
 
 [helm]
-format = "via [ $version](bold purple)"
+format = "via [\ue7fb $version](bold purple)"
 
 [python]
-symbol = " "
+symbol = "\ue73c "
 python_binary = "python3"
 
 [nodejs]
-format = "[ $version](bold 070)"
+format = "[\ued0d $version](bold 070)"
 # disabled = true
 
 [package]
-format = "[ $version](bold 208)"
+format = "[\uf487 $version](bold 208)"
 disabled = true
 
 [ruby]
-format = "[ $version]($style)"
+format = "[\ue23e $version]($style)"
 
 [kubernetes]
-format = 'on [ $context\($namespace\)](bold purple)'
+format = 'on [\ue81d $context\($namespace\)](bold purple)'
 disabled = false
 [kubernetes.context_aliases]
 "clcreative-k8s-staging" = "cl-k8s-staging"
