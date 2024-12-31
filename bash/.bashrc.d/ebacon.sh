@@ -1,7 +1,11 @@
-alias cdviper='cd /c/Viper'
-alias cdsql='cd /c/TAG_SQL'
-alias cdprojects='cd /c/tag-projects'
-alias cdcore='cd /c/Core'
+alias cdviper='cd ~/eBacon/Viper'
+alias cdsql='cd ~/eBacon/SQL'
+alias cdprojects='cd ~/eBacon/tag-projects'
+alias cdcore='cd ~/eBacon/Core'
+alias devs='npm run devserver'
+
+#~ Core
+alias coredev='cdcore && cd Core/Core.API && dotnet run --launch-profile "Core.API - Dev"'
 
 #~ React Stuff
 REACT_ROOT='public/assets/App/viper/js/react'

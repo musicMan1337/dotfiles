@@ -1,12 +1,1 @@
-{
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "rules": {
-    "prettier/prettier": "error"
-  }
-}
+/Users/derek/dotfiles/language-configs/javascript/.eslintrc.json

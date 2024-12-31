@@ -15,7 +15,7 @@ editor = code-insiders --wait
 ec = config --global -e
 hist = log --oneline --all --graph --decorate
 co = checkout
-bv = branch -vv
+bv = !git --no-pager branch -vv
 undo = reset HEAD~1 --mixed # reset to previous commit without losing current changes
 amend = commit -a --amend   # amend current changes to last commit
 
@@ -27,7 +27,7 @@ b = "!f() { \
     term='Derek/'; \
   fi; \
 \
-  git branch | grep Derek/; \
+  git branch | grep \"$term\"; \
 }; f"
 
 # grabs the default branch name (master, main, etc)

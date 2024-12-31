@@ -54,8 +54,14 @@ function check_and_create_link() {
 function create_links() {
   local SOURCE_DIR="$1"
 
-  for TARGET in "$SOURCE_DIR"/*; do
-    local LINK="$HOME/$(basename "$TARGET")"
+  # Enable globbing
+  shopt -s nullglob dotglob
+  for TARGET in $SOURCE_DIR/*; do
+    # Ensure target is not "*"
+    local BASENAME=$(basename "$TARGET")
+    local LINK="$HOME/$BASENAME" # Add a dot prefix to the link name
+
+    echo "Creating link for $BASENAME..."
 
     if [ -d "$TARGET" ]; then
       check_and_create_directory_link "$LINK" "$TARGET"
@@ -88,7 +94,7 @@ create_links "$HOME/dotfiles/bash"
 create_links "$HOME/dotfiles/zsh"
 create_links "$HOME/dotfiles/git"
 
-auto_link "$HOME/dotfiles/language-configs/javascript/.eslintrc.json"
+check_and_create_link "$HOME/.eslintrc.json" "$HOME/dotfiles/language-configs/javascript/.eslintrc.json"
 
 auto_directory_link "$HOME/dotfiles/hereDocs"
 auto_directory_link "$HOME/dotfiles/language-configs"

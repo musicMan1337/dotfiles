@@ -10,7 +10,7 @@ call :create_links "%USERPROFILE%\dotfiles\bash"
 call :create_links "%USERPROFILE%\dotfiles\zsh"
 call :create_links "%USERPROFILE%\dotfiles\git"
 
-call :AutoLink "%USERPROFILE%\dotfiles\language-configs\javascript\.eslintrc.json"
+call :CheckAndCreateLink "%USERPROFILE%\.eslintrc.json" "%USERPROFILE%\dotfiles\language-configs\javascript\.eslintrc.json"
 
 call :AutoDirectoryLink "%USERPROFILE%\dotfiles\hereDocs"
 call :AutoDirectoryLink "%USERPROFILE%\dotfiles\language-configs"

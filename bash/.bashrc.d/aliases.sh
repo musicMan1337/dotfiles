@@ -1,3 +1,5 @@
+alias rsource='source ~/.bashrc'
+
 alias test='echo test... testing, 1, 2... test... test, balls... testing, 1... All clear!'
 alias ..='cd ..'
 alias ...='cd ../../'
@@ -5,7 +7,7 @@ alias .3='cd ../../../'
 alias .4='cd ../../../../'
 alias .5='cd ../../../../..'
 alias exp='explorer.exe .'
-alias c.='code-insiders .'
+alias c.='code .'
 alias c='clear'
 alias l.='ls -d .* --color=auto'
 
@@ -14,11 +16,11 @@ alias cdcode='cd ~/code'
 alias cddot='cd ~/dotfiles'
 
 #~ open config files
-alias cdot='code-insiders ~/dotfiles'
-alias cbash='code-insiders ~/dotfiles/bash/.bashrc'
-alias cstar='code-insiders ~/dotfiles/bash/.config/starship.toml'
-alias czsh='code-insiders ~/dotfiles/zsh/.zshrc'
-alias cec='code-insiders ~/dotfiles/git/.gitconfig'
+alias cdot='code ~/dotfiles'
+alias cbash='code ~/dotfiles/bash/.bashrc'
+alias cstar='code ~/dotfiles/bash/.config/starship.toml'
+alias czsh='code ~/dotfiles/zsh/.zshrc'
+alias cec='code ~/dotfiles/git/.gitconfig'
 
 #~ tput (fancy stdout)
 #? Font Style

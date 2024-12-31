@@ -185,6 +185,8 @@ The repo will now have it's files symlinked into your home directory in the prop
   cp ~/language-configs/csharp/NuGet.config .
   ```
 
+### Other Things of Interest
+
 ### Summary
 
 This repository aims to simplify the management of dotfiles across different environments by providing a standardized setup.

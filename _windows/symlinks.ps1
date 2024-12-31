@@ -81,7 +81,7 @@ Create-Links "$env:USERPROFILE\dotfiles\bash"
 Create-Links "$env:USERPROFILE\dotfiles\zsh"
 Create-Links "$env:USERPROFILE\dotfiles\git"
 
-Auto-Link "$env:USERPROFILE\dotfiles\language-configs\javascript\.eslintrc.json"
+Check-And-Create-Link "$env:USERPROFILE\.eslintrc.json" "$env:USERPROFILE\dotfiles\language-configs\javascript\.eslintrc.json"
 
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\hereDocs"
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\language-configs"
