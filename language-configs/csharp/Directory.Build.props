@@ -1,10 +1,4 @@
 <Project>
-  <!--  Version variables (used in Packages.props)  -->
-  <PropertyGroup>
-    <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
-    <SwashbuckleAspNetCoreVersion>6.5.0</SwashbuckleAspNetCoreVersion>
-  </PropertyGroup>
-
   <!--  Global settings  -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -20,5 +14,19 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!--  Global Analyzer Package  -->
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.24.0.89429">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!--  Version variables (used in Packages.props)  -->
+  <PropertyGroup>
+    <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
+    <SwashbuckleAspNetCoreVersion>6.5.0</SwashbuckleAspNetCoreVersion>
   </PropertyGroup>
 </Project>
