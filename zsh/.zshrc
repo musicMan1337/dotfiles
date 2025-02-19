@@ -135,4 +135,4 @@ fi
 
 # php crap
 export PATH="/opt/homebrew/opt/php@7.2/bin:$PATH"
-export PATH="/opt/homebrew/opt/php@7.2/sbin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
