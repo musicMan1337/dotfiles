@@ -10,7 +10,6 @@ alias exp='explorer.exe .'
 alias c.='code .'
 alias c='clear'
 alias l.='ls -d .* --color=auto'
-alias code='code-insiders'
 
 #~ navigation
 alias cdcode='cd ~/code'
@@ -22,6 +21,9 @@ alias cbash='code ~/dotfiles/bash/.bashrc'
 alias cstar='code ~/dotfiles/bash/.config/starship.toml'
 alias czsh='code ~/dotfiles/zsh/.zshrc'
 alias cec='code ~/dotfiles/git/.gitconfig'
+
+#~ ngrok
+alias ngstatic='ngrok http --url=panda-enhanced-truly.ngrok-free.app $1'
 
 #~ tput (fancy stdout)
 #? Font Style

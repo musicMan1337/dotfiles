@@ -136,3 +136,17 @@ fi
 # php crap
 export PATH="/opt/homebrew/opt/php@7.2/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/derek/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/derek/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/derek/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/derek/google-cloud-sdk/completion.zsh.inc'; fi
+
+# === Persistent SSH keys on macOS ===
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)" > /dev/null
+fi
+# Automatically add your default key every time you open a terminal
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519 2>/dev/null || \
+ssh-add --apple-use-keychain ~/.ssh/id_rsa 2>/dev/null

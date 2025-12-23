@@ -10,7 +10,7 @@ email = dnellis3456@gmail.com
 longpaths = true
 autocrlf = input
 ignorecase = false
-editor = code-insiders --wait
+editor = code --wait
 [alias]
 ec = config --global -e
 hist = log --oneline --all --graph --decorate
@@ -92,5 +92,5 @@ bdone = "!f() { \
 \
   git checkout \"$branch\"; \
   git pull -p; \
-  git branch -vv | grep ': gone]' | grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -d; \
+  git branch -vv | grep ': gone]' | grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -D; \
 }; f"
