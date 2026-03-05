@@ -130,6 +130,10 @@ if [ -d ~/.zshrc.d/ ]; then
   unset file
 fi
 
+#~ zsh-specific aliases
+#~ Claude
+alias claude-upgrade='brew upgrade claude-code'
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -154,9 +158,6 @@ ssh-add --apple-use-keychain ~/.ssh/id_rsa 2>/dev/null
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/derek/.lmstudio/bin"
 # End of LM Studio CLI section
-
-# Claude model for prompt display
-export CLAUDE_MODEL="claude-sonnet-4-6"
 
 # Created by `pipx` on 2026-03-05 15:44:03
 export PATH="$PATH:/Users/derek/.local/bin"
