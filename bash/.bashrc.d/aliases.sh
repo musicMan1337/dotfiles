@@ -25,6 +25,21 @@ alias cec='code ~/dotfiles/git/.gitconfig'
 #~ ngrok
 alias ngstatic='ngrok http --url=panda-enhanced-truly.ngrok-free.app $1'
 
+#~ IP, router and port forwarding
+alias ports_twilio_on='bash ~/bin/toggle-twilio-port-forwarding.sh on'
+alias ports_twilio_off='bash ~/bin/toggle-twilio-port-forwarding.sh off'
+
+alias ssh_router='bash ~/bin/ssh-router.sh'
+
+alias ip_update='curl -s https://ipinfo.io/ip > ~/my-public-ip.txt'
+function ip_check() {
+  CURRENT_IP=$(curl -s https://ipinfo.io/ip)
+  SAVED_IP=$(cat ~/my-public-ip.txt)
+
+  echo "current ip: $CURRENT_IP"
+  echo "saved ip: $SAVED_IP"
+}
+
 #~ tput (fancy stdout)
 #? Font Style
 BOLD=$(tput bold)

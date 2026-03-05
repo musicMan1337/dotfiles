@@ -150,3 +150,13 @@ fi
 # Automatically add your default key every time you open a terminal
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519 2>/dev/null || \
 ssh-add --apple-use-keychain ~/.ssh/id_rsa 2>/dev/null
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/derek/.lmstudio/bin"
+# End of LM Studio CLI section
+
+# Claude model for prompt display
+export CLAUDE_MODEL="claude-sonnet-4-6"
+
+# Created by `pipx` on 2026-03-05 15:44:03
+export PATH="$PATH:/Users/derek/.local/bin"

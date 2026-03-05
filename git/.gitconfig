@@ -4,8 +4,8 @@ smudge = git-lfs smudge -- %f
 process = git-lfs filter-process
 required = true
 [user]
-name = Derek
-email = dnellis3456@gmail.com
+	name = Derek Nellis
+	email = 39734095+musicMan1337@users.noreply.github.com
 [core]
 longpaths = true
 autocrlf = input
