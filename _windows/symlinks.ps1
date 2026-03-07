@@ -86,6 +86,9 @@ Check-And-Create-Link "$env:USERPROFILE\.eslintrc.json" "$env:USERPROFILE\dotfil
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\hereDocs"
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\language-configs"
 
+Check-And-Create-Link "$env:USERPROFILE\.claude\settings.json" "$env:USERPROFILE\dotfiles\claude\settings.json" $false
+Check-And-Create-Link "$env:USERPROFILE\.claude\statusline-command.sh" "$env:USERPROFILE\dotfiles\claude\statusline-command.sh" $false
+
 # Start-Process to keep the window open at the end
 function KeepWindowOpen {
     Write-Host "======================================================================="
