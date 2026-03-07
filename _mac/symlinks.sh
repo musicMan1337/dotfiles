@@ -101,6 +101,7 @@ auto_directory_link "$HOME/dotfiles/language-configs"
 
 check_and_create_link "$HOME/.claude/settings.json" "$HOME/dotfiles/claude/settings.json"
 check_and_create_link "$HOME/.claude/statusline-command.sh" "$HOME/dotfiles/claude/statusline-command.sh"
+check_and_create_link "$HOME/.claude/statusline-costs.jq" "$HOME/dotfiles/claude/statusline-costs.jq"
 
 echo =======================================================================
 echo
