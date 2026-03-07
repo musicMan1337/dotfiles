@@ -1,6 +1,5 @@
 alias rsource='source ~/.bashrc'
 
-alias test='echo test... testing, 1, 2... test... test, balls... testing, 1... All clear!'
 alias ..='cd ..'
 alias ...='cd ../../'
 alias .3='cd ../../../'

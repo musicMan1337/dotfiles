@@ -132,7 +132,7 @@ fi
 
 #~ zsh-specific aliases
 #~ Claude
-alias claude-upgrade='brew upgrade claude-code'
+alias claude-up='brew upgrade claude-code'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
