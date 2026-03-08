@@ -87,8 +87,15 @@ Auto-Directory-Link "$env:USERPROFILE\dotfiles\hereDocs"
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\language-configs"
 
 Check-And-Create-Link "$env:USERPROFILE\.claude\settings.json" "$env:USERPROFILE\dotfiles\claude\settings.json" $false
-Check-And-Create-Link "$env:USERPROFILE\.claude\statusline-command.sh" "$env:USERPROFILE\dotfiles\claude\statusline-command.sh" $false
-Check-And-Create-Link "$env:USERPROFILE\.claude\statusline-costs.jq" "$env:USERPROFILE\dotfiles\claude\statusline-costs.jq" $false
+
+foreach ($subdir in @("hooks", "commands", "scripts")) {
+    $targetDir = "$env:USERPROFILE\dotfiles\claude\$subdir"
+    $linkDir = "$env:USERPROFILE\.claude\$subdir"
+    if (-not (Test-Path $linkDir)) { New-Item -ItemType Directory -Path $linkDir | Out-Null }
+    Get-ChildItem -Path $targetDir -File -ErrorAction SilentlyContinue | ForEach-Object {
+        Check-And-Create-Link "$linkDir\$($_.Name)" $_.FullName $false
+    }
+}
 
 # Start-Process to keep the window open at the end
 function KeepWindowOpen {

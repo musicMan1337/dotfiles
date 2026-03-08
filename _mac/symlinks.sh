@@ -100,8 +100,27 @@ auto_directory_link "$HOME/dotfiles/hereDocs"
 auto_directory_link "$HOME/dotfiles/language-configs"
 
 check_and_create_link "$HOME/.claude/settings.json" "$HOME/dotfiles/claude/settings.json"
-check_and_create_link "$HOME/.claude/statusline-command.sh" "$HOME/dotfiles/claude/statusline-command.sh"
-check_and_create_link "$HOME/.claude/statusline-costs.jq" "$HOME/dotfiles/claude/statusline-costs.jq"
+
+[ ! -d "$HOME/.claude/scripts" ] && mkdir "$HOME/.claude/scripts"
+shopt -s nullglob
+for TARGET in "$HOME/dotfiles/claude/scripts"/*; do
+  BASENAME=$(basename "$TARGET")
+  check_and_create_link "$HOME/.claude/scripts/$BASENAME" "$TARGET"
+done
+
+[ ! -d "$HOME/.claude/hooks" ] && mkdir "$HOME/.claude/hooks"
+shopt -s nullglob
+for TARGET in "$HOME/dotfiles/claude/hooks"/*; do
+  BASENAME=$(basename "$TARGET")
+  check_and_create_link "$HOME/.claude/hooks/$BASENAME" "$TARGET"
+done
+
+[ ! -d "$HOME/.claude/commands" ] && mkdir "$HOME/.claude/commands"
+shopt -s nullglob
+for TARGET in "$HOME/dotfiles/claude/commands"/*; do
+  BASENAME=$(basename "$TARGET")
+  check_and_create_link "$HOME/.claude/commands/$BASENAME" "$TARGET"
+done
 
 echo =======================================================================
 echo

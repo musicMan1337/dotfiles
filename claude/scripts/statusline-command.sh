@@ -38,7 +38,7 @@ format_cost() {
 # --- Cost calculation from JSONL files (cached for 30s) ---
 CACHE_FILE="/tmp/claude-statusline-costs.json"
 CACHE_TTL=30
-JQ_FILTER="$HOME/.claude/statusline-costs.jq"
+JQ_FILTER="$HOME/.claude/scripts/statusline-costs.jq"
 
 refresh_costs() {
   export TODAY_START
@@ -167,7 +167,7 @@ esac
 parts=()
 model_seg="${model} ${effort_bars}"
 parts+=("🤖 ${model_seg}")
-[ -n "$cost_seg" ] && parts+=("💰 ${cost_seg}")
+[ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && parts+=("💰 ${cost_seg}")
 [ -n "$ctx" ] && parts+=("🧠 ${ctx}")
 parts+=("📂 ${short_cwd}")
 [ -n "$git_seg" ] && parts+=("${git_seg}")
