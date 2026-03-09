@@ -1,4 +1,5 @@
 ---
+model: haiku
 allowed-tools: Bash, Read, Edit
 description: Add Node/TypeScript allow and deny permission rules to local project settings
 ---

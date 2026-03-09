@@ -1,4 +1,5 @@
 ---
+model: haiku
 description: Opens a repository workspace in VS Code fullscreen
 ---
 # open-repo

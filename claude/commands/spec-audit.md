@@ -1,8 +1,9 @@
 ---
+model: sonnet
 description: Verify a spec file is fully and correctly implemented, then fix any gaps
 ---
 
-# spec-authenticate
+# spec-audit
 
 Read the spec file at `$1` in full. If no argument was provided, ask the user for the spec file path.
 

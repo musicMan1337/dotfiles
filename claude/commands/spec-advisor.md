@@ -1,4 +1,5 @@
 ---
+model: opus
 description: Unbiased third-party advisor for personal situations, relationships, decisions, and life advice
 ---
 
