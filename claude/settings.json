@@ -1,12 +1,12 @@
 {
-  "model": "sonnet",
-  "statusLine": {
-    "type": "command",
-    "command": "bash /Users/derek/.claude/scripts/statusline-command.sh"
-  },
   "permissions": {
     "allow": [
       "Bash(bash ~/.claude/scripts/toggle-costs.sh)"
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash /Users/derek/.claude/scripts/statusline-command.sh"
+  },
+  "effortLevel": "high"
 }
