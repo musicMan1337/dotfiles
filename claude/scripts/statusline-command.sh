@@ -139,7 +139,7 @@ if [ -n "$cwd" ]; then
     [ "$ahead" -gt 0 ] 2>/dev/null && details+=("⇡${ahead}")
     [ "$behind" -gt 0 ] 2>/dev/null && details+=("⇣${behind}")
 
-    git_seg="⎇ ${branch}"
+    git_seg="$(printf '\uf126') ${branch}"
     if [ ${#details[@]} -gt 0 ]; then
       IFS=' '
       git_seg+=" [${details[*]}]"
