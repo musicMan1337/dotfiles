@@ -14,3 +14,5 @@ description: Create a git commit
 ## Your task
 
 Based on the above changes, create a single git commit.
+
+After committing, print the short hash and full commit message (title and body) so the user can see what was committed.
