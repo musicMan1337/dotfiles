@@ -1,5 +1,5 @@
 ---
-model: sonnet
+model: opus
 description: Implement a spec file using parallel sub-agents, committing between waves
 ---
 

@@ -1,5 +1,5 @@
 ---
-model: sonnet
+model: opus
 description: Verify a spec file is fully and correctly implemented, then fix any gaps
 ---
 
