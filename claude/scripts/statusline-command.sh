@@ -133,13 +133,13 @@ if [ -n "$cwd" ]; then
 
     details=()
     [ "$staged" -gt 0 ] 2>/dev/null && details+=("●${staged}")
-    [ "$modified" -gt 0 ] 2>/dev/null && details+=("✚${modified}")
+    [ "$modified" -gt 0 ] 2>/dev/null && details+=("+${modified}")
     [ "$untracked" -gt 0 ] 2>/dev/null && details+=("…${untracked}")
     [ "$stash" -gt 0 ] 2>/dev/null && details+=("⚑${stash}")
     [ "$ahead" -gt 0 ] 2>/dev/null && details+=("⇡${ahead}")
     [ "$behind" -gt 0 ] 2>/dev/null && details+=("⇣${behind}")
 
-    git_seg="$(printf '\uf126') ${branch}"
+    git_seg="⎇ ${branch}"
     if [ ${#details[@]} -gt 0 ]; then
       IFS=' '
       git_seg+=" [${details[*]}]"
