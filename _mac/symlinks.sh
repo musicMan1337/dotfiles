@@ -99,6 +99,9 @@ check_and_create_link "$HOME/.eslintrc.json" "$HOME/dotfiles/language-configs/ja
 auto_directory_link "$HOME/dotfiles/hereDocs"
 auto_directory_link "$HOME/dotfiles/language-configs"
 
+[ ! -d "$HOME/.config/ghostty" ] && mkdir -p "$HOME/.config/ghostty"
+check_and_create_link "$HOME/.config/ghostty/config" "$HOME/dotfiles/ghostty/config"
+
 check_and_create_link "$HOME/.claude/settings.json" "$HOME/dotfiles/claude/settings.json"
 
 [ ! -d "$HOME/.claude/scripts" ] && mkdir "$HOME/.claude/scripts"

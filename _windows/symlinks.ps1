@@ -86,6 +86,10 @@ Check-And-Create-Link "$env:USERPROFILE\.eslintrc.json" "$env:USERPROFILE\dotfil
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\hereDocs"
 Auto-Directory-Link "$env:USERPROFILE\dotfiles\language-configs"
 
+$ghosttyDir = "$env:APPDATA\ghostty"
+if (-not (Test-Path $ghosttyDir)) { New-Item -ItemType Directory -Path $ghosttyDir | Out-Null }
+Check-And-Create-Link "$ghosttyDir\config" "$env:USERPROFILE\dotfiles\ghostty\config" $false
+
 Check-And-Create-Link "$env:USERPROFILE\.claude\settings.json" "$env:USERPROFILE\dotfiles\claude\settings.json" $false
 
 foreach ($subdir in @("hooks", "commands", "scripts")) {
