@@ -31,9 +31,13 @@
     "type": "command",
     "command": "bash /Users/derek/.claude/scripts/statusline-command.sh"
   },
-  "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true,
   "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": true
-  }
+    "swift-lsp@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "csharp-lsp@claude-plugins-official": true,
+    "php-lsp@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true
 }
