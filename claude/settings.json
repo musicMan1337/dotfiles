@@ -25,6 +25,26 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/Users/Admin/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/Users/Admin/.claude/hooks/gsd-context-monitor.js\""
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
