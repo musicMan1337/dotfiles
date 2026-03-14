@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "TTY=$(ps -o tty= -p $PPID | tr -d ' ') && printf '\\a' > \"/dev/$TTY\""
+            "command": "if command -v osascript &>/dev/null; then TTY=$(ps -o tty= -p $PPID | tr -d ' ') && printf '\\a' > \"/dev/$TTY\"; else printf '\\a'; fi"
           }
         ]
       }
@@ -29,7 +29,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/derek/.claude/scripts/statusline-command.sh"
+    "command": "bash \"$HOME/.claude/scripts/statusline-command.sh\""
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,

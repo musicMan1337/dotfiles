@@ -57,7 +57,8 @@ refresh_costs() {
 # Check cache age
 need_refresh=1
 if [ -f "$CACHE_FILE" ]; then
-  cache_age=$(( $(date +%s) - $(stat -f %m "$CACHE_FILE" 2>/dev/null || stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0) ))
+  cache_mtime=$(stat -c %Y "$CACHE_FILE" 2>/dev/null || stat -f %m "$CACHE_FILE" 2>/dev/null || echo 0)
+  cache_age=$(( $(date +%s) - cache_mtime ))
   [ "$cache_age" -lt "$CACHE_TTL" ] && need_refresh=0
 fi
 
