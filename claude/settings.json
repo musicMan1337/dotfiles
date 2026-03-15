@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"C:/Users/Admin/.claude/hooks/gsd-check-update.js\""
+            "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\""
           }
         ]
       }
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"C:/Users/Admin/.claude/hooks/gsd-context-monitor.js\""
+            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\""
           }
         ]
       }

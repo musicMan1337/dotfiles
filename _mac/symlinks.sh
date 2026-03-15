@@ -103,6 +103,7 @@ auto_directory_link "$HOME/dotfiles/language-configs"
 check_and_create_link "$HOME/.config/ghostty/config" "$HOME/dotfiles/ghostty/config"
 
 check_and_create_link "$HOME/.claude/settings.json" "$HOME/dotfiles/claude/settings.json"
+check_and_create_link "$HOME/.claude/CLAUDE.md" "$HOME/dotfiles/claude/CLAUDE.md"
 
 [ ! -d "$HOME/.claude/scripts" ] && mkdir "$HOME/.claude/scripts"
 shopt -s nullglob
