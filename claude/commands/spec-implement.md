@@ -11,6 +11,10 @@ Read the spec file at `$1` in full. If no argument was provided, ask the user fo
 
 You are the orchestrator. You do **not** write implementation code directly — you analyze the spec, plan execution waves, spawn sub-agents in parallel, and commit between waves.
 
+## Step 0 — Gather Context via Haiku Sub-Agents
+
+Before analyzing the spec, spawn **multiple Haiku sub-agents in parallel** to gather all codebase context you'll need (file structure, existing implementations, relevant patterns, dependencies, etc.). Do NOT search or explore the codebase yourself — delegate all information gathering to Haiku agents. Each agent should have a narrow search scope (e.g. one searches for data models, another for API routes, another for UI components). Collect their results before proceeding.
+
 ## Step 1 — Analyze the Spec
 
 Read `$1` and extract every implementation section. For each section identify:
@@ -63,3 +67,4 @@ Continue to the next wave until all sections are implemented.
 - **No partial commits**: commit once per wave, after the wave is fully done, never mid-wave
 - **Stay in lead role**: if you find yourself writing implementation code, stop and delegate to a sub-agent instead
 - **Handle blockers**: if a sub-agent reports an error or ambiguity, resolve it before spawning dependent waves
+- **Haiku for gathering**: any time you need to search files, explore code, or gather context, spawn Haiku sub-agents (`model: "haiku"`) — never do exploratory searching yourself

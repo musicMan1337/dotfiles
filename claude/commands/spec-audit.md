@@ -15,13 +15,17 @@ You are the orchestrator. You do **not** write implementation code directly — 
 
 ## Phase 1 — Audit
 
-### 1a. Extract Sections
+### 1a. Gather Context via Haiku Sub-Agents
+
+Before extracting sections, spawn **multiple Haiku sub-agents in parallel** (`model: "haiku"`) to map the codebase — file structure, existing implementations, tech stack, relevant patterns. Do NOT search or explore the codebase yourself; delegate all information gathering to Haiku agents. Use their results to inform the audit.
+
+### 1b. Extract Sections
 
 Read `$1` and identify every implementation section. For each, note:
 - A short **section ID** (e.g. `auth-api`, `data-models`, `ui-components`)
 - Its **scope** — what should exist when it is correctly implemented
 
-### 1b. Spawn Audit Agents in Parallel
+### 1c. Spawn Audit Agents in Parallel
 
 In a **single message**, launch one Agent tool call per section. Each audit agent must:
 - Receive the spec file path and its specific section ID + scope
@@ -39,7 +43,7 @@ In a **single message**, launch one Agent tool call per section. Each audit agen
     - [type] <file>:<line> — <description>
   ```
 
-### 1c. Consolidate Findings
+### 1d. Consolidate Findings
 
 After all audit agents finish, collect every FAIL report. Group issues by type and file. If there are no failures, skip to the commit step.
 
@@ -80,3 +84,4 @@ Once all issues are resolved, invoke `/git-commit`.
 - **No scope creep**: fix agents address only the listed issues — they do not refactor, optimize, or expand features
 - **Placeholder intolerance**: `console.log`, `alert()`, `TODO`, `FIXME`, hardcoded stub data, and empty error handlers are always flagged as issues unless the spec explicitly permits them
 - **Stay in lead role**: if you find yourself writing implementation code, stop and delegate to a fix agent instead
+- **Haiku for gathering**: any time you need to search files, explore code, or gather context, spawn Haiku sub-agents (`model: "haiku"`) — never do exploratory searching yourself

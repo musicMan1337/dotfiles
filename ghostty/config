@@ -70,8 +70,6 @@ keybind = cmd+plus=increase_font_size:1
 keybind = cmd+minus=decrease_font_size:1
 keybind = cmd+zero=reset_font_size
 
-# Quick terminal global hotkey
-keybind = global:ctrl+grave_accent=toggle_quick_terminal
 
 # Rename tab
 keybind = cmd+shift+r=prompt_surface_title

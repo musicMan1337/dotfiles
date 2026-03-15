@@ -3,7 +3,9 @@ model: opus
 description: Interview and write a detailed spec file
 ---
 
-Read $1 and interview me in detail using the AskUserQuestionTool about literally anything:
+Read $1. Before interviewing, spawn **multiple Haiku sub-agents in parallel** (`model: "haiku"`) to gather all relevant codebase context — existing files, patterns, dependencies, tech stack, etc. Do NOT search or explore the codebase yourself; delegate all information gathering to Haiku agents. Use their findings to inform your interview questions.
+
+Then interview me in detail using the AskUserQuestionTool about literally anything:
 - Technical implementation
 - UI & UX
 - Concerns
