@@ -14,7 +14,7 @@ used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 input_tokens=$(echo "$input" | jq -r '
   .context_window |
   if .current_usage then
-    (.total_input_tokens + .total_output_tokens + .current_usage.cache_creation_input_tokens + .current_usage.cache_read_input_tokens)
+    (.current_usage.input_tokens + .current_usage.cache_creation_input_tokens + .current_usage.cache_read_input_tokens)
   else
     empty
   end
