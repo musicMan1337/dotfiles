@@ -11,7 +11,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude needs your attention!\" with title \"Claude Code\"'"
+            "command": "if command -v osascript &>/dev/null; then osascript -e 'display notification \"Claude needs your attention!\" with title \"Claude Code\"'; elif command -v powershell.exe &>/dev/null; then powershell.exe -Command \"[void][System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Claude needs your attention!','Claude Code')\"; else printf '\\a'; fi"
+          },
+          {
+            "type": "command",
+            "command": "if command -v osascript &>/dev/null; then TTY=$(ps -o tty= -p $PPID | tr -d ' ') && printf '\\a' > \"/dev/$TTY\"; else printf '\\a'; fi"
           }
         ]
       }
@@ -32,16 +36,6 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\""
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$HOME/.claude/hooks/gsd-context-monitor.js\""
           }
         ]
       }

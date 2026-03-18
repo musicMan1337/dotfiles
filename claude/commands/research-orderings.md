@@ -145,3 +145,7 @@ Present the final synthesis to the user. You can lightly edit the synthesizer's 
 - **Be honest about confidence.** Single-ordering findings are lower confidence than consensus findings. Say so.
 - **Don't over-iterate.** 2-3 cycles is usually sufficient. Diminishing returns set in quickly.
 - **Adapt ordering strategies to the domain.** Debugging logs need different orderings than research papers.
+
+## Next Step
+
+If the research produced actionable findings, you can run `/research-execute` to spawn sub-agents that act on the synthesis — implementing changes, applying fixes, or following through on recommendations. Pass optional notes to scope or prioritize the execution (e.g., `/research-execute focus on the auth changes only`).

@@ -4,21 +4,26 @@
 
 input=$(cat)
 
-model=$(echo "$input" | jq -r '.model.display_name // .model.id // "unknown"')
+model=$(echo "$input" | jq -r '.model.display_name // .model.id // "unknown"' | sed 's/ context)/)/; s/(1M )/(1M)/')
 # Effort: check statusline JSON first, then settings, default to "medium"
 effort=$(echo "$input" | jq -r '.effortLevel // empty')
 [ -z "$effort" ] && effort=$(jq -r '.effortLevel // empty' ~/.claude/settings.json 2>/dev/null)
 [ -z "$effort" ] && effort="medium"
-used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
-# Total context tokens including cache (matches used_percentage)
-input_tokens=$(echo "$input" | jq -r '
+# Compute real context usage including output tokens
+ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // empty')
+ctx_tokens=$(echo "$input" | jq -r '
   .context_window |
   if .current_usage then
-    (.current_usage.input_tokens + .current_usage.cache_creation_input_tokens + .current_usage.cache_read_input_tokens)
+    (.current_usage.input_tokens + .current_usage.output_tokens + .current_usage.cache_creation_input_tokens + .current_usage.cache_read_input_tokens)
   else
     empty
   end
 ' 2>/dev/null)
+if [ -n "$ctx_tokens" ] && [ -n "$ctx_size" ] && [ "$ctx_size" -gt 0 ] 2>/dev/null; then
+  used_pct=$(echo "$ctx_tokens $ctx_size" | awk '{printf "%.0f", ($1/$2)*100}')
+else
+  used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+fi
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // ""')
 
 # Session cost from statusline JSON
@@ -108,9 +113,10 @@ fi
 
 # Context info
 ctx=""
-if [ -n "$input_tokens" ] && [ -n "$used_pct" ]; then
+if [ -n "$ctx_tokens" ] && [ -n "$used_pct" ]; then
   used_int=$(printf "%.0f" "$used_pct")
-  ctx="$(format_num "$input_tokens") (${used_int}%)"
+  token_k=$(( ctx_tokens / 1000 ))
+  ctx="${token_k}K (${used_int}%)"
 elif [ -n "$used_pct" ]; then
   used_int=$(printf "%.0f" "$used_pct")
   ctx="${used_int}%"
