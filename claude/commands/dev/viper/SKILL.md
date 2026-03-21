@@ -30,16 +30,33 @@ Parse these from the user's message. Do not prompt for them if not provided.
 2. Navigate Playwright to `http://localhost:{port}/` (or the provided URL's origin).
 3. Take a snapshot to confirm the login page loaded (full `browser_snapshot()` is fine here — login page is small).
 
-## Phase 2: Wait for Login
+## Phase 2: Login
 
-The user will log in manually in the browser.
+**Try automated login first** using the Playwright integration test credentials from the Viper `.env` file.
 
-1. Tell the user: "Log in to Viper in the browser. I'll detect when you're done."
-2. **Poll for login completion** — use `browser_wait_for` with `time: 5` between checks, then use `browser_evaluate` to check:
+1. Read the credentials:
+   ```bash
+   grep -E '^INTEGRATION_(USERNAME|PASSWORD)=' ~/eBacon/Viper/.env
    ```
-   () => window.location.hash.includes('#')
-   ```
-3. Once login is detected, proceed immediately.
+   The variables are:
+   - `INTEGRATION_USERNAME` — the login username
+   - `INTEGRATION_PASSWORD` — the login password
+
+2. **If credentials are found**, automate the login:
+   - Use `browser_fill_form` or `browser_click` + `browser_type` to fill the username and password fields on the login page
+   - Click the login/submit button
+   - Use `browser_wait_for` to wait for navigation to complete, then verify login succeeded by checking for the hash route:
+     ```
+     () => window.location.hash.includes('#')
+     ```
+
+3. **If credentials are missing or login fails**, fall back to manual login:
+   - Tell the user: "Couldn't auto-login. Please log in to Viper in the browser. I'll detect when you're done."
+   - **Poll for login completion** — use `browser_wait_for` with `time: 5` between checks, then use `browser_evaluate` to check:
+     ```
+     () => window.location.hash.includes('#')
+     ```
+   - Once login is detected, proceed immediately.
 
 ## Phase 3: Extract Cookie & Set Up Backend
 
@@ -170,7 +187,7 @@ Look for `$this->coreApi->get(...)`, `$this->coreApi->post(...)`, etc. in the co
 ## Gotchas
 
 - **PHP 7.2**: Viper is on PHP 7.2. Use the most modern syntax available in 7.2, but nothing newer. Available: short arrays `[]`, null coalescing `??`, spaceship `<=>`, return type declarations, scalar type hints, `list()` destructuring, anonymous classes, group `use` declarations. NOT available (7.3+): named arguments, typed properties, union types, `match`, arrow functions `fn() =>`, null coalescing assignment `??=`, trailing commas in function calls, `str_contains`/`str_starts_with`/`str_ends_with`, enums, fibers, readonly properties.
-- **DO NOT** try to automate the login form. The user logs in manually — credentials are encrypted client-side and we don't handle that.
+- **Automated login uses .env credentials.** Read `INTEGRATION_USERNAME` and `INTEGRATION_PASSWORD` from `~/eBacon/Viper/.env`. These are the same credentials the Playwright integration test suite uses (`tests/integration/setup/auth.setup.ts`). If the .env values are missing or login fails, fall back to manual login.
 - **NEVER use full `browser_snapshot()` inside the app.** Always scope to `#ebacon-theme-container` or `#viperMain__injectedContainer`. See reference doc for details.
 - **Client shell switch**: NEVER use the `#CompanySelector` dropdown directly. Always use the `sessionStorage` + reload pattern — the dropdown dumps hundreds of clients into the snapshot.
 - **Cookie extraction**: `document.cookie` only exposes non-HttpOnly cookies. PHPSESSID in Viper's local dev is accessible this way. If it ever fails, ask the user to paste the cookie value manually.

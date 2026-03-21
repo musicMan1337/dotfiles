@@ -22,6 +22,31 @@ Parse the user's input to determine:
   - `--resume [run-id]` — resume from last completed phase
   - `--from <phase>` — restart from a specific phase number (1-6)
 
+## Repo Detection & Dev Skills
+
+Before starting any phase, detect which repo you're running in and set the dev skill context:
+
+| Working Directory | Dev Skill | MCP Tools | Live Testing |
+|---|---|---|---|
+| `~/eBacon/Viper` (or subdirs) | `/dev:viper` | Playwright (frontend) + Viper MCP (backend) + sqlsrv + core | Browser automation, API requests, DB queries |
+| `~/eBacon/SQL` (or subdirs) | `/dev:sql` | sqlsrv MCP | Execute stored procedures, inspect tables |
+| `~/eBacon/Core` (or subdirs) | `/dev:core` | Core MCP | Start/stop API, fire requests, monitor logs |
+| Other repos | None | Standard tools only | Run test suites if available |
+
+**Store the detected dev skill in `status.json`** as `"dev_skill": "/dev:viper"` (or null) so sub-agents and resume runs use it consistently.
+
+### MCP Serialization Constraint
+
+**CRITICAL: Only ONE agent can use a `/dev:*` skill at a time.** The dev skills test against live environments (real database, running API, browser sessions). Multiple agents using the same MCP simultaneously will corrupt each other's state.
+
+**The pattern is: parallel work first, dev skill as sequential gatekeeper.**
+
+- **Phase 3 (Implement):** Write all code in parallel waves → then run a sequential dev skill verification pass at the end. Mid-implementation spot checks are fine when you need to verify an assumption before building on it.
+- **Phase 4 (Audit):** Run all code-level audits in parallel → fix issues in parallel → then run a sequential dev skill live verification pass. Fix-verify loops for live issues are sequential.
+- **Phase 3 and Phase 4 are already sequential** (phase gates enforce this), so cross-phase conflicts don't apply.
+
+This approach keeps the pipeline fast (most work is parallel) while using the dev skill where it matters most (catching runtime issues that code inspection misses).
+
 ## Session Files (Context Management)
 
 All phase artifacts live in Obsidian at `factory/<run-id>/` via `/obsidian:factory`. This is the central design principle — **no phase output returns to the orchestrator's context**.
@@ -66,6 +91,7 @@ This holds `status.json` only — the machine-readable run state for resume/coor
     "5": { "name": "commit", "status": "pending" },
     "6": { "name": "pr", "status": "pending" }
   },
+  "dev_skill": "/dev:viper | /dev:sql | /dev:core | null",
   "result": null,
   "pr_url": null,
   "paused_reason": null
@@ -137,27 +163,38 @@ The sub-agent handles the entire spec conversation internally. The orchestrator 
 
 ### Phase 3 — Implement
 
-**Your role:** Create the feature branch, then spawn a single autonomous sub-agent that runs `/spec:implement` in `/autonomous-mode`.
+**Your role:** Create the feature branch, then spawn a single autonomous sub-agent that runs `/spec:implement` in `/autonomous-mode` with the appropriate dev skill.
 
 1. Create feature branch: `factory/<run-id>`
 2. Spawn one sub-agent with these instructions:
    - Run `/spec:implement` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
    - Read `factory/<run-id>/1-synthesis.md` via `/obsidian:factory` for additional context on patterns and conventions
-   - Let `/spec:implement` handle wave-based parallel execution internally
-   - When done, write a summary to `factory/<run-id>/3-implement-log.md` via `/obsidian:factory`: files modified, decisions made, deviations from spec
+   - **If a dev skill is detected** (see Repo Detection above):
+     - **Do all code implementation first using parallel waves.** Write all the code changes across all spec sections using `/spec:implement`'s normal parallel execution. No MCP usage during this phase of work — maximize parallelism.
+     - **Then use the dev skill as a final gatekeeper.** After all code is written, initialize the dev environment and run a sequential verification pass — fire API requests, execute sprocs, check browser behavior. This is a validation step, not the primary development loop.
+     - **Mid-implementation spot checks are OK.** If a wave's output depends on verifying an assumption (e.g., "does this API endpoint actually return X?"), it's fine to pause, do a single dev skill check, then resume parallel work. Use judgment — don't check after every file, but don't wait until the end if you're building on uncertain ground.
+     - **Serialize all MCP usage.** Parallel code writing is fine. All dev skill MCP operations must be sequential. Never spawn parallel sub-agents that both use the MCP.
+     - The dev skill's gotchas section contains critical repo-specific knowledge (e.g., Core needs a restart after code changes, SQL sprocs must be deployed before execution, Viper needs session cookies). Follow them.
+   - **If no dev skill:** Let `/spec:implement` handle wave-based parallel execution without constraints
+   - When done, write a summary to `factory/<run-id>/3-implement-log.md` via `/obsidian:factory`: files modified, decisions made, deviations from spec, live verification results
    - Use `/git:commit` for commits (the spec:implement skill handles this)
 
 **Gate:** Check git status on the feature branch — files should be modified and committed. If the sub-agent reports a blocker → **pause the run**.
 
 ### Phase 4 — Audit
 
-**Your role:** Spawn a single autonomous sub-agent that runs `/spec:audit` in `/autonomous-mode`.
+**Your role:** Spawn a single autonomous sub-agent that runs `/spec:audit` in `/autonomous-mode` with the appropriate dev skill for live verification.
 
 Spawn one sub-agent with these instructions:
 - Run `/spec:audit` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
-- `/spec:audit` handles: parallel audit agents, issue detection, fix agents, re-audit
-- Also run the project's test suite if one exists (`npm test`, `pytest`, `go test ./...`, etc.)
-- Write results to `factory/<run-id>/4-audit.md` via `/obsidian:factory`: per-section pass/fail, issues found and fixed, test results, overall verdict (`pass` | `pass-with-warnings` | `fail`)
+- **If a dev skill is detected:**
+  - **First pass — parallel code audit.** Run `/spec:audit`'s normal parallel audit agents for code-level checks: does code match spec? Are acceptance criteria implemented? Any TODOs, placeholders, stubs? This pass uses NO MCP — pure code inspection, fully parallel.
+  - **If issues found in code audit:** spawn parallel fix agents to resolve them. Code fixes don't need MCP. Re-audit the fixed sections (still parallel, still code-only).
+  - **Second pass — sequential live verification.** After code audit passes, initialize the dev environment and run a sequential live verification: fire API requests, execute stored procedures, check browser behavior for each spec section. This is the gatekeeper — it catches things code inspection can't (wrong API behavior, bad SQL logic, broken UI flows).
+  - **If live verification finds issues:** fix them, then re-verify the specific fix via the dev skill before moving on. This fix-verify loop is sequential by nature.
+  - **Serialize all MCP operations.** All dev skill usage is sequential. Parallel code inspection is fine.
+- **If no dev skill:** Run `/spec:audit` normally + the project's test suite if one exists (`npm test`, `pytest`, `go test ./...`, etc.)
+- Write results to `factory/<run-id>/4-audit.md` via `/obsidian:factory`: per-section pass/fail (code audit), per-section pass/fail (live verification), issues found and fixed, overall verdict (`pass` | `pass-with-warnings` | `fail`)
 - Use `/git:commit` for any fix commits
 
 **Gate:** Check the sub-agent's completion status. If it reports `fail` (critical issues or test failures persisting after fix cycle) → **pause the run**. `pass-with-warnings` is acceptable — proceed.
@@ -233,3 +270,6 @@ You are a coordinator, not a worker. Follow these rules strictly:
 - **`/spec:developer` IS interactive — that's fine.** The autonomous sub-agent answers its questions using the synthesis context. The orchestrator never sees the conversation.
 - **`/research:orderings` is expensive.** Only use for genuinely ambiguous inputs where the problem space itself is unclear. Most bugs and features don't need it.
 - **Obsidian is the source of truth for phase artifacts.** The local `.factory/pipeline/<run-id>/` directory holds only `status.json` and the spec file (local copy for `/spec:implement`). Everything else is in Obsidian.
+- **MCP serialization is non-negotiable.** Two agents hitting the same MCP simultaneously WILL cause failures — corrupted API state, conflicting DB writes, browser session collisions. Parallel code changes are fine; parallel MCP usage is not.
+- **Dev skill environments can drift between phases.** Core may need a restart if Phase 3 changed code. Viper session cookies expire. SQL sprocs need to be deployed before they can be executed. Phase 4 sub-agents must re-initialize the dev environment, don't assume Phase 3 left it in a good state.
+- **Dev skill gotchas are critical.** Each `/dev:*` skill has a gotchas section with hard-won repo-specific knowledge. Sub-agents must read and follow these — e.g., Core takes up to 120s to start, SQL hits a real stage database (writes persist!), Viper needs `source ~/.zprofile` before certain commands.
