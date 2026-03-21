@@ -42,9 +42,9 @@ Severity → icon:
 
 ## Delivery
 
-### Step 1 — Always: Write to log
+### Step 1 — Local log (repo-level)
 
-Append the formatted notification to `.factory/notifications.log` with an ISO-8601 timestamp prefix. Create the file if it doesn't exist.
+Append the formatted notification to `.factory/notifications.log` in the working directory with an ISO-8601 timestamp prefix. Create the file if it doesn't exist.
 
 Format in log:
 ```
@@ -55,48 +55,18 @@ Format in log:
 ---
 ```
 
-### Step 2 — Deliver
+### Step 2 — Obsidian (primary delivery)
 
-<!-- TODO: Plug in actual notification delivery here.
+Invoke `/obsidian:notify` to write an enriched entry to today's daily factory note (`factory/YYYY-MM-DD.md` in Obsidian). Pass all fields: summary, severity, source, links, and details.
 
-     When ready to implement, add delivery config to .factory/config.json:
-     {
-       "notify": {
-         "method": "log-only",
-         "config": {}
-       }
-     }
+`/obsidian:notify` handles:
+- Creating the daily note if it's the first entry of the day
+- Appending with enriched markdown formatting (clickable links, collapsible details, Obsidian callouts)
+- Dedup checking against existing entries
 
-     Planned delivery methods:
+### Step 3 — Console output
 
-     1. Obsidian — Write to daily note or inbox
-        - Use the obsidian skills to append to a factory inbox note
-        - Config: { "method": "obsidian", "config": { "vault": "...", "note": "Factory Inbox" } }
-
-     2. Slack — Post to a webhook
-        - curl -X POST -H 'Content-type: application/json' --data '{"text":"..."}' $SLACK_WEBHOOK_URL
-        - Config: { "method": "slack", "config": { "webhook_env": "SLACK_WEBHOOK_URL" } }
-
-     3. Telegram — Send via bot API
-        - curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" -d "chat_id=${TELEGRAM_CHAT_ID}" -d "text=..."
-        - Config: { "method": "telegram", "config": { "token_env": "TELEGRAM_BOT_TOKEN", "chat_id_env": "TELEGRAM_CHAT_ID" } }
-
-     4. GitHub — Comment on the relevant issue/PR
-        - gh issue comment <number> --body "..."  or  gh pr comment <number> --body "..."
-        - Config: { "method": "github", "config": { "comment_on": "issue|pr" } }
-
-     5. Email — via sendmail, SMTP, or API
-        - Config: { "method": "email", "config": { "to": "...", "from": "..." } }
-
-     Implementation pattern:
-     1. Read .factory/config.json for notify.method
-     2. Switch on method, call the appropriate delivery
-     3. Fall back to log-only if method not configured or delivery fails
--->
-
-**Current behavior:** Log file + console output only. The log file at `.factory/notifications.log` is the persistent record.
-
-Print the formatted notification as your response so the calling skill (or user) sees it.
+Print the formatted notification as your response so the calling skill (or user) sees it inline.
 
 ## Gotchas
 
@@ -104,5 +74,6 @@ Print the formatted notification as your response so the calling skill (or user)
 - **Keep it scannable.** The notification should be readable in 5 seconds. If there's more context, it goes in the details section, capped at 5 lines. Full details belong in the log or run directory, not the notification.
 - **Severity discipline.** `info` = FYI. `warning` = something unusual but not blocking. `action-needed` = a human must do something before work can continue. `error` = something broke. If everything is `action-needed`, nothing is.
 - **Always include at least one link.** A notification without a link to the relevant PR, issue, branch, or run directory is useless. If there truly are no links, include the path to the run directory or log file.
-- **Don't duplicate notifications.** If the same event would trigger multiple notifications (e.g., patrol runs twice, finds same fixed item), check the log first. Recent duplicate = skip.
-- **The log file grows forever.** That's fine. It's append-only by design. Cleanup is a separate concern.
+- **Don't duplicate notifications.** If the same event would trigger multiple notifications (e.g., patrol runs twice, finds same fixed item), `/obsidian:notify` checks for recent duplicates. The local log file is a fallback record.
+- **Obsidian is the primary record.** The `.factory/notifications.log` file is a local backup. The enriched daily notes in Obsidian (`factory/YYYY-MM-DD.md`) are what you and other factory skills read from.
+- **If Obsidian write fails, don't crash.** Fall back to local log + console output. Log a warning that Obsidian delivery failed. The notification still happened.

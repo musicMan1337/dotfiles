@@ -50,6 +50,21 @@ Every phase writes its output here. `status.json` tracks the run.
 
 Phase statuses: `pending` → `running` → `complete` | `failed` | `skipped` | `paused`
 
+## Pre-flight — Check Notifications
+
+Before starting (or resuming), read today's factory note from Obsidian for context:
+
+```bash
+source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
+```
+
+Use this to:
+- **Avoid duplicate work** — if patrol already reported a fix for the same issue, check if it's sufficient before running a full pipeline
+- **Pick up context** — if a previous pipeline run paused with `action-needed` and has notes in the daily log, use that context when resuming
+- **Coordinate** — if multiple pipeline runs are in flight, the notification log shows what's already in progress
+
+This is advisory, not blocking — if the read fails, proceed normally.
+
 ## Phases
 
 ### Phase 1 — Gather Context

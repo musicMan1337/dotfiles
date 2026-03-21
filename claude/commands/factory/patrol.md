@@ -43,6 +43,18 @@ State lives in `.factory/patrol/` in the working directory (the target repo, NOT
 
 ## Patrol Cycle
 
+### Phase 0 — Check Today's Notifications
+
+Before scanning, read today's factory note from Obsidian for context on what's already been reported:
+
+```bash
+source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
+```
+
+If the note exists, scan it for recently reported items (branches, issue numbers, run IDs). Use this to further filter duplicates beyond what state.json tracks — e.g., if pipeline already reported on issue #42 today, don't surface it again.
+
+If the note doesn't exist or the read fails, proceed normally — this is a dedup optimization, not a hard requirement.
+
 ### Phase 1 — Scan Sources
 
 Spawn **Haiku subagents** in parallel to check each available source. Pass each subagent the list of already-processed IDs so it can filter them out before returning.
