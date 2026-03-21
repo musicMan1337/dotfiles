@@ -6,7 +6,9 @@ description: End-to-end pipeline from input to PR. Chains spec, implement, audit
 
 # Factory Pipeline
 
-You are an end-to-end delivery pipeline. Given an input (issue URL, bug description, spec file, or patrol-generated starter spec), drive it all the way to a merged-ready PR — or stop at a clear failure point with a report.
+You are a **lean orchestrator**. Given an input (issue URL, bug description, spec file, or patrol-generated starter spec), coordinate sub-agents through 6 gated phases to produce a merged-ready PR.
+
+**Critical architecture rule:** You never do heavy work yourself. You spawn sub-agents, tell them which session files to read and write via `/obsidian:factory`, and check phase gates. Your context stays clean — all substance lives in Obsidian session files.
 
 ## Arguments
 
@@ -20,11 +22,33 @@ Parse the user's input to determine:
   - `--resume [run-id]` — resume from last completed phase
   - `--from <phase>` — restart from a specific phase number (1-6)
 
-## Run Directory
+## Session Files (Context Management)
 
-Each run gets: `.factory/pipeline/<run-id>/`
+All phase artifacts live in Obsidian at `factory/<run-id>/` via `/obsidian:factory`. This is the central design principle — **no phase output returns to the orchestrator's context**.
 
-Every phase writes its output here. `status.json` tracks the run.
+- Sub-agents **write** their findings to individual session files
+- Each phase ends with a **synthesis agent** that reads individual files and produces a `<phase>-synthesis.md`
+- The next phase's agents **read** the synthesis file directly
+- The orchestrator only knows file names, never file contents
+
+**File naming:** `<phase>-<agent-id>-<description>.md`
+
+```
+factory/<run-id>/
+  1-01-codebase-analysis.md     # Phase 1 agent output
+  1-02-web-research.md          # Phase 1 agent output
+  1-synthesis.md                # Phase 1 combined summary → Phase 2 reads this
+  2-spec.md                     # Phase 2 spec output → Phase 3 reads this
+  3-implement-log.md            # Phase 3 log → Phase 4 reads this
+  4-audit.md                    # Phase 4 results
+  status.md                     # Human-readable run status (also in Obsidian)
+```
+
+## Run Directory (Local)
+
+Each run also gets a local directory: `.factory/pipeline/<run-id>/`
+
+This holds `status.json` only — the machine-readable run state for resume/coordination.
 
 ### status.json schema
 ```json
@@ -35,12 +59,12 @@ Every phase writes its output here. `status.json` tracks the run.
   "started": "ISO-8601",
   "current_phase": 1,
   "phases": {
-    "1": { "name": "gather", "status": "pending", "output": "gather.md" },
-    "2": { "name": "spec", "status": "pending", "output": "spec.md" },
-    "3": { "name": "implement", "status": "pending", "output": "implement-log.md" },
-    "4": { "name": "audit", "status": "pending", "output": "audit.md" },
-    "5": { "name": "commit", "status": "pending", "output": "commit-log.md" },
-    "6": { "name": "pr", "status": "pending", "output": "pr.md" }
+    "1": { "name": "gather", "status": "pending" },
+    "2": { "name": "spec", "status": "pending" },
+    "3": { "name": "implement", "status": "pending" },
+    "4": { "name": "audit", "status": "pending" },
+    "5": { "name": "commit", "status": "pending" },
+    "6": { "name": "pr", "status": "pending" }
   },
   "result": null,
   "pr_url": null,
@@ -61,7 +85,6 @@ source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
 Use this to:
 - **Avoid duplicate work** — if patrol already reported a fix for the same issue, check if it's sufficient before running a full pipeline
 - **Pick up context** — if a previous pipeline run paused with `action-needed` and has notes in the daily log, use that context when resuming
-- **Coordinate** — if multiple pipeline runs are in flight, the notification log shows what's already in progress
 
 This is advisory, not blocking — if the read fails, proceed normally.
 
@@ -69,85 +92,81 @@ This is advisory, not blocking — if the read fails, proceed normally.
 
 ### Phase 1 — Gather Context
 
-Spawn **Haiku subagents** in parallel to collect context:
+**Your role:** Classify the input type, spawn the right research agents, then spawn a synthesis agent.
 
-- **If issue URL:** fetch issue body, comments, labels, linked PRs, referenced files
-- **If description:** identify relevant files, existing patterns, test coverage, related code
-- **If spec file:** read it, extract scope, identify affected files — then skip to Phase 3
-- **If patrol-generated spec** (`.factory/specs/*`): read it, treat as a starter that Phase 2 will expand
+**Step 1 — Classify the input and determine research strategy:**
 
-Write `gather.md` with structured sections:
-- Problem statement
-- Affected files/areas (with paths)
-- Existing patterns to follow
-- Test coverage status
-- Success criteria
+| Input Type | Research Strategy |
+|---|---|
+| **Bug / error report** | Codebase-focused — spawn Haiku agents to search for affected files, trace the error, find related code patterns, check test coverage |
+| **Feature request / enhancement** | Codebase + web — spawn agents to find relevant existing code AND agents to web search for patterns, libraries, prior art |
+| **Spec file** | Skip to Phase 3 — write the spec path to `1-synthesis.md` and mark Phase 1 + 2 as skipped |
+| **Patrol starter spec** (`.factory/specs/*`) | Read the starter, spawn agents to fill gaps — codebase search for affected areas, web search if the starter references external concerns |
+| **Complex / ambiguous input** | Use `/research:orderings` — spawn an autonomous sub-agent running the research skill for multi-angle investigation. This is rare — only for inputs where the problem space itself is unclear. |
 
-**Gate:** gather.md must contain a concrete problem statement and at least one affected file path. If the input is too vague, **pause the run** — don't guess.
+**Step 2 — Spawn research agents in parallel.** Each agent writes its findings via `/obsidian:factory`:
+
+```
+Session: <run-id>
+File: 1-<agent-num>-<description>.md
+```
+
+Tell each agent: the session ID, which file to write to, and what to research. Do NOT read their results back.
+
+**Step 3 — Spawn a synthesis agent.** Tell it to:
+1. Read all `1-*.md` files in the session (via `/obsidian:factory` list + read)
+2. Combine into a single `1-synthesis.md` with sections: Problem Statement, Affected Files/Areas, Existing Patterns, Test Coverage, Success Criteria
+3. Write `1-synthesis.md` via `/obsidian:factory`
+
+**Gate:** Read ONLY the synthesis agent's completion status (success/fail). If it reports the synthesis lacks a concrete problem statement or file paths → **pause the run**. Do not read the synthesis file yourself.
 
 ### Phase 2 — Spec
 
-Using `gather.md`, autonomously generate a spec. This is NOT an interactive interview — you have the context, write the spec.
+**Your role:** Spawn a single autonomous sub-agent that runs `/spec:developer` in `/autonomous-mode`.
 
-Write `spec.md` with:
-- **Problem:** What's broken or missing (from gather)
-- **Approach:** How to fix/build it (your recommendation)
-- **Files to modify:** Specific paths with what changes in each
-- **Acceptance criteria:** Testable conditions (not vague "it works")
-- **Edge cases / risks:** What could go wrong
-- **Out of scope:** What this does NOT address
+Spawn one sub-agent with these instructions:
+- Run `/spec:developer` in `/autonomous-mode`
+- Read `factory/<run-id>/1-synthesis.md` via `/obsidian:factory` for full context
+- When `/spec:developer` asks questions, answer them yourself using the synthesis content and your best judgment — you are operating autonomously
+- Write the final spec to `factory/<run-id>/2-spec.md` via `/obsidian:factory`
+- Also write the spec to a local file at `.factory/pipeline/<run-id>/spec.md` so Phase 3 has a local copy for `/spec:implement`
 
-**Gate:** spec.md must have:
-- At least one concrete file path in "Files to modify"
-- At least one testable acceptance criterion
-- If the problem is too ambiguous to spec confidently, **pause the run** and notify via `/factory:notify` with severity `action-needed`
+The sub-agent handles the entire spec conversation internally. The orchestrator receives only a completion signal.
+
+**Gate:** Verify `2-spec.md` was written (via `/obsidian:factory` list). If the sub-agent reports it couldn't produce a spec (ambiguity it couldn't resolve autonomously) → **pause the run** and notify via `/factory:notify` with severity `action-needed`.
 
 ### Phase 3 — Implement
 
-1. Create feature branch: `factory/<run-id>`
-2. Analyze the spec for sections and dependencies between them
-3. Group into waves (Wave 1: no dependencies, Wave 2: depends on Wave 1, etc.)
-4. Execute wave by wave:
-   - Spawn one subagent per independent section (all within a wave run in parallel)
-   - Each subagent gets: the spec section + relevant file contents + patterns from gather.md
-   - Collect results, verify no conflicts between subagent outputs
-5. After all waves complete, write `implement-log.md`:
-   - Files modified and why
-   - Decisions made during implementation
-   - Any deviations from spec (with rationale)
+**Your role:** Create the feature branch, then spawn a single autonomous sub-agent that runs `/spec:implement` in `/autonomous-mode`.
 
-**Gate:** Every file listed in spec's "Files to modify" must be either modified or explicitly explained as unnecessary. If implementation hits a blocker (missing dependency, ambiguous requirement, conflicting code), **pause the run**.
+1. Create feature branch: `factory/<run-id>`
+2. Spawn one sub-agent with these instructions:
+   - Run `/spec:implement` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
+   - Read `factory/<run-id>/1-synthesis.md` via `/obsidian:factory` for additional context on patterns and conventions
+   - Let `/spec:implement` handle wave-based parallel execution internally
+   - When done, write a summary to `factory/<run-id>/3-implement-log.md` via `/obsidian:factory`: files modified, decisions made, deviations from spec
+   - Use `/git:commit` for commits (the spec:implement skill handles this)
+
+**Gate:** Check git status on the feature branch — files should be modified and committed. If the sub-agent reports a blocker → **pause the run**.
 
 ### Phase 4 — Audit
 
-Run an audit cycle against the spec:
+**Your role:** Spawn a single autonomous sub-agent that runs `/spec:audit` in `/autonomous-mode`.
 
-1. Spawn **Haiku subagents** — one per spec section — to verify implementation:
-   - Does the code match the spec?
-   - Are acceptance criteria met?
-   - Any placeholders, TODOs, console.logs, or stubs?
-   - Flag: `missing` | `incomplete` | `placeholder` | `incorrect`
+Spawn one sub-agent with these instructions:
+- Run `/spec:audit` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
+- `/spec:audit` handles: parallel audit agents, issue detection, fix agents, re-audit
+- Also run the project's test suite if one exists (`npm test`, `pytest`, `go test ./...`, etc.)
+- Write results to `factory/<run-id>/4-audit.md` via `/obsidian:factory`: per-section pass/fail, issues found and fixed, test results, overall verdict (`pass` | `pass-with-warnings` | `fail`)
+- Use `/git:commit` for any fix commits
 
-2. **If the project has tests**, run them: `npm test`, `pytest`, `go test ./...`, etc. Test failure = critical issue.
-
-3. If issues found:
-   - Spawn fix subagents (one per issue, parallel)
-   - Re-run the audit checks that failed
-   - If issues persist after one fix cycle, **pause the run**
-
-Write `audit.md`:
-- Per-section pass/fail
-- Issues found and fixes applied
-- Test results
-- Overall: `pass` | `pass-with-warnings` | `fail`
-
-**Gate:** Zero critical issues. Zero test failures. Warnings logged but don't block. `fail` status = pause the run.
+**Gate:** Check the sub-agent's completion status. If it reports `fail` (critical issues or test failures persisting after fix cycle) → **pause the run**. `pass-with-warnings` is acceptable — proceed.
 
 ### Phase 5 — Commit
 
-Invoke `/git:commit` for all changes on the feature branch.
+Invoke `/git:commit` for any remaining uncommitted changes on the feature branch.
 
-Write `commit-log.md`:
+Write `commit-log.md` locally to `.factory/pipeline/<run-id>/`:
 - Commit hash
 - Commit message
 - Files included
@@ -160,14 +179,9 @@ Invoke `/git:pr` to create the pull request.
 
 Enrich the PR body with:
 - Link to original issue (if applicable)
-- Summary from spec
-- Audit results summary (pass/pass-with-warnings)
+- Read `factory/<run-id>/2-spec.md` summary section (this is the ONE time you read a session file — to build the PR description)
+- Audit verdict from the sub-agent's completion report
 - `Pipeline run: <run-id>` for traceability
-
-Write `pr.md`:
-- PR URL
-- PR number
-- Title
 
 Update `status.json` with `pr_url` and `result: "success"`.
 
@@ -179,11 +193,11 @@ When resuming (explicit `--resume` or run directory detected):
 
 1. Read `status.json`
 2. Find the last phase with status `complete`
-3. Verify its output file exists and has content
-4. Start from the next phase
+3. Use `/obsidian:factory` list to verify session files exist for completed phases
+4. Start from the next phase — sub-agents read the prior phase's synthesis files directly
 5. If a phase is `failed` or `paused`:
-   - Read its output file for context on what went wrong
-   - Re-run that phase from scratch (the output file will be overwritten)
+   - The session files contain what went wrong
+   - Re-run that phase from scratch
    - If the same phase fails twice, stop and report
 
 ## Pause Behavior
@@ -194,6 +208,15 @@ When a phase gate fails and the run pauses:
 3. Invoke `/factory:notify` with severity `action-needed` and the reason
 4. Stop execution — don't attempt subsequent phases
 5. The user can resume later with `--resume <run-id>` after addressing the issue
+
+## Orchestrator Discipline
+
+You are a coordinator, not a worker. Follow these rules strictly:
+
+- **Never read phase output files yourself** (except Phase 6 reading the spec summary for PR description). Sub-agents read what they need.
+- **Never pass content between phases in your context.** Tell agents which files to read; don't read and re-tell.
+- **Sub-agents are autonomous.** Spawn them with clear instructions (session ID, files to read, files to write, skill to run) and wait for completion status only.
+- **Your context should contain:** status.json state, file names, phase gate results, sub-agent completion signals. Nothing else.
 
 ## Gotchas
 
@@ -207,4 +230,6 @@ When a phase gate fails and the run pauses:
 - **Rate limit PR creation.** If running multiple pipelines concurrently, stagger PR creation so reviewers aren't flooded.
 - **Keep the run directory.** Even after success. It's the audit trail. Clean up with a separate command, not automatically.
 - **Clean up branches on hard failure.** If a run fails permanently and won't be resumed, delete the feature branch. But keep the run directory for debugging.
-- **The spec:developer interview won't work here.** That skill is interactive. Phase 2 must be autonomous — generate the spec from available context without asking questions. If context is insufficient, pause.
+- **`/spec:developer` IS interactive — that's fine.** The autonomous sub-agent answers its questions using the synthesis context. The orchestrator never sees the conversation.
+- **`/research:orderings` is expensive.** Only use for genuinely ambiguous inputs where the problem space itself is unclear. Most bugs and features don't need it.
+- **Obsidian is the source of truth for phase artifacts.** The local `.factory/pipeline/<run-id>/` directory holds only `status.json` and the spec file (local copy for `/spec:implement`). Everything else is in Obsidian.
