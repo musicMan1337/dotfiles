@@ -1,6 +1,6 @@
 # Git Commits
 
-**All commits MUST use the `/git-commit` command.** When any other command, skill, or workflow wants to create a commit, it must invoke `/git-commit` rather than committing directly. This ensures the proper pre-commit lint checks and formatting rules are always applied.
+**All commits MUST use the `/git:commit` command.** When any other command, skill, or workflow wants to create a commit, it must invoke `/git:commit` rather than committing directly. This ensures the proper pre-commit lint checks and formatting rules are always applied.
 
 # Subagent Strategy
 
@@ -12,3 +12,9 @@
 - **Web search tool selection — use contextual reasoning:**
   - **Use Exa MCP** (`mcp__exa__*`) for **targeted, precise lookups** — when you know exactly what you're looking for and need detailed, accurate content from specific sources (e.g., fetching specific documentation, pulling a known API reference, researching a particular library or tool). Typically 1–2 subagents max. Exa has limited monthly credits, so use it deliberately.
   - **Use WebSearch/WebFetch** for **broad, exploratory research** — when sending many researcher subagents to scour the web in parallel, gather general information, or survey a topic widely. These have no credit cost and are better suited for high-volume, discovery-oriented searches.
+
+# Repo Locations
+
+If it exists, read `LOCATIONS.md` next to this file for a map of repos and services on this machine. Use it to find project paths without searching.
+
+When you create or discover a new repo, add it to `LOCATIONS.md`. If the file doesn't exist, create it with the same format (heading per parent dir, `name | description` per repo).

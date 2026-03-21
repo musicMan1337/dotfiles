@@ -1,7 +1,8 @@
 ---
+name: git:commit
 model: haiku
 allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Bash(npm run lint:*), Bash(npx prettier:*)
-description: Create a git commit
+description: Create a git commit with lint checks. Triggers on: commit, save changes, commit this, git commit
 ---
 
 ## Context

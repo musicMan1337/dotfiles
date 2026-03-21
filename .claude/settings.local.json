@@ -6,7 +6,10 @@
       "Bash(powershell.exe -Command \"\n  @\\('settings.json','commands\\\\git-commit.md','commands\\\\allow-node.md','commands\\\\open-repo.md','commands\\\\spec-advisor.md','commands\\\\spec-audit.md','commands\\\\spec-developer.md','commands\\\\spec-implement.md','commands\\\\toggle-costs.md','scripts\\\\open-repo-mac.sh','scripts\\\\open-repo-windows.ps1','scripts\\\\open-repo-wsl.sh','scripts\\\\statusline-command.sh','scripts\\\\statusline-costs.jq','scripts\\\\toggle-costs.sh'\\) | ForEach-Object {\n    \\\\$p = Join-Path \\\\$env:USERPROFILE '.claude' \\\\$_\n    \\\\$exists = Test-Path \\\\$p\n    \\\\$target = if \\(\\\\$exists\\) { \\(Get-Item \\\\$p\\).Target } else { 'MISSING' }\n    '{0}: {1} -> {2}' -f \\\\$_, \\\\$exists, \\\\$target\n  }\n\")",
       "Bash(echo '{}' | bash \"$HOME/.claude/scripts/statusline-command.sh\" 2>&1 | head -5)",
       "Bash(echo \"HOME=$HOME\")",
-      "Bash(echo '{}' | bash /c/Users/Admin/.claude/scripts/statusline-command.sh 2>&1 | head -5)"
+      "Bash(echo '{}' | bash /c/Users/Admin/.claude/scripts/statusline-command.sh 2>&1 | head -5)",
+      "Bash(bash \"$HOME/.claude/hooks/sync-theme.sh\")",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(ln:*)"
     ]
   }
 }

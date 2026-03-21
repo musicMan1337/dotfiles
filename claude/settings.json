@@ -35,6 +35,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/sync-theme.sh\""
+          },
+          {
+            "type": "command",
             "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\""
           }
         ]

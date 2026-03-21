@@ -123,6 +123,8 @@ done
 shopt -s nullglob
 for TARGET in "$HOME/dotfiles/claude/commands"/*; do
   BASENAME=$(basename "$TARGET")
+  # Skip local-only folders (machine-specific, not symlinked)
+  [[ "$BASENAME" == "dev" ]] && continue
   check_and_create_link "$HOME/.claude/commands/$BASENAME" "$TARGET"
 done
 

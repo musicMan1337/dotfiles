@@ -1,0 +1,128 @@
+---
+name: obsidian:briefing
+model: haiku
+description: Morning briefing — show where you left off, open follow-ups, pending reviews, and draft today's standup plan. Triggers on: briefing, morning briefing, start my day, where did I leave off, what's on my plate, daily briefing
+---
+
+# Daily Briefing
+
+Generate a morning context-restore by pulling from Obsidian notes, GitHub, and Claude session history. Then draft today's standup entry.
+
+## Input
+
+**Request:** $ARGUMENTS
+
+No args needed — defaults to "brief me for today". The user might also say:
+- "briefing for monday" (if catching up after a weekend)
+- "what did I miss yesterday"
+
+## Step 1 — Gather context (parallel)
+
+Run these in parallel to collect all the data:
+
+### A. Yesterday's standup (what was done)
+```bash
+source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+```
+Use yesterday's date (or last workday if today is Monday).
+
+If no standup file exists for yesterday, run the extraction script to generate one:
+```bash
+node ~/.claude/commands/obsidian-standup/lib/extract-sessions.js [YESTERDAY-DATE]
+```
+Then synthesize and write it following the same format as `/obsidian-standup` (numbered headers with sub-bullets, outcome-focused). Write it to Obsidian before proceeding.
+
+### B. Open follow-ups
+```bash
+source ~/.zprofile && obsidian read path="followups.md"
+```
+Filter to unchecked items (`- [ ]`). Flag any that are past their date as overdue.
+
+### C. Active investigations
+```bash
+source ~/.zprofile && obsidian search query="Status: Active" path="investigations"
+```
+Read any active investigation files to get their summaries.
+
+### D. PRs awaiting your review
+```bash
+gh pr list --search "is:open review-requested:musicMan1337" --json number,title,url,author,repository --limit 10
+```
+
+### E. Your open PRs (waiting on others)
+```bash
+gh pr list --author musicMan1337 --state open --json number,title,url,reviews --limit 10
+```
+
+## Step 2 — Present the briefing
+
+Show the user a structured summary:
+
+```
+## Yesterday
+[yesterday's standup bullets — read from or generated into standup file]
+
+## Open Follow-ups
+- [overdue items first, flagged]
+- [upcoming items]
+(or "None" if clear)
+
+## Active Investigations
+- [investigation name] — [status summary]
+(or "None" if clear)
+
+## PRs
+**Waiting for your review:**
+- #123 "Title" by @author
+
+**Your PRs waiting on others:**
+- #456 "Title" — [approved/changes requested/pending review]
+
+(or "None" for either)
+```
+
+## Step 3 — Draft today's plan
+
+Based on everything above, draft a "Today" section with planned bullets. Use judgment:
+- Overdue follow-ups become today items
+- PRs awaiting your review become today items
+- Active investigations carry forward
+- Open PRs that need attention carry forward
+- Leave room — don't over-schedule, 3-6 bullets is ideal
+
+Show the draft to the user and ask:
+1. If they want to change any bullets
+2. If they have **additions** — things not captured in Obsidian/GitHub (meetings, non-code tasks, things people mentioned in Slack/Teams)
+
+Iterate until the user is happy.
+
+## Step 4 — Write today's standup
+
+Write today's standup file combining yesterday's work and today's plan:
+
+```bash
+source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
+```
+
+**Format:**
+```
+## Yesterday
+
+[yesterday's bullets — copied from yesterday's standup file]
+
+---
+## Today
+
+[today's planned bullets from Step 3]
+```
+
+If today's standup file already exists, read it first and ask the user whether to overwrite or skip.
+
+## Gotchas
+
+- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **Monday morning:** Yesterday means Friday. Skip weekends unless the user explicitly asks about them.
+- **Don't fabricate plans.** Only draft today items from real signals (follow-ups, PRs, investigations, carry-over). If there's nothing, say so — the user will add their own.
+- **Yesterday's standup is the source of truth for "Yesterday".** Don't re-synthesize from session data if the file already exists — it was already reviewed and approved.
+- **The user's additions are the most important part.** The automated stuff is just a starting point. Always ask for additions before writing.
+- **gh CLI failures:** If GitHub is unreachable, skip the PR sections and note it. Don't block the whole briefing.

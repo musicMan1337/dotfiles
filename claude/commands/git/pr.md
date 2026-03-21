@@ -1,7 +1,8 @@
 ---
+name: git:pr
 model: haiku
 allowed-tools: Bash(gh pr:*), Bash(git log:*), Bash(git diff:*), Bash(git branch:*)
-description: Create a pull request for the current branch
+description: Create a pull request for the current branch. Triggers on: make a PR, open PR, create pull request, push and PR, submit PR
 ---
 
 ## Context

@@ -1,6 +1,7 @@
 ---
+name: research:orderings
 model: opus
-description: Research a topic using multiple context orderings to minimize gaps and false positives
+description: Research a topic using multiple context orderings to minimize gaps and false positives. Triggers on: deep research, research this thoroughly, investigate, multi-angle research, comprehensive research
 ---
 
 # research-orderings
@@ -146,6 +147,10 @@ Present the final synthesis to the user. You can lightly edit the synthesizer's 
 - **Don't over-iterate.** 2-3 cycles is usually sufficient. Diminishing returns set in quickly.
 - **Adapt ordering strategies to the domain.** Debugging logs need different orderings than research papers.
 
-## Next Step
+## Next Steps
 
-If the research produced actionable findings, you can run `/research-execute` to spawn sub-agents that act on the synthesis — implementing changes, applying fixes, or following through on recommendations. Pass optional notes to scope or prioritize the execution (e.g., `/research-execute focus on the auth changes only`).
+After presenting the final report, offer the user two follow-up options:
+
+1. **Document the findings:** Ask if they want to run `/obsidian-investigate` to log this research as an investigation note in Obsidian — capturing the key findings, dead ends, and open questions so they don't have to re-do this research later.
+
+2. **Act on the findings:** If the research produced actionable findings, mention they can run `/research-execute` to spawn sub-agents that implement changes, apply fixes, or follow through on recommendations.
