@@ -1,30 +1,26 @@
 ---
-name: factory:patrol
+name: factory:patrol:github
 model: opus
-description: Loopable monitoring patrol for scheduled execution. Scans sources (GitHub issues, CI, PR comments), triages findings, dispatches work. Designed for /loop. Triggers on: patrol, monitor, check for issues, scan for problems, factory patrol, run patrol
+description: GitHub patrol mode. Scans issues, CI failures, PR reviews, and Dependabot alerts. Triages and dispatches auto-fixes or starter specs. Designed for /loop. Triggers on: patrol github, github patrol, check github, scan github, check ci, check prs
 ---
 
-# Factory Patrol
+# Factory Patrol — GitHub Mode
 
-You are a monitoring agent running on a schedule. Scan sources, triage findings, dispatch work — then get out. Designed to be called repeatedly by `/loop` and **must be idempotent**: never re-process something you've already handled.
+Read `factory/patrol/SKILL_BASE.md` and internalize the shared lifecycle before proceeding. This mode extends the base with GitHub-specific scanning, triage, and dispatch.
 
-## State Management
+## Constants
 
-State lives in `.factory/patrol/` in the working directory (the target repo, NOT ~/dotfiles):
-
-- `state.json` — tracks processed item IDs and their dispositions
-- `log.md` — append-only patrol log
-
-**First run:** If `.factory/patrol/` doesn't exist, create it with an empty state:
-```json
-{ "processed": {}, "last_run": null, "ci_failure_counts": {} }
+```
+STATE_FILE = "github-state.json"
 ```
 
-**Every run:** Load state.json at start. Write it back at end. This is your memory between runs.
+## State Schema
 
-### state.json schema
+Extends the base `last_run` with GitHub-specific tracking:
+
 ```json
 {
+  "last_run": "ISO-8601 | null",
   "processed": {
     "<source>:<id>": {
       "disposition": "fixed|spec-created|skipped|deferred",
@@ -34,26 +30,13 @@ State lives in `.factory/patrol/` in the working directory (the target repo, NOT
       "pr": null
     }
   },
-  "last_run": "ISO-8601",
   "ci_failure_counts": {
     "<workflow>:<branch>": { "count": 2, "first_seen": "ISO-8601" }
   }
 }
 ```
 
-## Patrol Cycle
-
-### Phase 0 — Check Today's Notifications
-
-Before scanning, read today's factory note from Obsidian for context on what's already been reported:
-
-```bash
-source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
-```
-
-If the note exists, scan it for recently reported items (branches, issue numbers, run IDs). Use this to further filter duplicates beyond what state.json tracks — e.g., if pipeline already reported on issue #42 today, don't surface it again.
-
-If the note doesn't exist or the read fails, proceed normally — this is a dedup optimization, not a hard requirement.
+## Mode Phases
 
 ### Phase 1 — Scan Sources
 
@@ -102,34 +85,22 @@ For each new finding, classify:
 - Include: problem statement, relevant context from the issue, suggested approach, open questions
 - This is a *starter spec*, not a full spec — it's input for a human or `/factory:pipeline` later
 
-### Phase 4 — Log & Notify
+## Notify Threshold
 
-1. Update `state.json` with all newly processed items
-2. Append a run summary to `log.md`:
-   ```
-   ## Patrol Run — YYYY-MM-DD HH:MM
-   - Sources checked: issues, ci, prs, dependabot
-   - New items found: N
-   - Auto-fixed: N (branches: factory/patrol-fix-42, ...)
-   - Specs created: N
-   - Deferred: N
-   - Skipped (noise): N
-   ```
-3. **Only if actions were taken** (fixes or specs created), invoke `/factory:notify` with the summary
+- `action-needed` severity if auto-fixes were dispatched
+- `info` severity if only specs were created
+- Silent (no notify) if only deferrals/noise
 
-## Triage Rules (Hard Constraints)
+## Hard Constraints
 
 - **Never auto-fix:** auth/security code, payment logic, database migrations, CI/CD config, environment variables, secrets, deployment scripts
 - **Cap auto-fixes at 3 per run.** If more qualify, fix the 3 highest-severity ones and defer the rest. You'll run again soon.
-- **Default branch CI failures are higher priority** than feature branch failures
-- **When in doubt, defer.** A deferred item costs nothing — a bad auto-fix costs trust.
+- **Default branch CI failures are higher priority** than feature branch failures.
+- **Branches without PRs are intentional.** Patrol creates branches to preserve work, but PR creation is a human decision or a `/factory:pipeline` decision. No PR spam.
+- **Starter specs are intentionally incomplete.** They capture the problem and context, not the full solution. Don't over-spec — that's pipeline's job.
 
 ## Gotchas
 
-- **Idempotency is sacred.** If state.json says it's processed, don't touch it. Don't re-triage, don't re-evaluate. It's done.
 - **CI failures can be transient.** That's why you track `ci_failure_counts` and only act after 2+ occurrences. A single red run is not actionable.
 - **GitHub API rate limits.** The `gh` CLI handles auth, but don't make 100 API calls per patrol. The scan subagents should batch queries.
-- **State file corruption.** If state.json can't be parsed, back it up as `state.json.bak`, create a fresh one, and log a warning. Don't crash the patrol.
-- **Don't patrol ~/dotfiles.** This runs in target project repos.
-- **Starter specs are intentionally incomplete.** They capture the problem and context, not the full solution. Don't over-spec in patrol — that's pipeline's job.
-- **Branches without PRs are intentional.** Patrol creates branches to preserve work, but PR creation is a human decision or a `/factory:pipeline` decision. No PR spam.
+- **This mode requires a GitHub remote.** If `gh` commands fail (no remote, no auth), skip gracefully and log the error. Don't crash.
