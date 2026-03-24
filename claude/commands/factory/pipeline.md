@@ -31,6 +31,7 @@ Before starting any phase, detect which repo you're running in and set the dev s
 | `~/eBacon/Viper` (or subdirs) | `/dev:viper` | Playwright (frontend) + Viper MCP (backend) + sqlsrv + core | Browser automation, API requests, DB queries |
 | `~/eBacon/SQL` (or subdirs) | `/dev:sql` | sqlsrv MCP | Execute stored procedures, inspect tables |
 | `~/eBacon/Core` (or subdirs) | `/dev:core` | Core MCP | Start/stop API, fire requests, monitor logs |
+| `~/eBacon/snout` (or subdirs) | `/dev:snout` | Standard tools | Electron app dev, `npm start` / `npm test` |
 | Other repos | None | Standard tools only | Run test suites if available |
 
 **Store the detected dev skill in `status.json`** as `"dev_skill": "/dev:viper"` (or null) so sub-agents and resume runs use it consistently.
@@ -47,9 +48,11 @@ Before starting any phase, detect which repo you're running in and set the dev s
 
 This approach keeps the pipeline fast (most work is parallel) while using the dev skill where it matters most (catching runtime issues that code inspection misses).
 
-## Session Files (Context Management)
+## Run Directory
 
-All phase artifacts live in Obsidian at `factory/<run-id>/` via `/obsidian:factory`. This is the central design principle — **no phase output returns to the orchestrator's context**.
+**Everything for a run lives in a single directory:** `factory/<run-id>/` in the Obsidian vault (accessible via `/obsidian:factory`). This is both the artifact store AND the run state directory. There is no separate `.factory/pipeline/` directory.
+
+The `FACTORY_ROOT` environment variable points to the factory root (defaults to `$OBSIDIAN_VAULT/factory`). When triggered from Factory UI, the run directory is pre-created at `$FACTORY_ROOT/<run-id>/`.
 
 - Sub-agents **write** their findings to individual session files
 - Each phase ends with a **synthesis agent** that reads individual files and produces a `<phase>-synthesis.md`
@@ -60,20 +63,25 @@ All phase artifacts live in Obsidian at `factory/<run-id>/` via `/obsidian:facto
 
 ```
 factory/<run-id>/
+  status.json                   # Machine-readable run state (resume/coordination/UI)
+  attachments/                  # Files uploaded by user via Factory UI (if any)
+    spec.md                     # Example: user-provided spec document
+    design.md                   # Example: user-provided design doc
   1-01-codebase-analysis.md     # Phase 1 agent output
   1-02-web-research.md          # Phase 1 agent output
   1-synthesis.md                # Phase 1 combined summary → Phase 2 reads this
   2-spec.md                     # Phase 2 spec output → Phase 3 reads this
   3-implement-log.md            # Phase 3 log → Phase 4 reads this
   4-audit.md                    # Phase 4 results
-  status.md                     # Human-readable run status (also in Obsidian)
+  5-commit-log.md               # Phase 5 commit details
+  events.jsonl                  # SDK event stream (written by Factory UI, not by this skill)
 ```
 
-## Run Directory (Local)
+### Attachments
 
-Each run also gets a local directory: `.factory/pipeline/<run-id>/`
+When triggered from Factory UI, users may upload files before launching the run. These are saved to `factory/<run-id>/attachments/`. Phase 1 research agents should **always check for and read files in the attachments/ folder** — they contain user-provided specs, plans, or context documents that inform the entire run.
 
-This holds `status.json` only — the machine-readable run state for resume/coordination.
+When triggered from CLI, there are no attachments (the user provides everything inline).
 
 ### status.json schema
 ```json
@@ -100,6 +108,13 @@ This holds `status.json` only — the machine-readable run state for resume/coor
 
 Phase statuses: `pending` → `running` → `complete` | `failed` | `skipped` | `paused`
 
+**CRITICAL: Update `status.json` at every phase transition.** The Factory UI watches this file to render phase progress in real-time. At minimum, update it:
+1. **Before starting a phase:** Set that phase to `running`, update `current_phase`
+2. **After completing a phase gate:** Set that phase to `complete` (or `failed`/`paused`)
+3. **On final completion:** Set `result` and `pr_url`
+
+Write `status.json` to `factory/<run-id>/status.json` (the same directory as all other artifacts). Use `/obsidian:factory` or write directly — either works since it's the same path.
+
 ## Pre-flight — Check Notifications
 
 Before starting (or resuming), read today's factory note from Obsidian for context:
@@ -119,6 +134,8 @@ This is advisory, not blocking — if the read fails, proceed normally.
 ### Phase 1 — Gather Context
 
 **Your role:** Classify the input type, spawn the right research agents, then spawn a synthesis agent.
+
+**Step 0 — Check for attachments.** List `factory/<run-id>/attachments/` (via `/obsidian:factory` or `ls`). If files exist, tell all research agents to read them — they contain user-provided specs, plans, or reference documents that should inform their research.
 
 **Step 1 — Classify the input and determine research strategy:**
 
@@ -143,6 +160,7 @@ Tell each agent: the session ID, which file to write to, and what to research. D
 1. Read all `1-*.md` files in the session (via `/obsidian:factory` list + read)
 2. Combine into a single `1-synthesis.md` with sections: Problem Statement, Affected Files/Areas, Existing Patterns, Test Coverage, Success Criteria
 3. Write `1-synthesis.md` via `/obsidian:factory`
+4. **Do NOT delete the individual `1-<agent-num>-*.md` research files.** They must be preserved — they serve as the audit trail and are viewable in the pipeline UI.
 
 **Gate:** Read ONLY the synthesis agent's completion status (success/fail). If it reports the synthesis lacks a concrete problem statement or file paths → **pause the run**. Do not read the synthesis file yourself.
 
@@ -155,7 +173,6 @@ Spawn one sub-agent with these instructions:
 - Read `factory/<run-id>/1-synthesis.md` via `/obsidian:factory` for full context
 - When `/spec:developer` asks questions, answer them yourself using the synthesis content and your best judgment — you are operating autonomously
 - Write the final spec to `factory/<run-id>/2-spec.md` via `/obsidian:factory`
-- Also write the spec to a local file at `.factory/pipeline/<run-id>/spec.md` so Phase 3 has a local copy for `/spec:implement`
 
 The sub-agent handles the entire spec conversation internally. The orchestrator receives only a completion signal.
 
@@ -167,7 +184,7 @@ The sub-agent handles the entire spec conversation internally. The orchestrator 
 
 1. Create feature branch: `factory/<run-id>`
 2. Spawn one sub-agent with these instructions:
-   - Run `/spec:implement` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
+   - Run `/spec:implement` in `/autonomous-mode` against the spec at `factory/<run-id>/2-spec.md`
    - Read `factory/<run-id>/1-synthesis.md` via `/obsidian:factory` for additional context on patterns and conventions
    - **If a dev skill is detected** (see Repo Detection above):
      - **Do all code implementation first using parallel waves.** Write all the code changes across all spec sections using `/spec:implement`'s normal parallel execution. No MCP usage during this phase of work — maximize parallelism.
@@ -186,7 +203,7 @@ The sub-agent handles the entire spec conversation internally. The orchestrator 
 **Your role:** Spawn a single autonomous sub-agent that runs `/spec:audit` in `/autonomous-mode` with the appropriate dev skill for live verification.
 
 Spawn one sub-agent with these instructions:
-- Run `/spec:audit` in `/autonomous-mode` against the spec at `.factory/pipeline/<run-id>/spec.md`
+- Run `/spec:audit` in `/autonomous-mode` against the spec at `factory/<run-id>/2-spec.md`
 - **If a dev skill is detected:**
   - **First pass — parallel code audit.** Run `/spec:audit`'s normal parallel audit agents for code-level checks: does code match spec? Are acceptance criteria implemented? Any TODOs, placeholders, stubs? This pass uses NO MCP — pure code inspection, fully parallel.
   - **If issues found in code audit:** spawn parallel fix agents to resolve them. Code fixes don't need MCP. Re-audit the fixed sections (still parallel, still code-only).
@@ -203,7 +220,7 @@ Spawn one sub-agent with these instructions:
 
 Invoke `/git:commit` for any remaining uncommitted changes on the feature branch.
 
-Write `commit-log.md` locally to `.factory/pipeline/<run-id>/`:
+Write `factory/<run-id>/5-commit-log.md` via `/obsidian:factory`:
 - Commit hash
 - Commit message
 - Files included
@@ -228,7 +245,7 @@ Invoke `/factory:notify` with severity `info` and the PR link.
 
 When resuming (explicit `--resume` or run directory detected):
 
-1. Read `status.json`
+1. Read `factory/<run-id>/status.json`
 2. Find the last phase with status `complete`
 3. Use `/obsidian:factory` list to verify session files exist for completed phases
 4. Start from the next phase — sub-agents read the prior phase's synthesis files directly
@@ -269,7 +286,7 @@ You are a coordinator, not a worker. Follow these rules strictly:
 - **Clean up branches on hard failure.** If a run fails permanently and won't be resumed, delete the feature branch. But keep the run directory for debugging.
 - **`/spec:developer` IS interactive — that's fine.** The autonomous sub-agent answers its questions using the synthesis context. The orchestrator never sees the conversation.
 - **`/research:orderings` is expensive.** Only use for genuinely ambiguous inputs where the problem space itself is unclear. Most bugs and features don't need it.
-- **Obsidian is the source of truth for phase artifacts.** The local `.factory/pipeline/<run-id>/` directory holds only `status.json` and the spec file (local copy for `/spec:implement`). Everything else is in Obsidian.
+- **Single directory per run.** Everything lives in `factory/<run-id>/` — artifacts, status.json, attachments. There is no separate `.factory/pipeline/` directory. This directory IS in Obsidian, and IS what Factory UI reads.
 - **MCP serialization is non-negotiable.** Two agents hitting the same MCP simultaneously WILL cause failures — corrupted API state, conflicting DB writes, browser session collisions. Parallel code changes are fine; parallel MCP usage is not.
 - **Dev skill environments can drift between phases.** Core may need a restart if Phase 3 changed code. Viper session cookies expire. SQL sprocs need to be deployed before they can be executed. Phase 4 sub-agents must re-initialize the dev environment, don't assume Phase 3 left it in a good state.
 - **Dev skill gotchas are critical.** Each `/dev:*` skill has a gotchas section with hard-won repo-specific knowledge. Sub-agents must read and follow these — e.g., Core takes up to 120s to start, SQL hits a real stage database (writes persist!), Viper needs `source ~/.zprofile` before certain commands.

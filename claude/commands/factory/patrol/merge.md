@@ -6,7 +6,7 @@ description: Auto-merge patrol. Watches open PRs and merges them as soon as CI p
 
 # Factory Patrol — Merge Mode
 
-Read `factory/patrol/SKILL_BASE.md` and internalize the shared lifecycle before proceeding. This mode extends the base with PR merge watching — a **finite mode** that terminates when all watched PRs are merged.
+Read `factory/patrol/SKILL_BASE.txt` and internalize the shared lifecycle before proceeding. This mode extends the base with PR merge watching — a **finite mode** that terminates when all watched PRs are merged.
 
 ## Constants
 

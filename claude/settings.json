@@ -1,7 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash ~/.claude/scripts/toggle-costs.sh)"
+      "Bash(*)",
+      "Read(**)",
+      "Edit(**)",
+      "Write(**)",
+      "Grep(**)",
+      "Glob(**)",
+      "WebSearch",
+      "WebFetch(*)",
+      "Skill(*)",
+      "mcp__*"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(dd *)",
+      "Bash(diskutil erase*)",
+      "Bash(diskutil partitionDisk*)",
+      "Bash(shutdown*)",
+      "Bash(reboot*)"
     ]
   },
   "hooks": {
@@ -56,6 +75,6 @@
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true
 }

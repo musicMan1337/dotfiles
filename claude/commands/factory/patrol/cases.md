@@ -6,7 +6,7 @@ description: Case system patrol mode. Scans assigned cases via sqlsrv MCP, check
 
 # Factory Patrol — Case Mode
 
-Read `factory/patrol/SKILL_BASE.md` and internalize the shared lifecycle before proceeding. This mode extends the base with case-system-specific scanning, triage, and output.
+Read `factory/patrol/SKILL_BASE.txt` and internalize the shared lifecycle before proceeding. This mode extends the base with case-system-specific scanning, triage, and output.
 
 ## Constants
 

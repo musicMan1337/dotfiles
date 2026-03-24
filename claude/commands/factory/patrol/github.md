@@ -6,7 +6,7 @@ description: GitHub patrol mode. Scans issues, CI failures, PR reviews, and Depe
 
 # Factory Patrol — GitHub Mode
 
-Read `factory/patrol/SKILL_BASE.md` and internalize the shared lifecycle before proceeding. This mode extends the base with GitHub-specific scanning, triage, and dispatch.
+Read `factory/patrol/SKILL_BASE.txt` and internalize the shared lifecycle before proceeding. This mode extends the base with GitHub-specific scanning, triage, and dispatch.
 
 ## Constants
 
