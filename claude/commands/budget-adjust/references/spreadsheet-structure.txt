@@ -1,0 +1,90 @@
+# Boo Boo Budget — Spreadsheet Structure
+
+## File Locations
+
+- **Excel:** `/Users/derek/eBacon/obsidian/eBacon/finances/boo boo budget.xlsx`
+- **Markdown:** `/Users/derek/eBacon/obsidian/eBacon/finances/Boo Boo Budget.md`
+- **Sheet name:** `Budget (Updated)` (first sheet)
+
+## Account Architecture
+
+```
+Net Pay ($2,801.11/check)
+  ├── Ally ($1,820.00/check) — mammoth17@gmail.com
+  │     ├── Housing (sub-account)
+  │     ├── Auto & Debt (sub-account)
+  │     ├── Savings (sub-account)
+  │     └── Lion (sub-account) — cabanilla.km@gmail.com
+  │           └── Subscriptions (detail breakdown)
+  ├── Doge ($150.00/check) — single account, pets
+  └── Wells Fargo (remainder) — day-to-day spending
+        ├── Fixed (groceries, credit cards)
+        └── Discretionary (travel, dining, entertainment, etc.)
+```
+
+## Column Layout (3-column, 4 cells wide each)
+
+| Columns | Account | Sections |
+|---------|---------|----------|
+| A-D (1-4) | Income | Gross, Pre-Tax, After-Tax, Taxes, Deposit Split |
+| F-I (6-9) | Ally + Lion | Housing, Auto & Debt, Savings, then arrow row, then Lion + Subscriptions |
+| K-N (11-14) | Doge, then Wells Fargo (6-row gap between) | Pet Expenses, then Fixed + Discretionary + Unallocated |
+
+Spacer columns: E (5), J (10)
+
+## Section → Account Mapping
+
+When user says "add to ally", determine the right sub-section:
+- **Housing**: rent, insurance, water, electricity, internet, trash, pest control, utilities, parking, admin
+- **Auto & Debt**: car payment, car maintenance, debt, loans
+- **Savings**: presents, savings
+- **Lion**: gas, car insurance, verizon, phone, subscriptions (anything that's Lion's responsibility)
+- **Doge**: pet insurance, pet food, heartworm, pet-related expenses
+- **Wells Fargo Fixed**: groceries, credit cards, regular bills
+- **Wells Fargo Discretionary**: travel, computers, dining, entertainment, allowance, subscriptions (personal)
+
+If ambiguous, ask the user which section.
+
+## Formula Structure
+
+All expense tables follow this pattern:
+- **Column layout**: Label | Monthly | Per Check | Notes
+- **Per Check formula**: `=Monthly/2` (monthly column divided by 2)
+- **Sub-totals**: `=SUM(item rows)` for both Monthly and Per Check columns
+- **Grand totals**: `=SUM(sub-total rows)` across sub-sections
+
+Income column:
+- **Salary**: Annual is hardcoded ($107,000), Per Check = `=Annual/24`
+- **Pre-tax/After-tax/Tax totals**: `=SUM(item rows)` for Per Check column
+- **Tax % total**: `=Total Taxes / Gross Per Check`
+- **Total Take-Home**: `=Gross - PreTax - AfterTax - Taxes`
+- **Wells Fargo deposit**: `=Take-Home - Ally deposit - Doge deposit`
+- **Unallocated**: `=Wells Fargo deposit - Fixed total - Discretionary total`
+
+## How to Add an Expense Row
+
+Adding a row requires regenerating the affected table because inserting rows in openpyxl with merged cells and formulas is fragile. The recommended approach:
+
+1. Read the current Excel file with `openpyxl` (data_only=False to preserve formulas)
+2. Identify which section the new expense belongs to
+3. Use `lib/budget-regen.py` to regenerate the entire sheet with the new data
+4. Regenerate the markdown file from the same data
+
+## How to Update Salary
+
+Salary changes require a paystub because tax withholding amounts change with salary. The process:
+1. User provides a paystub PDF
+2. Read the PDF to extract: gross per check, all tax line items, all deduction line items
+3. Update the salary (annual) cell
+4. Update all tax amounts
+5. Update all deduction amounts
+6. Formulas recalculate everything else
+
+## Markdown Sync
+
+The markdown file must mirror the Excel data. After any Excel change, regenerate the markdown. The markdown structure:
+
+1. Income section (gross, deductions, taxes, deposit split)
+2. Ally Account (housing, auto & debt, savings, lion + subscriptions)
+3. Doge Account (pet expenses)
+4. Wells Fargo (fixed, discretionary, unallocated)
