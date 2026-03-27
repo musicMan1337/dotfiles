@@ -13,6 +13,8 @@ You are an expert skill architect. Your job is to create high-quality, effective
 
 If no arguments were provided, ask the user what they want to create and what problem it solves.
 
+If the current conversation already contains a workflow the user wants to capture (e.g., "turn this into a skill"), extract answers from conversation history first — tools used, sequence of steps, corrections the user made, input/output formats observed. Present what you extracted and let the user fill gaps before proceeding.
+
 ## Command vs Skill — Know Which to Build
 
 There are two distinct things you can create. **Classify the request before doing anything else.**
@@ -183,9 +185,20 @@ The description in frontmatter is how Claude decides when to trigger it. Write i
 **Bad:** "A comprehensive tool for monitoring pull request status across the deployment lifecycle"
 **Good:** "Monitors a PR until it merges. Triggers on: babysit, watch CI, make sure this lands, track PR"
 
+Claude tends to **undertrigger** skills — it won't use them when it should. Combat this by making descriptions slightly aggressive. Include explicit scenarios and adjacent phrasings. Instead of "Build dashboards for data", write "Build dashboards for data. Use whenever the user mentions dashboards, data visualization, metrics display, or wants to show any kind of data visually, even if they don't say 'dashboard'."
+
 ### 5. One Job, One Entry Point
 
 Each command or skill should do one thing well. If combining unrelated tasks, split them into separate complementary pieces that can call each other.
+
+### 6. Progressive Disclosure & Sizing
+
+Skills use a three-level loading system — design for it:
+1. **Metadata** (name + description) — always in context. Keep under ~100 words.
+2. **SKILL.md body** — loaded when skill triggers. Keep under 500 lines. If approaching this limit, move content into reference files and point to them.
+3. **Bundled resources** (scripts/, references/, assets/) — loaded on demand. No size limit. Scripts can execute without being loaded into context.
+
+For large reference files (>300 lines), include a table of contents. When a skill supports multiple domains/frameworks, organize by variant (e.g., `references/aws.md`, `references/gcp.md`) so Claude reads only the relevant one.
 
 ## Process
 
@@ -199,10 +212,12 @@ Before creating anything, understand:
 
 If the user provided a transcript, article, or reference material: extract the key insights, techniques, and non-obvious lessons. Don't summarize; distill into actionable guidance that shifts behavior.
 
-If the intent is unclear, use AskUserQuestion to interview the user about:
+If the intent is unclear, interview the user about:
 - Specific examples of good and bad outputs they've seen
 - Gotchas they've encountered in this domain
 - What they wish Claude did differently by default
+
+Check available MCPs — if useful for research (searching docs, finding similar skills, looking up best practices), research in parallel via subagents to reduce burden on the user.
 
 ### Step 2 — Classify: Command or Skill
 
@@ -243,12 +258,60 @@ Before presenting, verify:
 - [ ] Is data persistence set up if needed?
 - [ ] Are hooks defined if security matters?
 
-### Step 5 — Present and Write
+### Step 5 — Place and Commit
 
 1. Show the user: classification (command vs skill), proposed structure, and content
 2. Ask if they want adjustments
-3. Write files to `$HOME/dotfiles/claude/commands/`
-4. If hooks or permissions are needed, mention what to add to settings
+3. Ask where it should live:
+
+| Scope | Path | Use when |
+|-------|------|----------|
+| **Source-controlled** | `~/dotfiles/claude/commands/` | Personal skills to version-control and sync across machines |
+| **Global** | `~/.claude/commands/` | Available everywhere but not version-controlled — experiments, machine-specific tools |
+| **Local** | `.claude/commands/` (project root) | Project-specific skills shared via the repo |
+
+4. Write the files to the chosen location
+5. If hooks or permissions are needed, mention what to add to settings
+6. If the destination is a git repo, use `/git:commit`
+
+## Testing & Iteration
+
+After writing the skill, offer to test it. The default path is lightweight:
+
+1. Come up with 2-3 realistic test prompts — things a real user would actually say. Share them for approval.
+2. Run each prompt via a subagent with the skill loaded. Run in parallel when possible.
+3. Review outputs with the user. "How does this look? Anything you'd change?"
+4. If improvements are needed, revise and rerun.
+
+### How to Think About Improvements
+
+- **Generalize from feedback.** You're iterating on a few examples to move fast, but the skill will be used across many prompts. Don't overfit — if a stubborn issue persists, try different approaches rather than adding rigid constraints.
+- **Keep the prompt lean.** Cut what isn't pulling its weight. If the skill makes Claude waste time on unproductive steps, remove those instructions.
+- **Explain the why.** LLMs respond better to reasoning than to rigid rules. If you find yourself writing ALWAYS or NEVER in all caps, reframe and explain the reasoning instead.
+- **Look for repeated work.** If every test run independently writes a similar helper script, that's a signal to bundle it in `scripts/` or `lib/`.
+
+Keep iterating until the user is satisfied, outputs look good across test cases, or you're not making meaningful progress.
+
+### Formal Eval Path (on request)
+
+For skills that warrant rigorous evaluation, escalate beyond the light path:
+
+1. For each test case, spawn two subagents: one with the skill, one without (baseline)
+2. Draft objectively verifiable assertions for each test case
+3. Grade each run against assertions
+4. Present results side-by-side and iterate
+
+This is overkill for most skills but valuable for high-stakes or widely-shared ones. Only use when the user requests it.
+
+### Description Optimization (on request)
+
+After a skill is working well, the trigger description can be tuned systematically. Generate 20 eval queries — a mix of should-trigger (8-10) and should-not-trigger (8-10):
+
+- **Should-trigger:** Different phrasings of the same intent — formal, casual, indirect. Include cases where the user doesn't name the skill but clearly needs it.
+- **Should-not-trigger:** Near-misses that share keywords but need something different. These should be genuinely tricky, not obviously irrelevant.
+- **All queries should be realistic** — include file paths, personal context, casual speech, abbreviations. Not abstract requests.
+
+Review the eval set with the user, test the current description against each query via `claude -p`, iterate on the description based on what misfires, and retest.
 
 ## Rules
 
@@ -260,3 +323,4 @@ Before presenting, verify:
 - **Keep it focused.** Suggest splitting if the user describes multiple unrelated capabilities.
 - **Extract signal from noise.** When given transcripts or articles, pull out non-obvious insights that actually shift behavior, not generic advice.
 - **Skills need scripts.** If a skill touches external APIs, pre-build the scripts. Don't let Claude re-discover API patterns every run — that's the whole point of making it a skill.
+- **Commit via `/git:commit`.** When writing to a git-tracked location, always use `/git:commit` to ensure pre-commit lint checks run.
