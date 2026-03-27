@@ -1,6 +1,6 @@
 ---
 name: research:orderings
-model: opus
+model: sonnet
 description: Research a topic using multiple context orderings to minimize gaps and false positives. Triggers on: deep research, research this thoroughly, investigate, multi-angle research, comprehensive research
 ---
 
@@ -34,13 +34,27 @@ This keeps bad context, failed attempts, and verbose material out of your main s
 
 If no arguments were provided, ask the user what they'd like researched, then proceed.
 
+## Model Tiers
+
+Use the right model for each role — don't burn Opus tokens on file lookups:
+
+| Role | Model | Why |
+|------|-------|-----|
+| **Orchestrator** (you) | Sonnet | Coordination and ordering design — no heavy reasoning needed |
+| **Scouts** (Phase 1) | **Haiku** | Pure file/web lookup, no analysis required |
+| **Workers** (Phase 3) | **Sonnet** | Research and reasoning — Sonnet handles this well at ~1/5 the cost |
+| **Synthesizer** (Phase 4) | **Opus** | Cross-referencing, contradiction detection, and nuanced judgment — this is where Opus matters |
+| **Follow-up workers** (Phase 5) | **Sonnet** | Same as initial workers |
+
+Set the `model` parameter explicitly on every Agent call. Never rely on inheritance — it defaults to Opus and wastes budget on scouts.
+
 ## Phase 1 — Scope and Gather (Scout)
 
-Spawn **explorer subagents** to understand the research landscape:
+Spawn **Haiku explorer subagents** to understand the research landscape. Scouts only read and locate — they don't analyze.
 
 1. **Understand the research question.** What exactly needs to be answered? What would a complete answer look like?
 
-2. **Identify research materials.** Dispatch scout subagents to locate relevant materials:
+2. **Identify research materials.** Dispatch Haiku scout subagents to locate relevant materials:
    - Files in the codebase (logs, source code, configs, docs)
    - Web sources to fetch
    - A combination of both
@@ -72,7 +86,7 @@ Write out your chosen orderings and briefly justify why each one is useful for t
 
 ## Phase 3 — Parallel Research (Workers)
 
-Spawn one Opus subagent per ordering. Each subagent gets a **fresh context window** — this is critical. Fresh context means fresh thinking, no pollution from prior work, and focused attention on its specific ordering.
+Spawn one **Sonnet** subagent per ordering. Each subagent gets a **fresh context window** — this is critical. Fresh context means fresh thinking, no pollution from prior work, and focused attention on its specific ordering.
 
 Each worker subagent receives:
 
@@ -92,7 +106,7 @@ The prompt to each subagent should include:
 
 ## Phase 4 — Synthesize (Synthesizer Subagent)
 
-**Do NOT synthesize in the main session.** Delegate synthesis to a dedicated Opus subagent with a fresh context window.
+**Do NOT synthesize in the main session.** Delegate synthesis to a dedicated **Opus** subagent with a fresh context window. This is the one phase that genuinely benefits from Opus — it must cross-reference multiple reports, detect contradictions, evaluate confidence levels, and identify positional bias. Use `model: "opus"` explicitly.
 
 The synthesizer subagent receives:
 - The original research question
@@ -113,10 +127,10 @@ Why delegate synthesis? Because the synthesizer gets a fresh perspective without
 
 Read the synthesizer's report. If it identifies significant gaps or contradictions:
 
-1. Design targeted follow-up worker subagents that focus specifically on the gaps
+1. Design targeted follow-up **Sonnet** worker subagents that focus specifically on the gaps
 2. Consider new orderings that place gap-related materials in attention-favored positions
 3. Spawn follow-up workers in parallel
-4. Delegate re-synthesis to a **new** synthesizer subagent (fresh context again)
+4. Delegate re-synthesis to a **new Opus** synthesizer subagent (fresh context again)
 
 Each cycle uses only the compact reports from your subagents, so your main orchestrator context grows slowly — you can comfortably run 2-3 cycles before context becomes a concern.
 
@@ -139,7 +153,7 @@ Present the final synthesis to the user. You can lightly edit the synthesizer's 
 
 - **You are a coordinator.** Do not read research materials or perform synthesis in the main session. Delegate everything to subagents.
 - **Always design orderings before spawning agents.** The ordering design is the intellectual core of this technique — it's the one thing the orchestrator does think deeply about.
-- **Use Opus subagents.** This is research that requires reasoning, not just lookup.
+- **Use tiered models.** Haiku for scouts, Sonnet for workers, Opus for synthesis only. Always set `model` explicitly on every Agent call — never rely on default inheritance.
 - **Maximize parallelism.** All orderings of the same phase run simultaneously.
 - **Keep main context clean.** Subagents return compact structured reports. Bad context from failed attempts stays trapped in the subagent's context and gets discarded — only the summary returns.
 - **Fresh context = fresh thinking.** Each subagent starts with a clean slate. This avoids the creativity/novelty degradation that occurs when a single context accumulates too much history.

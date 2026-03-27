@@ -52,7 +52,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # DISABLE_LS_COLORS="true"
 
 # Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
+DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
 # ENABLE_CORRECTION="true"
@@ -162,3 +162,11 @@ export PATH="$PATH:/Users/derek/.lmstudio/bin"
 
 # Created by `pipx` on 2026-03-05 15:44:03
 export PATH="$PATH:/Users/derek/.local/bin"
+
+# Set Ghostty tab title to current directory name
+function set_terminal_title() {
+    [[ -n "$GHOSTTY_RESOURCES_DIR" ]] && print -Pn '\e]0;%1~\a'
+}
+precmd_functions+=(set_terminal_title)
+chpwd_functions+=(set_terminal_title)
+export PATH=$PATH:$HOME/.maestro/bin

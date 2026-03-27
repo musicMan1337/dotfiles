@@ -15,6 +15,7 @@ Generate concise standup bullet points by scanning Claude Code session history, 
 - No args or "today" → scan today's sessions
 - "yesterday" → scan yesterday's sessions
 - A date like "2026-03-18" or "monday" → scan that day
+- "all day" / "the whole day" / "the entire day" / "full day" → pass `--start 0 --end 24` (no time filtering)
 - The user may also specify a custom time range. Look for phrases like:
   - "I worked until 6" / "worked until 8pm" / "ended at 21" → override end hour
   - "started at 4am" / "I was up early, started at 4" → override start hour

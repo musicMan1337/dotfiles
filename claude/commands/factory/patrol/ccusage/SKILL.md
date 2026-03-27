@@ -26,11 +26,11 @@ watcher.js (background) → usage-state.json → this patrol mode → /factory:n
 ## Constants
 
 ```
-WATCHER_STATE = "~/.claude/ccusage-watcher/usage-state.json"
-WATCHER_HISTORY = "~/.claude/ccusage-watcher/usage-history.jsonl"
-WATCHER_LOG = "~/.claude/ccusage-watcher/watcher.log"
-STATE_FILE = "ccusage-state.json"
-OUTPUT_FILE = "ccusage-summary.md"
+WATCHER_STATE = "~/.obsidian-vault/factory/ccusage/usage-state.json"
+WATCHER_HISTORY = "~/.obsidian-vault/factory/ccusage/usage-history.jsonl"
+WATCHER_LOG = "~/.obsidian-vault/factory/ccusage/watcher.log"
+STATE_FILE = ".factory/patrol/ccusage-state.json"
+OUTPUT_FILE = ".factory/patrol/ccusage-summary.md"
 STALE_THRESHOLD_MINUTES = 10
 ```
 
@@ -62,9 +62,19 @@ Extends the base `last_run` with alert tracking and watcher health:
 
 ## Mode Phases
 
+### Phase 0 — Obsidian Dedup Check (from base spec)
+
+Before scanning, read today's factory note for context on what's already been reported:
+
+```bash
+source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
+```
+
+Scan the note for session IDs and alert types already reported today. Use this to further filter duplicates beyond what the patrol state tracks. If the note doesn't exist or the read fails, proceed normally.
+
 ### Phase 1 — Watcher Health Check
 
-Read `~/.claude/ccusage-watcher/usage-state.json`. If the file:
+Read `~/.obsidian-vault/factory/ccusage/usage-state.json`. If the file:
 
 - **Does not exist:** Log warning, notify user to start watcher (`node ~/dotfiles/claude/commands/factory/patrol/ccusage/lib/ccusage-watcher.js`), exit this cycle. No-op.
 - **Exists but `lastUpdated` is >10 minutes stale:**
@@ -76,7 +86,21 @@ Read `~/.claude/ccusage-watcher/usage-state.json`. If the file:
 
 ### Phase 2 — Read & Classify Alerts
 
-Read the state file **once** — do not re-read during this cycle.
+**The state file regularly exceeds 10k tokens.** Do NOT use the Read tool directly — it will fail on large files. Instead, use a Bash command with `node -e` or a temp script to parse the JSON and extract only what you need: `summary`, `newAlerts`, `topSessions`, `modelDistribution`, and `recentDaily`. Example:
+
+```bash
+node -e "
+  const s = require('$HOME/.obsidian-vault/factory/ccusage/usage-state.json');
+  console.log(JSON.stringify({
+    lastUpdated: s.lastUpdated,
+    summary: s.summary,
+    newAlerts: s.newAlerts,
+    topSessions: s.topSessions?.slice(0, 10),
+    modelDistribution: s.modelDistribution,
+    recentDaily: s.recentDaily
+  }, null, 2));
+"
+```
 
 Extract `newAlerts[]` and classify by severity:
 
@@ -151,6 +175,23 @@ _(no alerts = "All clear.")_
 
 **For RUNAWAY_SESSION alerts**, include the suggestion: "Consider running /clear or starting a fresh session."
 
+### Final Phase — Log & Notify (from base spec)
+
+1. **Update state file** — Write patrol state to `.factory/patrol/ccusage-state.json`.
+
+2. **Append to `log.md`** — Every run gets a log entry in `.factory/patrol/log.md`:
+   ```
+   ## ccusage Patrol — YYYY-MM-DD HH:MM
+   - Watcher: {healthy|stale|stopped}
+   - New alerts: {N} ({breakdown by severity})
+   - 30-day cost: ${totalCost30d}
+   - Result: {notified | no-op}
+   ```
+
+3. **Notify via `/factory:notify`** — Only if genuinely new alerts exist (see threshold below).
+
+4. **No-op rule:** If nothing changed since last run, update `last_run` and exit silently.
+
 ## Notify Threshold
 
 Route notifications based on the genuinely new alerts (post-dedup):
@@ -172,7 +213,7 @@ details: "{top 1-3 alert messages, one per line}"
 ## Hard Constraints
 
 - **Never run ccusage directly.** Read from the watcher's state file only. The watcher handles all CLI interaction.
-- **Never modify `~/.claude/ccusage-watcher/` files.** Those belong to the watcher process. Read-only access.
+- **Never modify `~/.obsidian-vault/factory/ccusage/` files.** Those belong to the watcher process. Read-only access.
 - **Read-only monitoring.** No branches, no fixes, no code changes. This mode creates awareness, not work.
 - **DAILY_BURN_RATE fires once per day max.** Track in `daily_burn_notified` by date string. Even if the watcher fires this alert every 5 minutes, patrol notifies once.
 - **Watcher-down warning fires once.** Don't nag on every loop cycle. Set `warned_user` and suppress until recovery.
@@ -182,8 +223,9 @@ details: "{top 1-3 alert messages, one per line}"
 
 - **Watcher must be running separately.** This patrol mode is useless without it. If usage-state.json is missing or perpetually stale, the watcher isn't running. The startup health check catches this, but don't silently no-op forever — warn the user on first detection.
 - **Double dedup is intentional.** The watcher deduplicates `newAlerts` against its previous snapshot (same type+sessionId). But if the same session keeps triggering RUNAWAY_SESSION across multiple watcher polls (cost keeps climbing), `newAlerts` will contain it again. Patrol's `alerts_processed` prevents re-notification for the same session.
-- **Model name matching.** Model IDs change over time (`claude-opus-4-5`, `claude-opus-4-6-20250901`, etc.). When checking for Opus usage in the summary, match on substring `opus`, `sonnet`, `haiku` — never hardcode full model IDs.
-- **usage-state.json can be large.** It contains 30 days of session data, model breakdowns, and alert history. Read it once per cycle into memory. Don't re-read it in later phases.
+- **Model name matching.** Model IDs change over time (`claude-opus-4-5`, `claude-opus-4-6-20250901`, etc.). When checking for Opus usage in the summary, match on substring `opus`, `sonnet`, `haiku` — never hardcode full model IDs. The watcher's `modelBreakdowns` use `modelName` (not `model`) as the field name.
+- **usage-state.json is too large for the Read tool.** It contains 30 days of session data, model breakdowns, and alert history — regularly 11k+ tokens. Always use `node -e` or a temp script to parse it. Never use the Read tool on this file.
 - **The watcher runs `npx ccusage@latest`.** If ccusage isn't installed or npx is unavailable, the watcher fails silently and writes nothing. The patrol mode sees this as a stale/missing state file.
 - **Active block can be null.** Between billing blocks, `activeBlock` and `activeBlockCost` are null. Handle gracefully — show "No active block" in the summary, not an error.
 - **History JSONL is append-only.** If you ever need trend data beyond the 7-day `recentDaily` in the state file, read `usage-history.jsonl`. But for normal patrol cycles, the state file has everything you need.
+- **Notifications go to Obsidian vault.** `/factory:notify` routes through `/obsidian:notify` which writes to `factory/YYYY-MM-DD.md` in the Obsidian vault via the `obsidian` CLI. Patrol state and summary files stay in `.factory/patrol/` in the working directory — these are different locations.

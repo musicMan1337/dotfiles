@@ -45,8 +45,11 @@ for (let i = 0; i < args.length; i++) {
 }
 
 // Build time window in local time
+// endHour 24 means end of day — use next day midnight
 const windowStart = new Date(`${targetDate}T${String(startHour).padStart(2, "0")}:00:00`);
-const windowEnd = new Date(`${targetDate}T${String(endHour).padStart(2, "0")}:00:00`);
+const windowEnd = endHour >= 24
+  ? new Date(new Date(`${targetDate}T00:00:00`).getTime() + 24 * 60 * 60 * 1000)
+  : new Date(`${targetDate}T${String(endHour).padStart(2, "0")}:00:00`);
 
 function inWindow(timestamp) {
   let d;
@@ -86,10 +89,25 @@ async function getSessionsForDate() {
   return sessions;
 }
 
-// Step 2: Find session JSONL file across all project directories
-function findSessionFile(sessionId) {
-  if (!fs.existsSync(PROJECTS_DIR)) return null;
+// Step 2: Resolve session JSONL file by encoding the project path directly
+function encodeProjectPath(projectPath) {
+  // /Users/derek/eBacon/Viper → -Users-derek-eBacon-Viper
+  return projectPath.replace(/\//g, "-");
+}
 
+function findSessionFile(sessionId, projectPath) {
+  if (!projectPath) return findSessionFileFallback(sessionId);
+
+  const encoded = encodeProjectPath(projectPath);
+  const direct = path.join(PROJECTS_DIR, encoded, `${sessionId}.jsonl`);
+  if (fs.existsSync(direct)) return direct;
+
+  // Fallback to scanning if encoding doesn't match
+  return findSessionFileFallback(sessionId);
+}
+
+function findSessionFileFallback(sessionId) {
+  if (!fs.existsSync(PROJECTS_DIR)) return null;
   const projectDirs = fs.readdirSync(PROJECTS_DIR);
   for (const dir of projectDirs) {
     const candidate = path.join(PROJECTS_DIR, dir, `${sessionId}.jsonl`);
@@ -197,7 +215,7 @@ async function main() {
   const results = [];
 
   for (const [sessionId, meta] of sessions) {
-    const filePath = findSessionFile(sessionId);
+    const filePath = findSessionFile(sessionId, meta.project);
     if (!filePath) continue;
 
     const parsed = await parseSession(filePath, meta);

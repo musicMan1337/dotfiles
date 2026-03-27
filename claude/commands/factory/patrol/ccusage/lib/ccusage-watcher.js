@@ -16,33 +16,29 @@ const args = process.argv.slice(2)
 const pollIntervalMs = args[0] ? parseInt(args[0]) : 0
 
 const POLL_INTERVAL_MS = pollIntervalMs || 5 * 60 * 1000 // 5 minutes
-const STATE_FILE = join(
+const OBSIDIAN_CCUSAGE_DIR = join(
   homedir(),
-  ".claude",
-  "ccusage-watcher",
-  "usage-state.json",
+  ".obsidian-vault",
+  "factory",
+  "ccusage",
 )
-const HISTORY_FILE = join(
-  homedir(),
-  ".claude",
-  "ccusage-watcher",
-  "usage-history.jsonl",
-)
-const LOG_FILE = join(homedir(), ".claude", "ccusage-watcher", "watcher.log")
+const STATE_FILE = join(OBSIDIAN_CCUSAGE_DIR, "usage-state.json")
+const HISTORY_FILE = join(OBSIDIAN_CCUSAGE_DIR, "usage-history.jsonl")
+const LOG_FILE = join(OBSIDIAN_CCUSAGE_DIR, "watcher.log")
 
 // Thresholds — patrol agent uses these too, keep in sync with SKILL.md
 const THRESHOLDS = {
   // Cost spike: current 5-min block cost increased by more than this vs previous snapshot
-  blockCostSpikeDelta: 2.0, // $2 increase in one poll cycle = spike
+  blockCostSpikeDelta: 10.0, // $10 increase in one poll cycle = spike
   // Opus abuse: session used opus but output was tiny
   opusLowOutputTokens: 6000, // flag opus sessions with < 6k output tokens
   // Cache miss: large input with almost no cache reads
   cacheMissInputThreshold: 80000, // flag sessions with >80k input...
   cacheMissReadRatio: 0.05, // ...but <5% cache read ratio
   // Runaway session: single session cost exceeded this
-  runawaySessionCost: 10.0, // $10 in one session
+  runawaySessionCost: 100.0, // $100 in one session (Pro plan — heavy usage is normal)
   // Daily burn rate: on pace to exceed this by end of day
-  dailyBurnWarning: 20.0, // warn at $20/day pace
+  dailyBurnWarning: 100.0, // warn at $100/day pace (7d avg ~$68)
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -111,7 +107,7 @@ function analyzeAlerts(sessions, daily, blocks, prevState) {
   for (const s of sessions?.sessions ?? []) {
     for (const m of s.modelBreakdowns ?? []) {
       if (
-        m.model?.includes("opus") &&
+        (m.modelName ?? m.model)?.includes("opus") &&
         (s.outputTokens ?? 0) < THRESHOLDS.opusLowOutputTokens &&
         (m.totalCost ?? 0) > 0.5 // only flag if it actually cost something meaningful
       ) {
@@ -119,7 +115,7 @@ function analyzeAlerts(sessions, daily, blocks, prevState) {
           type: "OPUS_OVER_MODELED",
           severity: "MEDIUM",
           sessionId: s.sessionId,
-          model: m.model,
+          model: m.modelName ?? m.model,
           outputTokens: s.outputTokens,
           opusCost: m.totalCost,
           estimatedSonnetCost: parseFloat(
@@ -230,18 +226,19 @@ async function poll() {
   const modelTotals = {}
   for (const s of sessions?.sessions ?? []) {
     for (const m of s.modelBreakdowns ?? []) {
-      if (!modelTotals[m.model]) {
-        modelTotals[m.model] = {
+      const modelKey = m.modelName ?? m.model ?? "unknown"
+      if (!modelTotals[modelKey]) {
+        modelTotals[modelKey] = {
           sessions: 0,
           inputTokens: 0,
           outputTokens: 0,
           cost: 0,
         }
       }
-      modelTotals[m.model].sessions++
-      modelTotals[m.model].inputTokens += m.inputTokens ?? 0
-      modelTotals[m.model].outputTokens += m.outputTokens ?? 0
-      modelTotals[m.model].cost += m.totalCost ?? 0
+      modelTotals[modelKey].sessions++
+      modelTotals[modelKey].inputTokens += m.inputTokens ?? 0
+      modelTotals[modelKey].outputTokens += m.outputTokens ?? 0
+      modelTotals[modelKey].cost += m.totalCost ?? 0
     }
   }
 
