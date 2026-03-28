@@ -75,7 +75,7 @@
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true
 }
