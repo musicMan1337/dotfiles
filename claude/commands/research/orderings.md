@@ -36,7 +36,7 @@ If no arguments were provided, ask the user what they'd like researched, then pr
 
 ## Model Tiers
 
-Use the right model for each role — don't burn Opus tokens on file lookups:
+Set `model` explicitly on **every** Agent call. Never omit it — default inheritance silently runs Haiku-tier work on Opus, wasting tokens and money for zero benefit:
 
 | Role | Model | Why |
 |------|-------|-----|
@@ -46,7 +46,7 @@ Use the right model for each role — don't burn Opus tokens on file lookups:
 | **Synthesizer** (Phase 4) | **Opus** | Cross-referencing, contradiction detection, and nuanced judgment — this is where Opus matters |
 | **Follow-up workers** (Phase 5) | **Sonnet** | Same as initial workers |
 
-Set the `model` parameter explicitly on every Agent call. Never rely on inheritance — it defaults to Opus and wastes budget on scouts.
+This is not a suggestion — set the `model` parameter on every single Agent call. Omitting it defaults to Opus, which means you're paying 30x more for a file lookup that Haiku handles identically.
 
 ## Phase 1 — Scope and Gather (Scout)
 

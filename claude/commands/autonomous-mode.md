@@ -93,3 +93,4 @@ When you need to make a choice the user would normally make:
 - **Never change things outside the stated scope.** Stay focused on the task.
 - **Always read before editing.** Don't guess at file contents.
 - **Handle errors.** If something fails, diagnose and fix it. Don't give up.
+- **Haiku for all information gathering.** Any time you need to search files, explore code, read logs, or gather context, spawn Haiku sub-agents (`model: "haiku"`). Do NOT search, grep, or read exploratory files yourself — Opus tokens are for orchestration and decision-making, not file lookups. Set `model` explicitly on every Agent call; default inheritance burns Opus on tasks Haiku handles fine.

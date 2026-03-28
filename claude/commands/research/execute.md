@@ -46,10 +46,12 @@ Within each wave, maximize parallelism. Independent items within a wave all run 
 
 For each action item, spawn an appropriate sub-agent:
 
-- **Implementation tasks** (code changes, file creation): Use default model sub-agents with clear, self-contained instructions
-- **Simple file operations** (moves, renames, config edits): Use Haiku sub-agents
-- **Tasks requiring judgment or design decisions**: Use Opus sub-agents
-- **Verification/validation tasks**: Use Haiku sub-agents for checks, default for analysis
+Set `model` explicitly on every Agent call — never rely on default inheritance, which burns Opus on tasks that don't need it:
+
+- **Implementation tasks** (code changes, file creation): `model: "sonnet"` — writes code well at a fraction of Opus cost
+- **Simple file operations** (moves, renames, config edits): `model: "haiku"` — these are mechanical tasks
+- **Tasks requiring judgment or design decisions**: `model: "opus"` — the only tier that warrants Opus
+- **Verification/validation tasks**: `model: "haiku"` for checks, `model: "sonnet"` for analysis
 
 Each sub-agent receives:
 1. The specific action item and its context

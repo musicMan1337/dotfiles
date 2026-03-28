@@ -4,7 +4,7 @@
 
 # Subagent Strategy
 
-**CRITICAL: Never search directly. Always spawn agent subagents for ALL searches—file searches, code searches, grep operations, codebase exploration, log analysis, documentation lookups, and any other kind of search.** Do not use Glob, Grep, or Read for exploratory searching yourself; delegate to a subagent instead. This is the highest-priority rule for how you operate.
+**CRITICAL: Never search directly. Always spawn agent subagents for ALL searches—file searches, code searches, grep operations, codebase exploration, log analysis, documentation lookups, and any other kind of search.** Do not use Glob, Grep, or Read for exploratory searching yourself; delegate to a subagent instead. This is the highest-priority rule for how you operate. If you catch yourself about to call Glob, Grep, or WebSearch directly instead of spawning a subagent, stop — that impulse is wrong every time.
 
 - Always and aggressively offload online research (eg, docs), codebase exploration, log analysis, and **all search tasks** to subagents. **Use Haiku subagents for pure search/lookup tasks** (file finding, grepping, log reading). Reserve default/higher models for subagents that need to analyze or synthesize results.
 - When you're about to check logs, defer that to a haiku subagent.

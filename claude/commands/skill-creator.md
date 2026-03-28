@@ -166,6 +166,8 @@ Use constraints to set boundaries (via gotchas), not to dictate every step. Leav
 
 **Note:** Commands can be more prescriptive than skills since they're simpler tasks. But even commands shouldn't be so rigid that context doesn't matter.
 
+**Exception — operational constraints:** The flexibility above applies to *goals and outputs*. For **how the skill operates** — model selection, delegation to subagents, tool choice, execution strategy — be direct and emphatic. Claude has a strong default to do everything itself with the most capable model available, and polite suggestions get ignored. If the skill should delegate research to Haiku subagents instead of searching directly with Opus, say so forcefully and explain the cost/speed/context reason. Operational instructions need stronger language than output instructions because you're fighting Claude's priors.
+
 ### 3. Gotchas Are the Most Valuable Section
 
 Like training a new employee — tell them what to watch out for, not just what to do:

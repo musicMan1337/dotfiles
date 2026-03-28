@@ -23,7 +23,7 @@ Spawn a **Haiku sub-agent** to analyze the repo and report:
 
 ### Phase 2 — Research Current Best Practices
 
-Spawn **WebSearch sub-agents** in parallel to get the latest guidance for each detected component:
+Spawn **WebSearch sub-agents** (`model: "haiku"`) in parallel to get the latest guidance for each detected component:
 1. "ESLint 9 flat config setup [detected-framework] 2025" — get the latest flat config patterns
 2. "prettier eslint integration 2025 eslint-config-prettier" — current integration approach
 3. "[detected-framework] eslint recommended plugins 2025" — framework-specific plugins
@@ -167,7 +167,7 @@ Run `npm run lint` (or the project's package manager equivalent). If there are:
 
 1. **Configuration errors or plugin compatibility issues:** This is critical — DO NOT just remove the problematic config. Instead:
    - Read the error message carefully
-   - Spawn a **WebSearch sub-agent** to search for the exact error message + the package versions involved
+   - Spawn a **WebSearch sub-agent** (`model: "haiku"`) to search for the exact error message + the package versions involved
    - Apply the fix from the search results
    - Only if no fix exists after searching should you downgrade or remove a config, and explain why to the user
 
