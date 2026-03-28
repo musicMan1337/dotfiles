@@ -3,4 +3,5 @@ node_modules
 .config
 !.config/starship.toml
 .DS_Store
+__pycache__
 .factory
