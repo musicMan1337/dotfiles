@@ -13,6 +13,10 @@
   - **Use Exa MCP** (`mcp__exa__*`) for **targeted, precise lookups** — when you know exactly what you're looking for and need detailed, accurate content from specific sources (e.g., fetching specific documentation, pulling a known API reference, researching a particular library or tool). Typically 1–2 subagents max. Exa has limited monthly credits, so use it deliberately.
   - **Use WebSearch/WebFetch** for **broad, exploratory research** — when sending many researcher subagents to scour the web in parallel, gather general information, or survey a topic widely. These have no credit cost and are better suited for high-volume, discovery-oriented searches.
 
+# Large File Reading
+
+When reading a file, first check its line count. If a file exceeds 2,000 lines, do NOT read it in a single call — use the `offset` and `limit` parameters to read it in chunks of 2,000 lines or fewer, ensuring nothing is missed.
+
 # Repo Locations
 
 If it exists, read `LOCATIONS.md` next to this file for a map of repos and services on this machine. Use it to find project paths without searching.

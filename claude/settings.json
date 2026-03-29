@@ -49,6 +49,17 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/check-large-file-read.sh\""
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
@@ -75,7 +86,15 @@
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "terminalOutputLimit": 150000,
   "effortLevel": "medium",
   "autoDreamEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "disableTelemetry": true,
+  "disableErrorReporting": true,
+  "disableFeedbackDisplay": true
 }
