@@ -1,7 +1,7 @@
 ---
 name: git:pr
 model: haiku
-allowed-tools: Bash(gh pr:*), Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(git push:*), Bash(git remote:*)
+allowed-tools: Bash(gh pr:*), Bash(git log:*), Bash(git diff:*), Bash(git branch:*), Bash(git remote:*)
 description: Create a pull request for the current branch. Triggers on: make a PR, open PR, create pull request, push and PR, submit PR
 ---
 
@@ -17,17 +17,8 @@ Run these commands to understand the branch:
 2. `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'` — default/base branch
 3. `git log --oneline <default-branch>..HEAD` — commits on this branch
 4. `git diff <default-branch>...HEAD --stat` — diff summary (file names only, NOT full diff)
-5. `git remote -v` — check remote exists
-6. Check if branch is pushed: `git log --oneline @{upstream}..HEAD 2>/dev/null` — if this shows commits, need to push
 
-## Step 2 — Push if needed
-
-If the branch hasn't been pushed or has unpushed commits:
-```bash
-git push -u origin <branch-name>
-```
-
-## Step 3 — Create PR
+## Step 2 — Create PR
 
 Use `gh pr create` with a heredoc body:
 
@@ -48,6 +39,6 @@ EOF
 - Keep the title short (under 70 characters)
 - Base branch should be the default branch
 
-## Step 4 — Report
+## Step 3 — Report
 
 Print the PR URL so the user can see it.

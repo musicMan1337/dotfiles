@@ -1,4 +1,8 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(*)",
@@ -86,15 +90,12 @@
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
   },
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "terminalOutputLimit": 150000,
   "effortLevel": "medium",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "terminalOutputLimit": 150000,
   "disableTelemetry": true,
   "disableErrorReporting": true,
-  "disableFeedbackDisplay": true
+  "disableFeedbackDisplay": true,
+  "model": "sonnet"
 }

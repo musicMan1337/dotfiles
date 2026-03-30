@@ -9,7 +9,9 @@
       "Bash(echo '{}' | bash /c/Users/Admin/.claude/scripts/statusline-command.sh 2>&1 | head -5)",
       "Bash(bash \"$HOME/.claude/hooks/sync-theme.sh\")",
       "Bash(echo \"Exit code: $?\")",
-      "Bash(ln:*)"
+      "Bash(ln:*)",
+      "mcp__exa__web_search_exa",
+      "mcp__exa__crawling_exa"
     ]
   }
 }

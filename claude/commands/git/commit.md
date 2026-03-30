@@ -40,8 +40,6 @@ The Viper repo does NOT have a standard lint script. Instead, run `npx prettier 
 ```bash
 git commit -m "$(cat <<'EOF'
 Commit message here.
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
