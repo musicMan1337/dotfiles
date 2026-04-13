@@ -1,5 +1,5 @@
-#~ Initial Load Message
-eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
+#~ Initial Load Message (only in login shells)
+[[ -o login ]] && bash ~/hereDocs/asciiArt/loadMessage.txt
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -90,8 +90,6 @@ plugins=(
   docker-compose
   dotenv
   node
-  nodenv
-  nvm
   npm
   react-native
   dotnet
@@ -132,7 +130,7 @@ fi
 
 #~ zsh-specific aliases
 #~ Claude
-alias claude-up='brew upgrade claude-code'
+alias claude-up='npm update -g @anthropic-ai/claude-code'
 alias claude-d='claude --dangerously-skip-permissions'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -152,9 +150,10 @@ if [ -f '/Users/derek/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/der
 if [ -z "$SSH_AUTH_SOCK" ]; then
   eval "$(ssh-agent -s)" > /dev/null
 fi
-# Automatically add your default key every time you open a terminal
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519 2>/dev/null || \
-ssh-add --apple-use-keychain ~/.ssh/id_rsa 2>/dev/null
+# Add default key only if not already loaded
+ssh-add -l &>/dev/null || \
+  ssh-add --apple-use-keychain ~/.ssh/id_ed25519 2>/dev/null || \
+  ssh-add --apple-use-keychain ~/.ssh/id_rsa 2>/dev/null
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/derek/.lmstudio/bin"

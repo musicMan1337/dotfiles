@@ -40,8 +40,15 @@ source ~/.zprofile && obsidian append path="followups.md" content="..."
 
 **Entry format:**
 ```
-- [ ] [YYYY-MM-DD] Description — @person (if applicable)
+- [ ] [YYYY-MM-DD] Description — @person (if applicable) — [[context-link]]
 ```
+
+**Linking context:** If the follow-up came from a specific investigation, decision, or standup, add a wikilink at the end. Search for relevant notes:
+```bash
+source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
+source ~/.zprofile && obsidian search query="<keywords>" path="decisions"
+```
+Only add a link if a real match is found. Omit the `— [[...]]` suffix if there's nothing to link to.
 
 If the file doesn't exist yet, create it:
 ```bash

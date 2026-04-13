@@ -32,9 +32,13 @@ source ~/.zprofile && obsidian create path="decisions/YYYY-MM-DD-<slug>.md" cont
 
 **Format:**
 ```markdown
-**Date:** YYYY-MM-DD
-**Participants:** [names if mentioned, otherwise just "Derek"]
-**Related:** [ticket, branch, project if mentioned]
+---
+date: YYYY-MM-DD
+participants: [names if mentioned, otherwise "Derek"]
+project: [inferred — e.g. "viper", "hive", "dotfiles"]
+related: "[[investigations/YYYY-MM-DD-slug]]"
+tags: [project-tag]
+---
 
 ## Decision
 [What was decided — one clear sentence]
@@ -49,8 +53,13 @@ source ~/.zprofile && obsidian create path="decisions/YYYY-MM-DD-<slug>.md" cont
 
 ## Research
 Based on [[investigations/YYYY-MM-DD-<slug>]]
-[Only include this section if the decision was derived from an investigation. Link using wiki-link syntax.]
+[Only include this section if the decision was derived from an investigation. Remove otherwise.]
 ```
+
+**Filling in frontmatter:**
+- `project`: infer from context (branch name, ticket prefix, or explicit mention)
+- `related`: wikilink to the investigation that informed this decision (if any). Search for it if not obvious. Leave empty string if none.
+- `tags`: lowercase tags matching the project/domain (e.g. `[viper, auth]`)
 
 Keep it tight. A decision log entry should be scannable in 10 seconds.
 

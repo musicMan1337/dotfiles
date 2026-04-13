@@ -160,6 +160,21 @@ Revert the package lock to master's version.
 - For inline comments, prefix with the file path: `- \`path/to/file:123\` — comment text`
 - For authored PRs with no review activity that day, the status line alone is sufficient
 
+## Step 3b — Add wikilinks to standup
+
+After writing the PR notes file, check if a standup file exists for the same date:
+```bash
+source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+```
+
+If it exists, add a wikilink reference at the bottom:
+```markdown
+---
+[[standup/YYYY-MM-DD]]
+```
+
+Also, if any reviewed PR maps to an open investigation (e.g., the PR topic matches a known investigation), note the link inline in the review entry using `[[investigations/...]]`.
+
 ## Step 4 — Report
 
 Show the user a summary of how many PRs were logged and any notable reviews (changes requested, detailed feedback).

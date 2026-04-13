@@ -1,42 +1,38 @@
 ---
 name: git:commit
 model: haiku
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Bash(npm run lint:*), Bash(npx prettier:*), Bash(cat package.json:*), Bash(grep:*), Read
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Read
 description: Create a git commit with lint checks. Triggers on: commit, save changes, commit this, git commit
 ---
 
 ## Your task
 
-Create a single git commit for the current changes.
+Create a single git commit for the current changes. Terse caveman-style commit message.
 
-## Step 1 — Gather context (do this yourself)
+## Step 1 — Gather context
 
-Run these commands to understand what you're committing:
+Run these commands:
 
-1. `git status` — see what files are changed/untracked
-2. `git diff --stat HEAD` — summary of changes (file names and line counts only)
-3. `git diff HEAD` — full diff, BUT if it's very large (>200 lines), use `git diff --stat HEAD` and read individual key files instead
+1. `git status` — what files changed/untracked
+2. `git diff --stat HEAD` — summary of changes
+3. `git diff HEAD` — full diff (if >200 lines, use `--stat` and read key files instead)
 4. `git branch --show-current` — current branch
 5. `git log --oneline -5` — recent commit style
 
-## Step 2 — Pre-commit lint check
+## Step 2 — Stage and commit
 
-**HIGH PRIORITY — Do this BEFORE committing.**
-
-Check if the repo has an `npm run lint` script by running `grep -q '"lint"' package.json && echo "HAS_LINT" || echo "NO_LINT"`.
-
-- **If HAS_LINT**: Run `npm run lint`. If lint fails with errors (not warnings), stop and report the errors — do NOT commit.
-- **If NO_LINT**: Skip this step.
-
-### Exception: Viper repo (~/eBacon/Viper)
-
-The Viper repo does NOT have a standard lint script. Instead, run `npx prettier --write` **only on the files being committed** (i.e. the changed/staged files). Do not run prettier on the entire codebase.
-
-## Step 3 — Stage and commit
-
-1. Stage the appropriate files with `git add` (prefer specific files over `git add -A`)
-2. Write a concise commit message that summarizes the "why" not the "what"
-3. Commit using a heredoc for the message:
+1. Stage appropriate files with `git add` (prefer specific files over `git add -A`)
+2. Write commit message using Conventional Commits format:
+   - Subject: `<type>(<scope>): <imperative summary>` — **≤50 chars**, hard cap 72
+   - Types: feat, fix, refactor, perf, docs, test, chore, build, ci, style, revert
+   - Body: only when "why" isn't obvious from subject. Why over what.
+   - Skip body for self-explanatory changes
+   - Add body for: breaking changes, migrations, linked issues, security fixes, reversions
+   - No "This commit does X", no "I"/"we"/"now"/"currently", no emoji (unless project convention)
+   - Bullets use `-` not `*`
+   - Reference issues: `Closes #42`, `Refs #17`
+   - No period on subject line
+3. Commit using heredoc:
 ```bash
 git commit -m "$(cat <<'EOF'
 Commit message here.
@@ -44,9 +40,8 @@ EOF
 )"
 ```
 
-## Step 4 — Report
+## Step 3 — Report
 
-Print the short hash and full commit message so the user can see what was committed:
 ```bash
 git log --oneline -1
 ```

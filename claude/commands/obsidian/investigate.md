@@ -27,9 +27,13 @@ source ~/.zprofile && obsidian create path="investigations/YYYY-MM-DD-<slug>.md"
 
 **Format:**
 ```markdown
-**Status:** Active
-**Started:** YYYY-MM-DD
-**Related:** [ticket/case number if mentioned, branch name if relevant]
+---
+status: active
+project: [inferred from context — e.g. "viper", "hive", "dotfiles"]
+started: YYYY-MM-DD
+related: ""
+tags: [project-tag]
+---
 
 ## Summary
 [1-2 sentence description of what's being investigated]
@@ -40,6 +44,16 @@ source ~/.zprofile && obsidian create path="investigations/YYYY-MM-DD-<slug>.md"
 ## Dead Ends
 [Empty — populated as investigation progresses]
 ```
+
+**Filling in frontmatter:**
+- `project`: infer from context (branch name, ticket prefix, or explicit mention)
+- `related`: wikilink to related decision/standup/investigation if one exists — e.g. `"[[decisions/2026-03-19-vault-dev-token-delivery]]"`. Search for it:
+  ```bash
+  source ~/.zprofile && obsidian search query="<keywords>" path="decisions"
+  source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
+  ```
+  Leave empty string if nothing relevant found. Don't fabricate links.
+- `tags`: one or more lowercase tags matching the project/domain (e.g. `[viper, architecture]`)
 
 ## Appending to an existing investigation
 
@@ -58,7 +72,7 @@ When something turns out to be a dead end, add it under Dead Ends so it's not re
 
 ## Closing an investigation
 
-When the user says they're done, update the Status line to "Resolved" and add a resolution summary.
+When the user says they're done, update the frontmatter `status` to `resolved` and add a resolution summary.
 
 ## Gotchas
 

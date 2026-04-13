@@ -170,19 +170,39 @@ case "$effort" in
   *)          effort_bars="${b}${b}${g}" ;;
 esac
 
-# Build output
-parts=()
+# Caveman mode badge (reads flag file written by caveman-mode-tracker hook)
+caveman_badge=""
+if [ -f "$HOME/.claude/.caveman-active" ]; then
+  caveman_mode=$(cat "$HOME/.claude/.caveman-active" 2>/dev/null | tr -d '[:space:]')
+  if [ -n "$caveman_mode" ] && [ "$caveman_mode" != "off" ]; then
+    c_yellow=$'\033[38;5;220m'
+    case "$caveman_mode" in
+      full)   caveman_badge="${c_yellow}[CAVEMAN]${c_reset}" ;;
+      *)      upper=$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')
+              caveman_badge="${c_yellow}[CAVEMAN:${upper}]${c_reset}" ;;
+    esac
+  fi
+fi
+
+# Build output - Line 1: model | costs | context | caveman
+line1=()
 model_seg="${model} ${effort_bars}"
-parts+=("🤖 ${model_seg}")
-[ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && parts+=("💰 ${cost_seg}")
-[ -n "$ctx" ] && parts+=("🧠 ${ctx}")
-parts+=("📂 ${short_cwd}")
-[ -n "$git_seg" ] && parts+=("${git_seg}")
+line1+=("🤖 ${model_seg}")
+[ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && line1+=("💰 ${cost_seg}")
+[ -n "$ctx" ] && line1+=("🧠 ${ctx}")
+[ -n "$caveman_badge" ] && line1+=("🪨 ${caveman_badge}")
 
-# Join with " | "
-IFS='|'
-output="${parts[*]}"
-IFS=' '
-output=$(echo "$output" | sed 's/|/ | /g')
+# Build output - Line 2: directory | git
+line2=()
+line2+=("📂 ${short_cwd}")
+[ -n "$git_seg" ] && line2+=("${git_seg}")
 
-echo "$output"
+# Join each line with " | "
+join_parts() {
+  local IFS='|'
+  local joined="${*}"
+  echo "$joined" | sed 's/|/ | /g'
+}
+
+echo "$(join_parts "${line1[@]}")"
+echo "$(join_parts "${line2[@]}")"

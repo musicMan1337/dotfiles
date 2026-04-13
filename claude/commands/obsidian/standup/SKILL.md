@@ -22,6 +22,18 @@ Generate concise standup bullet points by scanning Claude Code session history, 
   - "from 8 to 22" / "8am-10pm" → override both
 - Parse these into integer hours (24h). Defaults remain 6am start, 5pm (17) end.
 
+### Partial update mode
+
+If the user asks to "only update" specific points, or says "update the X bullet", this is a **partial update**:
+
+1. Read the existing standup file for the target date
+2. Only generate/replace the bullets the user specified — leave all other content intact
+3. Move completed "Today" items to a `## Completed` section at the bottom:
+   - Strike through the matching item in the Today list (`~~original text~~`)
+   - Add the completed work with full sub-bullets under `## Completed`
+4. If a `## Completed` section already exists, append to it — don't overwrite
+5. Show the full updated file for approval before writing
+
 ## Step 1 — Extract session data
 
 Run the extraction script. Resolve the target date first, then execute:
@@ -81,6 +93,24 @@ From the extracted session data, any PR review notes, **and** any completed foll
 
 Aim for 2-5 numbered sections. **Weight the number of sub-bullets proportionally to time spent** — if 60% of the day was on one feature, that section should have ~60% of the total bullets. Don't give equal bullet counts to a 6-hour focus area and a 30-minute task. Use session duration, number of tool calls, and volume of file edits as proxies for time spent. Merge trivial items. Don't include personal/non-work sessions.
 
+## Step 2b — Enrich bullets with wikilinks
+
+Before writing, scan the approved bullets for any investigations, decisions, or PR reviews that have Obsidian notes. If a bullet references something with a matching note, add an inline wikilink.
+
+Search for matches:
+```bash
+source ~/.zprofile && obsidian files folder="investigations"
+source ~/.zprofile && obsidian files folder="decisions"
+source ~/.zprofile && obsidian files folder="reviews"
+```
+
+**How to add links:**
+- If a bullet mentions research that produced an investigation note: `[[investigations/YYYY-MM-DD-slug|React-First Migration]]`
+- If a bullet references a decision: `[[decisions/YYYY-MM-DD-slug|decision]]`
+- If a PR review bullet matches a file in `reviews/`: `[[reviews/YYYY-MM-DD]]`
+
+Only add wikilinks where a real note exists — don't fabricate paths. Keep the bullet readable; the link should wrap a natural phrase, not be tacked on awkwardly.
+
 ## Step 3 — Write to Obsidian
 
 Use the Obsidian CLI to write a per-day file. The CLI requires `source ~/.zprofile &&` before each `obsidian` command.
@@ -92,14 +122,29 @@ Check if the file already exists first:
 source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
 ```
 
-If it exists, ask the user whether to overwrite or skip. Then write:
+### Full write (new file or full regeneration)
+
+If the file doesn't exist, or the user wants a full rewrite:
 ```bash
 source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
 ```
 
 The file content is just the bullets — no heading needed since the filename is the date.
 
-**CRITICAL: You MUST show the user the draft bullets and wait for their approval before writing to Obsidian.** Do not write the file until the user confirms or requests changes. This is a hard gate — never skip it.
+### Partial update (updating specific bullets)
+
+If in partial update mode (user asked to update specific items only):
+
+1. Read the existing file content
+2. Strike through the matching "Today" item(s) with `~~text~~`
+3. Append or create a `## Completed` section with the synthesized bullets
+4. Preserve all other content exactly as-is
+5. Write the full modified content back:
+```bash
+source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
+```
+
+**CRITICAL: You MUST show the user the draft (full file for partial updates, bullets for new files) and wait for their approval before writing to Obsidian.** Do not write the file until the user confirms or requests changes. This is a hard gate — never skip it.
 
 ## Step 4 — Clean up consumed follow-ups
 
