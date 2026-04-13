@@ -31,7 +31,9 @@
       "Read(**/out/**)",
       "Read(**/*.lock)",
       "Read(**/package-lock.json)",
-      "Read(**/pnpm-lock.yaml)"
+      "Read(**/pnpm-lock.yaml)",
+      "Read(**/yarn.lock)",
+      "Read(**/node_modules/**)"
     ]
   },
   "hooks": {
@@ -91,9 +93,9 @@
     "command": "bash \"$HOME/.claude/scripts/statusline-command.sh\""
   },
   "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": false,
     "playwright@claude-plugins-official": true,
-    "csharp-lsp@claude-plugins-official": true,
+    "csharp-lsp@claude-plugins-official": false,
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
