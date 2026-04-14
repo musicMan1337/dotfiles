@@ -175,11 +175,13 @@ caveman_badge=""
 if [ -f "$HOME/.claude/.caveman-active" ]; then
   caveman_mode=$(cat "$HOME/.claude/.caveman-active" 2>/dev/null | tr -d '[:space:]')
   if [ -n "$caveman_mode" ] && [ "$caveman_mode" != "off" ]; then
-    c_yellow=$'\033[38;5;220m'
+    c_black=$'\033[1;30m'
     case "$caveman_mode" in
-      full)   caveman_badge="${c_yellow}[CAVEMAN]${c_reset}" ;;
+      full)   caveman_badge="${c_black}[CAVEMAN]${c_reset}" ;;
+      lite)   caveman_badge="${c_black}[CAVEMAN-L]${c_reset}" ;;
+      ultra)  caveman_badge="${c_black}[CAVEMAN-U]${c_reset}" ;;
       *)      upper=$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')
-              caveman_badge="${c_yellow}[CAVEMAN:${upper}]${c_reset}" ;;
+              caveman_badge="${c_black}[CAVEMAN:${upper}]${c_reset}" ;;
     esac
   fi
 fi

@@ -1,28 +1,34 @@
 ---
 name: git:pr-suggestions
-description: Address Augment code review bot suggestions on a PR. Triggers on: pr suggestions, review comments, augment review, address review, pr feedback, check suggestions
-allowed-tools: Bash(gh *), Bash(git *), Bash(dotnet *), Bash(npm run lint*), Bash(npx prettier*), Bash(grep*), Read, Write, Edit, Glob, Grep, Agent
+description: Address unresolved review comments on a PR — bot, human, or otherwise. Triggers on: pr suggestions, review comments, address review, pr feedback, check suggestions, pr comments
+allowed-tools: Bash(gh *), Bash(git *), Bash(dotnet *), Bash(npm run lint*), Bash(npx prettier*), Bash(grep*), Read, Write, Edit, Glob, Grep, Agent, Skill(git:commit), Skill(code-review:code-review)
 ---
 
 ## Your task
 
-Review and address Augment code review bot comments on the current branch's PR.
+Review and address all unresolved review comments on the current branch's PR — from bots, humans, or any other source.
 
 ## Step 1 — Find the PR and fetch comments
 
 1. `git branch --show-current` to get the branch
 2. `gh pr view --json number,url --jq '.number'` to get the PR number
-3. Fetch review comments:
+3. Fetch all review comments (not filtered by author):
 ```bash
-gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[] | select(.user.login == "augmentcode[bot]") | {id, path, line, body, in_reply_to_id}'
+gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[] | {id, path, line, body, in_reply_to_id, user_login: .user.login}'
 ```
-4. Filter to only TOP-LEVEL comments (where `in_reply_to_id` is null) — these are the suggestions. Skip any that already have reply threads from you.
+4. Filter to only TOP-LEVEL comments (where `in_reply_to_id` is null). For each, check if there's already a reply from you (the current git user) — skip those.
+5. Also fetch review-level comments (non-inline):
+```bash
+gh api repos/{owner}/{repo}/pulls/{number}/reviews --jq '.[] | select(.state != "APPROVED" and .state != "DISMISSED" and .body != "") | {id, user_login: .user.login, state, body}'
+```
 
-If no unaddressed comments, report that and stop.
+If no unresolved comments exist, report that — then offer to run a full code review on the PR using the `/code-review:code-review` skill. Ask: "No unresolved comments. Want me to do a full review of this PR instead?"
+
+If the user accepts, invoke the `code-review:code-review` skill via the Skill tool. If they decline, stop.
 
 ## Step 2 — For each comment, evaluate and act
 
-For each Augment suggestion, read the referenced code and make a judgment call:
+For each unresolved comment, read the referenced code and make a judgment call:
 
 ### Option A: Intentional / Not an issue
 The comment asks about a deliberate design choice, or flags something that's correct as-is. Reply explaining the rationale concisely. Don't be defensive — acknowledge the concern and explain why the current approach is right.
@@ -34,7 +40,7 @@ The comment identifies a real bug, gap, or improvement worth making. Make the co
 3. Reply to the comment noting the fix was applied, with a brief description of what changed
 
 ### Option C: Noise / low-value
-The comment is generic, obvious, or not actionable. Reply briefly acknowledging it and explaining why no change is needed. Keep it professional — the bot's output is visible to the team.
+The comment is generic, obvious, or not actionable. Reply briefly acknowledging it and explaining why no change is needed. Keep it professional — the comment is visible to the team.
 
 ## Replying to comments and resolving threads
 
@@ -87,12 +93,13 @@ You can batch this: fetch all threads once at the start, build a map of `comment
 After addressing all comments, print a summary:
 - How many comments were addressed
 - What action was taken for each (replied/fixed/dismissed)
+- Who left each comment (so the user knows which teammates to follow up with)
 - Any that need the user's input (if you weren't sure)
 
 ## Gotchas
 
 - **Don't auto-fix without reading context.** Always read the surrounding code and understand the architectural intent before deciding. A suggestion that looks valid in isolation may be wrong in context.
-- **The bot doesn't understand project conventions.** Augment doesn't know about this project's architecture tests, module isolation rules, or other patterns. Weight your project knowledge over its suggestions.
+- **Bot vs human comments:** Treat human comments with more weight — they reflect team knowledge and context that bots lack. Bot comments (Augment, CodeRabbit, etc.) are more likely to be noise.
 - **Reply in-thread, not as new comments.** Use the `/replies` endpoint with the comment ID, not the top-level comments endpoint — otherwise you create a disconnected comment instead of a thread reply.
 - **Check if already addressed.** Before acting on a comment, check if there's already a reply thread. Don't double-reply.
 - **Push before replying on fixes.** If you made a code change, push first so the reply references committed code.

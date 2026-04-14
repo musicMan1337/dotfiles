@@ -1,47 +1,70 @@
 ---
 name: git:commit
-model: haiku
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git branch:*), Bash(git log:*), Read
 description: Create a git commit with lint checks. Triggers on: commit, save changes, commit this, git commit
+allowed-tools: Agent
 ---
 
 ## Your task
 
-Create a single git commit for the current changes. Terse caveman-style commit message.
+Create a single git commit for the current changes.
 
-## Step 1 — Gather context
+## CRITICAL: Delegate immediately
 
-Run these commands:
+**Do NOT read diffs, run git commands, or do any work yourself.** Spawn a single Haiku subagent and let it do everything. The diff can be large — loading it into the main session wastes context and risks limit errors.
 
-1. `git status` — what files changed/untracked
-2. `git diff --stat HEAD` — summary of changes
-3. `git diff HEAD` — full diff (if >200 lines, use `--stat` and read key files instead)
-4. `git branch --show-current` — current branch
-5. `git log --oneline -5` — recent commit style
+Your only job is to launch the subagent and relay its one-line result.
 
-## Step 2 — Stage and commit
+## Spawn the subagent
 
-1. Stage appropriate files with `git add` (prefer specific files over `git add -A`)
-2. Write commit message using Conventional Commits format:
-   - Subject: `<type>(<scope>): <imperative summary>` — **≤50 chars**, hard cap 72
+Use the Agent tool with `model: "haiku"` and this prompt (adapt the working directory if needed):
+
+---
+
+Create a git commit for the current changes. Follow these steps exactly:
+
+### Step 1 — Gather context
+
+Run in parallel:
+1. `git status` — what changed
+2. `git diff --stat HEAD` — change summary
+3. `git branch --show-current` — current branch
+4. `git log --oneline -5` — recent commit style
+
+Then read the full diff. If `git diff HEAD` is >200 lines, use `--stat` and selectively read key changed files instead.
+
+### Step 2 — Stage and commit
+
+1. Stage files with `git add` — prefer specific files over `git add -A`. Never stage `.env`, credentials, or secrets.
+2. Write commit message — Conventional Commits, terse caveman style:
+   - Subject: `<type>(<scope>): <imperative summary>` — **50 char cap**, hard max 72
    - Types: feat, fix, refactor, perf, docs, test, chore, build, ci, style, revert
-   - Body: only when "why" isn't obvious from subject. Why over what.
-   - Skip body for self-explanatory changes
-   - Add body for: breaking changes, migrations, linked issues, security fixes, reversions
-   - No "This commit does X", no "I"/"we"/"now"/"currently", no emoji (unless project convention)
+   - Body: only when "why" isn't obvious. Skip for self-explanatory changes.
+   - Add body for: breaking changes, migrations, linked issues, security fixes
+   - No filler ("This commit", "I", "we", "now"), no emoji, no period on subject
    - Bullets use `-` not `*`
    - Reference issues: `Closes #42`, `Refs #17`
-   - No period on subject line
 3. Commit using heredoc:
 ```bash
 git commit -m "$(cat <<'EOF'
-Commit message here.
+message here
 EOF
 )"
 ```
 
-## Step 3 — Report
+### Step 3 — Handle pre-commit hook failures
 
-```bash
-git log --oneline -1
-```
+If the commit fails due to a pre-commit hook (lint, format, etc.):
+1. Read the error output carefully
+2. Fix the issues the hook flagged
+3. Re-stage the fixed files
+4. Create a NEW commit (do NOT use --amend — the failed commit never happened)
+
+### Step 4 — Report
+
+Run `git log --oneline -1` and return ONLY that one line. Nothing else.
+
+---
+
+## After the subagent returns
+
+Relay the one-line commit result to the user. That's it. No elaboration needed.

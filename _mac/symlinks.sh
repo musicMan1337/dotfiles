@@ -128,6 +128,17 @@ for TARGET in "$HOME/dotfiles/claude/commands"/*; do
   check_and_create_link "$HOME/.claude/commands/$BASENAME" "$TARGET"
 done
 
+###############
+## Plugins   ##
+###############
+if command -v claude &>/dev/null; then
+  echo "Installing Claude Code plugins..."
+  claude plugin marketplace add JuliusBrussee/caveman 2>/dev/null
+  claude plugin install caveman@caveman 2>/dev/null
+  echo "Claude Code plugins installed."
+  echo ""
+fi
+
 echo =======================================================================
 echo
 echo "Symlinks created!"

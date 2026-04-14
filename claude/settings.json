@@ -32,8 +32,7 @@
       "Read(**/*.lock)",
       "Read(**/package-lock.json)",
       "Read(**/pnpm-lock.yaml)",
-      "Read(**/yarn.lock)",
-      "Read(**/node_modules/**)"
+      "Read(**/yarn.lock)"
     ]
   },
   "hooks": {
@@ -76,6 +75,11 @@
     "SessionStart": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/caveman-startup.sh\"",
+            "statusMessage": "CAVEMAN MODE ACTIVE — level: full"
+          },
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/sync-theme.sh\""
