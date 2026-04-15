@@ -291,6 +291,37 @@ This makes channel artifacts great prototyping tools: iterate visually until the
 - **When the user picks a winner** from variations, offer to integrate back into the actual codebase.
 - **Bun is available.** No install needed for Level 2+.
 
+## File decomposition (>500 lines)
+
+When any artifact file exceeds **500 lines**, decompose it. An artifact folder is a mini app — treat it like one.
+
+**Decomposition order** — extract in this sequence:
+
+1. **Data & types first** (`data.ts`) — type definitions, mock/seed data, constants, template configs, helper functions. This is always the first extraction because every other file depends on it.
+2. **Shared styles** (`styles.ts`) — color constants, reusable style functions (badge generators, progress bars, shared css`` blocks). Second extraction because components import these.
+3. **Components** — one file per logical section. The method of decomposition is up to the agent: by page section, by feature area, or by interaction pattern — whatever makes the most sense for the artifact. Default export for the primary component, named exports for related helpers.
+
+**Naming:** files use PascalCase for React components (`Dashboard.tsx`, `Timeline.tsx`), camelCase for non-component modules (`data.ts`, `styles.ts`).
+
+**index.tsx remains the orchestrator** — state, routing, and composition only. It imports sub-components and wires them together. Aim for <500 lines after decomposition.
+
+**Don't over-split.** A 600-line file that's cohesive is better than 12 files with 50 lines each. The goal is navigability, not granularity. A component and its tightly-coupled sub-component can share a file.
+
+## GUIDE.md
+
+Every artifact folder **must** include a `GUIDE.md`. Create it after the artifact is functional. This file serves two purposes: it tells the user how to run the artifact, and it tells future Claude sessions (especially channel sessions) what the artifact does and how it's structured.
+
+**GUIDE.md contents:**
+
+1. **Title + one-line description** — what this artifact is
+2. **Quick Start** — numbered steps to get it running. Include exact commands, ports, URLs. For channel artifacts: how to start the channel session, verify connection, and use pin mode.
+3. **File structure** — tree listing of all files in the artifact folder with one-line descriptions
+4. **Features** — bullet list of what the artifact does (interactive elements, views, toggles)
+5. **How Pins Work** (Level 2+) — how the annotation/feedback loop works, what node IDs exist
+6. **Ports** — table of services, ports, and URLs
+
+**When running a channel artifact session**, read the artifact's GUIDE.md first. It contains the node ID map, file structure, and feature list — everything needed to address pinned comments efficiently without re-exploring the codebase.
+
 ## Gotchas
 
 - **Don't over-engineer Level 1.** Single HTML file, inline CSS, no build tools. Speed is the point.
