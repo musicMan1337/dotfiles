@@ -22,3 +22,12 @@ When reading a file, first check its line count. If a file exceeds 2,000 lines, 
 If it exists, read `LOCATIONS.md` next to this file for a map of repos and services on this machine. Use it to find project paths without searching.
 
 When you create or discover a new repo, add it to `LOCATIONS.md`. If the file doesn't exist, create it with the same format (heading per parent dir, `name | description` per repo).
+
+# Numbered Options
+
+When presenting choices in plain text (approve/deny/alter, next steps, etc.), number each option so the user can reply by number. If a skill or tool uses the AskUserQuestion tool with multiple-choice options, use that instead — it already provides structured selection. Numbered options are for free-text responses only.
+
+Example — instead of: "Approve this or make changes?"
+Write:
+1. Approve
+2. Make changes

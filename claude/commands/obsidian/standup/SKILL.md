@@ -67,7 +67,9 @@ PR reviews are real work — they should appear in the standup as their own bull
 
 ## Step 3 — Synthesize into standup bullets
 
-From the extracted session data, PR notes, **and** any completed follow-ups, write **outcome-focused** bullet points. Think about what a team lead cares about in standup — not "edited 5 files" but "fixed the auth middleware bug".
+From the extracted session data, PR notes, **and** any completed follow-ups, write **detailed, outcome-focused** bullet points. The standup is a comprehensive record of what was actually accomplished — it should demonstrate the full scope of work done, not just high-level summaries. Think about what a team lead cares about in standup — not "edited 5 files" but "fixed the auth middleware bug blocking OAuth flow."
+
+**Verbosity goal:** The standup is the source of truth for the day's work. Be thorough — include specific files, components, case numbers, technical details, and decisions made. Other skills (like the briefing) will condense this into shorter summaries. The standup itself should be verbose enough that someone reading it months later understands exactly what was done and why.
 
 **How to synthesize:**
 - Group related activity across sessions by project/feature, not by session
@@ -75,18 +77,20 @@ From the extracted session data, PR notes, **and** any completed follow-ups, wri
 - Use commit messages as the strongest signal — they describe completed work
 - Branch names often encode ticket/feature context (e.g., `Derek/334513-PROSyncing`)
 - If a session has many edits but no commits, it's likely work-in-progress — note it as such
-- Collapse low-signal activity (reading files, exploring code) unless it was the main task (e.g., research/investigation)
+- Include specific details: file names changed, components affected, error counts fixed, tools/libraries involved
+- Collapse only truly low-signal activity (pure file browsing with no outcome) — if reading/exploring led to a discovery or decision, include it
 - Completed follow-ups should appear as their own bullet(s) using the completion notes
 - PR reviews and authored PR activity should appear as bullets, with wikilinks to the PR notes file
 
 **Format — numbered headers with sub-bullets:**
 ```
 1. **Project/Feature** (branch-or-context)
-   - Outcome-focused bullet, single sentence
-   - Another bullet if needed
+   - Detailed outcome bullet — what specifically changed, why, and what it affects
+   - Another bullet with specifics (file names, component names, case numbers)
+   - Sub-tasks or secondary outcomes from the same effort
 ```
 
-Aim for 2-5 numbered sections. **Weight the number of sub-bullets proportionally to time spent** — if 60% of the day was on one feature, that section should have ~60% of the total bullets. Don't give equal bullet counts to a 6-hour focus area and a 30-minute task. Use session duration, number of tool calls, and volume of file edits as proxies for time spent. Merge trivial items. Don't include personal/non-work sessions.
+Aim for 3-6 numbered sections. **Weight the number of sub-bullets proportionally to time spent** — if 60% of the day was on one feature, that section should have ~60% of the total bullets. Don't give equal bullet counts to a 6-hour focus area and a 30-minute task. Use session duration, number of tool calls, and volume of file edits as proxies for time spent. Each section should have 2-5 sub-bullets capturing the specifics. Merge only truly trivial items. Don't include personal/non-work sessions.
 
 ## Step 3b — Enrich bullets with wikilinks
 

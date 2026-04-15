@@ -169,3 +169,10 @@ function set_terminal_title() {
 precmd_functions+=(set_terminal_title)
 chpwd_functions+=(set_terminal_title)
 export PATH=$PATH:$HOME/.maestro/bin
+
+# bun completions
+[ -s "/Users/derek/.bun/_bun" ] && source "/Users/derek/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

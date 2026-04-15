@@ -55,7 +55,7 @@ EOF
 
 If the commit fails due to a pre-commit hook (lint, format, etc.):
 1. Read the error output carefully
-2. Fix the issues the hook flagged
+2. Fix the issues the hook flagged — if they are simple formatting/linting errors (e.g., Prettier, ESLint auto-fixable rules, trailing whitespace), fix them directly. Only fix issues in files being committed, not the entire repo.
 3. Re-stage the fixed files
 4. Create a NEW commit (do NOT use --amend — the failed commit never happened)
 
