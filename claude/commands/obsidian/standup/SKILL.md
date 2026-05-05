@@ -65,9 +65,29 @@ source ~/.zprofile && obsidian read path="reviews/YYYY-MM-DD.md"
 
 PR reviews are real work — they should appear in the standup as their own bullet (e.g., "Reviewed PR #1234 — feedback on error handling in auth flow"). Authored PRs that received activity should also be noted.
 
+## Step 2d — Read existing standup (CRITICAL for incremental synthesis)
+
+Read the existing standup file for the target date:
+```bash
+source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+```
+
+The briefing skill (`/obsidian:briefing`) typically creates this file earlier in the day with `## Yesterday`, `## Today`, and `## Completed` sections. Throughout the day, `/obsidian:standup-add` appends completed work to the `## Completed` section in the user's own voice and detail level.
+
+**When synthesizing for a day that already has a `## Completed` section, those items are LOCKED — they stay verbatim.** Do not rewrite, condense, re-word, or reorganize them. The user has already captured that work with the phrasing and detail they want.
+
+Enumerate the existing Completed items. Your job in Step 3 is purely additive: find work from session data that is NOT already represented in the existing Completed section and propose ONLY those as new items.
+
 ## Step 3 — Synthesize into standup bullets
 
 From the extracted session data, PR notes, **and** any completed follow-ups, write **detailed, outcome-focused** bullet points. The standup is a comprehensive record of what was actually accomplished — it should demonstrate the full scope of work done, not just high-level summaries. Think about what a team lead cares about in standup — not "edited 5 files" but "fixed the auth middleware bug blocking OAuth flow."
+
+**Incremental synthesis rule (when existing `## Completed` section present):**
+- Existing Completed items are frozen — do NOT rewrite them
+- Only synthesize ADDITIONAL items that aren't already captured
+- Cross-check each session's work against existing items before proposing a new bullet
+- If a session's work is already represented (even partially), skip it rather than duplicating or "enhancing"
+- When presenting the draft for approval, clearly label which items are existing (kept verbatim) vs new (proposed additions)
 
 **Verbosity goal:** The standup is the source of truth for the day's work. Be thorough — include specific files, components, case numbers, technical details, and decisions made. Other skills (like the briefing) will condense this into shorter summaries. The standup itself should be verbose enough that someone reading it months later understands exactly what was done and why.
 
@@ -129,7 +149,9 @@ If the file exists and has content, ask the user whether to overwrite or skip.
 source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
 ```
 
-The file content is just the bullets — no heading needed since the filename is the date.
+**Output format — flat list only.** A completed standup is a numbered list of what was done. No section headings (`## Yesterday`, `## Today`, `## Completed`), no subsections. The briefing skill may have created the file with those sections earlier in the day — when completing the standup, replace the entire file with just the flat numbered list. The filename is the date; no heading needed.
+
+**Flattening rule:** When flattening the existing standup file into the final list, the source of truth is the `## Completed` section (locked, verbatim) + any approved new additions from Step 3. Drop all briefing context sections — `## Today`, `## Open Follow-ups`, `## Active Investigations`, `## PRs Awaiting Your Review`, `## Your Open PRs` (and any legacy `## Yesterday`). These are reference context only. For `## Today`, checked items (✓) are usually already reflected in `## Completed` via standup-add, so don't duplicate.
 
 ## Step 5 — Clean up consumed follow-ups
 
@@ -152,3 +174,4 @@ This prevents completed follow-ups from accumulating in the file once they've be
 - **Multiple sessions, same project:** The user often has several sessions in one repo throughout the day. Merge these into unified bullets per feature, not per session.
 - **Skill/command invocations in prompts:** Prompts starting with `<command-name>` or `<command-message>` are slash command invocations — use the command name and args to understand intent, ignore the XML noise.
 - **PR notes are prerequisite.** Always ensure PR notes exist before synthesizing the standup — this avoids duplicate work and ensures wikilinks are valid.
+- **Existing Completed items are locked.** If the standup file already has a `## Completed` section (from `standup-add` throughout the day), those items stay verbatim. Synthesis is purely additive — scan sessions for gaps, propose new items only. Never rewrite or condense what the user already captured.

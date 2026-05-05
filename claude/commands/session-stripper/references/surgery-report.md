@@ -1,3 +1,6 @@
+---
+---
+
 # Session Surgery: What Actually Works
 
 Based on analysis of 4 conversations containing 14+ surgery attempts (9 successes, 5 failures) and verification against 3 real JSONL session files that were successfully modified and continued to work.

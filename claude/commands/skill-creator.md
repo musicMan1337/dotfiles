@@ -1,6 +1,6 @@
 ---
 model: opus
-description: Create a new Claude Code skill or command from a description, conversation context, or transcript. Triggers on: make a skill, turn this into a skill, create a command, new skill, new command, skill from this, make this a command
+description: Create a new Claude Code skill/command. Triggers: make a skill, create a command, turn this into a skill, new skill.
 ---
 
 # Skill Creator

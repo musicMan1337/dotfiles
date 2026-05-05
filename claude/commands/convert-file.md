@@ -1,7 +1,7 @@
 ---
 model: haiku
 allowed-tools: Bash(which *), Bash(pandoc *), Bash(magick *), Bash(sips *), Bash(cwebp *), Bash(dwebp *), Bash(rsvg-convert *), Bash(ffmpeg *), Bash(lame *), Bash(sox *), Bash(yq *), Bash(jq *), Bash(mlr *), Bash(dasel *), Bash(in2csv *), Bash(csvjson *), Bash(csvformat *), Bash(ssconvert *), Bash(xlsx2csv *), Bash(sass *), Bash(esbuild *), Bash(tsc *), Bash(tar *), Bash(gzip *), Bash(gunzip *), Bash(bzip2 *), Bash(bunzip2 *), Bash(xz *), Bash(zip *), Bash(unzip *), Bash(7z *), Bash(unrar *), Bash(woff2_compress *), Bash(woff2_decompress *), Bash(sfnt2woff *), Bash(pyftsubset *), Bash(ebook-convert *), Bash(assimp *), Bash(pdftoppm *), Bash(pdftotext *), Bash(pdfunite *), Bash(pdfseparate *), Bash(pdfimages *), Bash(gs *), Bash(qpdf *), Bash(img2pdf *), Bash(wkhtmltopdf *), Bash(weasyprint *), Bash(dot *), Bash(neato *), Bash(mmdc *), Bash(plantuml *), Bash(sqlite3 *), Bash(sqlite-utils *), Bash(ls *), Bash(file *), Bash(brew install *), Bash(pip install *), Bash(npm install *), Bash(realpath *), Bash(basename *), Bash(dirname *), Bash(mkdir *)
-description: Convert a file to another format using the best CLI tool
+description: Convert a file to another format via best CLI tool.
 ---
 
 ## Your task

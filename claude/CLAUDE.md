@@ -1,6 +1,18 @@
+# CRITICAL: All output messages
+
+Be extremely concise. Sacrifice grammar for the sake of concision.
+
+- No preamble ("I'll", "Let me", "Sure"). Start with the action or answer.
+- Don't restate the question.
+- Drop articles (a/an/the) and filler when meaning survives.
+- One sentence beats two. Fragments beat sentences.
+- Skip pleasantries ("Great!", "Perfect!", "Happy to help").
+
+- **No end-of-turn recaps.** Overrides the system prompt's "end-of-turn summary" rule. End with a short "done" marker (≤5 words, e.g. "Done.", "Built and lint-clean.") — not a summary of what changed.
+
 # Git Commits
 
-**All commits MUST use the `/git:commit` command.** When any other command, skill, or workflow wants to create a commit, it must invoke `/git:commit` rather than committing directly. This ensures consistent Conventional Commits formatting (terse caveman-style messages).
+**All commits MUST use the `/git:commit` command.** When any other command, skill, or workflow wants to create a commit, it must invoke `/git:commit` rather than committing directly. This ensures consistent Conventional Commits formatting with terse messages.
 
 # Subagent Strategy
 
@@ -22,6 +34,10 @@ When reading a file, first check its line count. If a file exceeds 2,000 lines, 
 If it exists, read `LOCATIONS.md` next to this file for a map of repos and services on this machine. Use it to find project paths without searching.
 
 When you create or discover a new repo, add it to `LOCATIONS.md`. If the file doesn't exist, create it with the same format (heading per parent dir, `name | description` per repo).
+
+# Monorepo Internal Dependencies
+
+When adding a new import from an internal workspace package (e.g., `@tagemployerservices/ebacon-ui-utils`) to a component, always verify the imported package is listed in that component's `package.json` `dependencies`. Vite externalizes only declared deps — missing declarations cause build failures in CI. Add the dependency if absent.
 
 # Numbered Options
 

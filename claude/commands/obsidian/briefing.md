@@ -16,16 +16,29 @@ No args needed — defaults to "brief me for today". The user might also say:
 - "briefing for monday" (if catching up after a weekend)
 - "what did I miss yesterday"
 
-## Step 0 — Check prior day's standup (BLOCKING)
+## Step 0 — Compute dates (MANDATORY, first action)
 
-This step gates the entire briefing. Do NOT proceed to Step 1 until resolved.
+Do not guess the weekday. Run this before anything else to get authoritative `$TODAY` and `$YESTERDAY` (Mon→Fri handled):
+
+```bash
+today=$(date "+%Y-%m-%d"); dow=$(date "+%u"); \
+  if [ "$dow" = "1" ]; then yday=$(date -v-3d "+%Y-%m-%d"); \
+  elif [ "$dow" = "7" ]; then yday=$(date -v-2d "+%Y-%m-%d"); \
+  else yday=$(date -v-1d "+%Y-%m-%d"); fi; \
+  echo "today=$today ($(date '+%A'))"; echo "yesterday=$yday"
+```
+
+Use the printed `today` / `yesterday` values everywhere below — never substitute a guessed date.
+
+## Step 1 — Check prior day's standup (BLOCKING)
+
+This step gates the entire briefing. Do NOT proceed to Step 2 until resolved.
 
 Read the prior workday's standup file:
 
 ```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+source ~/.zprofile && obsidian read path="standup/$yday.md"
 ```
-(Use previous workday's date — Friday if today is Monday.)
 
 **A completed standup is just a title and bullet points — no sections like `## Today`, `## Completed`, `## Yesterday`, etc.** If the file has section headers, it hasn't been finalized by `/obsidian:standup` yet.
 
@@ -40,29 +53,23 @@ source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
 
 If the user says yes, invoke `/obsidian:standup` via the Skill tool with the prior date, then continue with the briefing. If they decline, proceed without it — but note in the briefing's Yesterday section that it's reconstructed from incomplete data.
 
-## Step 1 — Gather context (parallel)
+## Step 2 — Gather context (parallel)
 
-Run these in parallel to collect all the data:
+Run these in parallel to collect all the data. Note: yesterday's standup was already read in Step 1 for the completeness gate — do NOT re-read or display it here. The user opens yesterday's notes themselves.
 
-### A. Yesterday's standup (what was done)
-```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
-```
-Use yesterday's date (or last workday if today is Monday).
-
-### B. Open follow-ups
+### A. Open follow-ups
 ```bash
 source ~/.zprofile && obsidian read path="followups.md"
 ```
 Filter to unchecked items (`- [ ]`). Flag any that are past their date as overdue.
 
-### C. Active investigations
+### B. Active investigations
 ```bash
 source ~/.zprofile && obsidian search query="Status: Active" path="investigations"
 ```
 Read any active investigation files to get their summaries.
 
-### D. PRs awaiting your review
+### C. PRs awaiting your review
 
 **IMPORTANT:** `gh pr list` defaults to the current directory's repo, which may not be where PRs live. Use `gh api` with search queries to find PRs across all repos:
 
@@ -70,7 +77,7 @@ Read any active investigation files to get their summaries.
 gh api "search/issues?q=review-requested:musicMan1337+is:open+is:pr&per_page=10" --jq '.items[] | {number, title, html_url, user: .user.login, repository: .repository_url}'
 ```
 
-### E. Your open PRs (waiting on others)
+### D. Your open PRs (waiting on others)
 
 Same issue — must search across all repos, not just the current directory:
 
@@ -88,14 +95,11 @@ Or batch it by fetching from known repos:
 gh pr list --author musicMan1337 --state open --repo OWNER/REPO --json number,title,url,headRefName,reviewDecision --limit 10
 ```
 
-## Step 2 — Present the briefing
+## Step 3 — Present the briefing
 
-Show the user a structured summary:
+Show the user a structured summary. Do NOT include a Yesterday section — the user opens yesterday's notes themselves.
 
 ```
-## Yesterday
-[condensed version of yesterday's standup — pithy one-liners per section, not the full verbose standup]
-
 ## Open Follow-ups
 - [overdue items first, flagged]
 - [upcoming items]
@@ -106,17 +110,19 @@ Show the user a structured summary:
 (or "None" if clear)
 
 ## PRs Awaiting Your Review
-- #123 "Title" by @author — [repo]
+- [Repo #123](https://github.com/OWNER/REPO/pull/123) "Title" by @author
 (or "None" if clear)
 
 ## Your Open PRs
-- #456 "Title" — [branch] — [approved/changes requested/pending review]
+- [Repo #456](https://github.com/OWNER/REPO/pull/456) "Title" — [branch] — [approved/changes requested/pending review]
 (or "None" if clear)
 ```
 
+**Every PR MUST be a clickable markdown link.** Format: `[Repo #NUMBER](https://github.com/OWNER/REPO/pull/NUMBER)`. Use the PR's `html_url` from the `gh api` response — never write a bare `#123` or plain repo-number. This applies to both the presented briefing AND the written standup file.
+
 The **Open PRs** sections aren't necessarily TODO items — they're visibility bumps so PRs don't get forgotten. Include the branch name and review status so the user can quickly gauge which need attention.
 
-## Step 3 — Draft today's plan
+## Step 4 — Draft today's plan
 
 Based on everything above, draft a "Today" section with planned bullets. Use judgment:
 - Overdue follow-ups become today items
@@ -131,35 +137,75 @@ Show the draft to the user and ask:
 
 Iterate until the user is happy.
 
-## Step 4 — Write today's standup
+## Step 5 — Write today's standup
 
-Write today's standup file combining yesterday's work and today's plan:
+Write today's standup file with today's plan plus the briefing context sections (follow-ups, investigations, PRs). Do NOT include a Yesterday section — yesterday's standup lives in its own file.
+
+These sections stay in the file through the day for reference. End-of-day `/obsidian:standup` synthesis strips everything except the finalized Completed bullets.
 
 ```bash
-source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
+source ~/.zprofile && obsidian create path="standup/$today.md" content="..." overwrite
 ```
 
 **Format:**
 ```
-## Yesterday
-
-[yesterday's bullets — copied from yesterday's standup file]
-
----
 ## Today
 
 [today's planned bullets from Step 3]
+
+## Completed
+
+<!-- standup-add appends here throughout the day -->
+
+---
+## Open Follow-ups
+
+[follow-ups from Step 2 — or "None"]
+
+## Active Investigations
+
+[investigations from Step 2 — or "None"]
+
+## PRs Awaiting Your Review
+
+[PRs from Step 2 — each as `[Repo #NUMBER](html_url) "Title" by @author` — or "None"]
+
+## Your Open PRs
+
+[PRs from Step 2 — each as `[Repo #NUMBER](html_url) "Title" — branch — status` — or "None"]
 ```
 
+**Every PR entry MUST be a clickable markdown link** using the PR's `html_url` from `gh api`. No bare `#123`.
+
+The empty `## Completed` section is preemptive — `/obsidian:standup-add` appends to it throughout the day instead of creating it.
+
 If today's standup file already exists, read it first and ask the user whether to overwrite or skip.
+
+## Step 6 — Archive old standups
+
+After writing today's standup, archive any files in `standup/` beyond the 10 most recent. Keep the 10 newest in `standup/` root; move the rest to `standup/archive/`.
+
+```bash
+source ~/.zprofile && obsidian files folder="standup"
+```
+
+Parse the output — filter to files directly under `standup/` (exclude `standup/archive/...`). Sort by filename descending (dates as `YYYY-MM-DD.md` sort naturally). Keep the first 10; move the rest.
+
+For each file to archive:
+```bash
+source ~/.zprofile && obsidian move path="standup/YYYY-MM-DD.md" to="standup/archive/YYYY-MM-DD.md"
+```
+
+If the archive move fails with `ENOENT: no such file or directory` on the destination, the `standup/archive/` folder doesn't exist yet — create it once with a plain `mkdir -p <vault>/standup/archive` (the vault path is visible in the ENOENT error). Then retry the moves.
+
+Skip archiving if there are 10 or fewer files in `standup/` root.
 
 ## Gotchas
 
 - **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
-- **Monday morning:** Yesterday means Friday. Skip weekends unless the user explicitly asks about them.
+- **Dates come from Step 0, not memory.** Never infer today's weekday from context — always run the Step 0 date script first. The script already handles the Monday→Friday rollback.
 - **Don't fabricate plans.** Only draft today items from real signals (follow-ups, PRs, investigations, carry-over). If there's nothing, say so — the user will add their own.
-- **Yesterday's standup is the source of truth for "Yesterday".** Don't re-synthesize from session data if the file already exists — it was already reviewed and approved.
-- **Condense Yesterday, don't copy.** The standup file is intentionally verbose and detailed. For the briefing, condense each numbered section into a single pithy line — just enough to jog memory, not re-read the full record. Example: standup says "Updated Trust/FringeSaver/TimeSaver quote templates with new rollover fringe/non-fringe adjustment bullets per Case #339646 requirements, created eBaconQuote CLAUDE.md scope doc for cross-repo context" → briefing says "Case #339646 — eBacon quote template updates".
+- **No Yesterday section.** Don't display or write a Yesterday section — yesterday's standup lives in its own file; the user opens it directly. Step 1 reads it only for the completeness gate.
 - **The user's additions are the most important part.** The automated stuff is just a starting point. Always ask for additions before writing.
 - **gh CLI failures:** If GitHub is unreachable, skip the PR sections and note it. Don't block the whole briefing.
 - **Open PRs are visibility, not action items.** Don't auto-promote every open PR to a TODO. Only PRs that need attention (review requested, changes requested, stale) should become Today items.

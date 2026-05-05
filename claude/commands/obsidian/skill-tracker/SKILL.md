@@ -169,7 +169,7 @@ After deletion, show what was removed and remind the user to commit the dotfiles
 
 - **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
 - **Renamed skills inflate counts if not merged.** The rename map in Step 3 is critical — without it, `git-commit` (89 uses) and `git:commit` (22 uses) look like two different skills. Update the map when skills are renamed.
-- **Plugin skills vs file skills.** Some skills come from plugins (e.g., `caveman`, `code-review`) — they show in the installed list via `settings.json` plugins, not as files in `commands/`. These can't be "deleted" the same way — they need to be disabled in settings instead. Flag these differently in the prune list.
+- **Plugin skills vs file skills.** Some skills come from plugins (e.g., `code-review`) — they show in the installed list via `settings.json` plugins, not as files in `commands/`. These can't be "deleted" the same way — they need to be disabled in settings instead. Flag these differently in the prune list.
 - **dev/ is sacred.** Never offer to delete anything in `~/.claude/commands/dev/` — it's a real directory with local-only skills, not symlinked from dotfiles.
 - **History only tracks invocations, not implicit triggers.** If a skill auto-triggers from conversation context (description matching), that invocation may not appear as `/skill-name` in history. Usage counts are a lower bound.
 - **Don't delete skills the user just created.** If a skill was created today or in the current session, it'll show as "never used" — that's expected. Use `firstUsed` / file creation date as a signal.

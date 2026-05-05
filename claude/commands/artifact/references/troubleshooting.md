@@ -1,3 +1,6 @@
+---
+---
+
 # Channel artifact — troubleshooting
 
 Every failure mode we've hit while building this pattern, with the one-liner fix.

@@ -7,7 +7,7 @@ allowed-tools: Bash(source ~/.zprofile && obsidian *), Read
 
 # Standup Add
 
-Append completed work to a standup note's `## Completed` section. Strike through matching TODOs in the `## Today` section.
+Append completed work to a standup note. If the note still has briefing structure (`## Today`, `## Completed`), work within that structure. If the note is already a flat numbered list (completed standup), append new items to the end of the list.
 
 ## Input
 
@@ -43,7 +43,7 @@ Use their description as-is, lightly formatted into bullets if needed.
 source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
 ```
 
-If no standup file exists, create one with just the `## Completed` section.
+If no standup file exists, create one as a flat numbered list (no section headings).
 
 ## Step 3 — Match and strike through TODOs
 

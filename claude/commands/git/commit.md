@@ -35,7 +35,7 @@ Then read the full diff. If `git diff HEAD` is >200 lines, use `--stat` and sele
 ### Step 2 — Stage and commit
 
 1. Stage files with `git add` — prefer specific files over `git add -A`. Never stage `.env`, credentials, or secrets.
-2. Write commit message — Conventional Commits, terse caveman style:
+2. Write commit message — Conventional Commits, terse:
    - Subject: `<type>(<scope>): <imperative summary>` — **50 char cap**, hard max 72
    - Types: feat, fix, refactor, perf, docs, test, chore, build, ci, style, revert
    - Body: only when "why" isn't obvious. Skip for self-explanatory changes.

@@ -37,6 +37,7 @@ const BUILTIN_COMMANDS = new Set([
   // Common single-word builtins that overlap with skill-like patterns
   "usage", "status", "stats", "theme", "rate-limit-options", "plugin",
   "chrome", "open-repo", "effort", "obs", "btw", "excalidrawx",
+  "reload-plugins",
 ]);
 
 // Renamed skills — map old names to current canonical names
@@ -60,7 +61,7 @@ const RENAMES = {
 // Bare namespace invocations (e.g., "/factory" without subcommand) — noise
 const NAMESPACE_ONLY = new Set([
   "factory", "obsidian", "git", "gsd", "ffmpeg", "spec", "dev",
-  "research", "mcp", "notebooklm", "caveman", "linting",
+  "research", "mcp", "notebooklm", "linting", "caveman",
 ]);
 
 // Parse args

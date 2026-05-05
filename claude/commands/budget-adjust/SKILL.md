@@ -1,7 +1,7 @@
 ---
 name: budget-adjust
 model: sonnet
-description: Adjust the Boo Boo Budget — add/remove/update expenses across accounts, update salary from paystub. Triggers on: budget, add expense, remove expense, budget adjust, update salary, change budget
+description: Adjust Boo Boo Budget — expenses, salary, paystub updates. Triggers: budget, add/remove expense, update salary.
 ---
 
 # Budget Adjust

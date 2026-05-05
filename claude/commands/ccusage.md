@@ -1,6 +1,6 @@
 ---
 model: haiku
-description: Query Claude Code usage and costs via the ccusage CLI. Takes natural language questions about token usage, costs, model breakdown, session costs. Triggers on: usage, ccusage, how much did this cost, token usage, spending, cost breakdown, session cost, daily cost, model usage
+description: Query Claude Code usage/costs via ccusage CLI. Triggers: usage, cost breakdown, token usage, session/daily cost, spending.
 ---
 
 # ccusage — Claude Code Usage Query

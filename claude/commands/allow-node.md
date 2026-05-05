@@ -1,7 +1,7 @@
 ---
 model: haiku
 allowed-tools: Bash, Read, Edit
-description: Add Node/TypeScript permission rules to project settings. Triggers on: allow node, setup node permissions, add node rules, configure typescript permissions, permit npm
+description: Add Node/TypeScript permission rules to project settings. Triggers: allow node, permit npm, typescript permissions.
 ---
 
 Add a comprehensive set of Node.js / TypeScript permission rules to `.claude/settings.local.json` in the current project.

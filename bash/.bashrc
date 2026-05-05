@@ -38,3 +38,5 @@ PS1="\[\033[38;5;9m\]\u\[$(tput sgr0)\]\[\033[38;5;10m\][\[$(tput sgr0)\]\[\033[
 export PATH="$PATH:/Users/derek/.lmstudio/bin"
 # End of LM Studio CLI section
 
+
+. "$HOME/.turso/env"

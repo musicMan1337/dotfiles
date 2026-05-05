@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
@@ -77,11 +80,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/caveman-startup.sh\"",
-            "statusMessage": "CAVEMAN MODE ACTIVE — level: full"
-          },
-          {
-            "type": "command",
             "command": "bash \"$HOME/.claude/hooks/sync-theme.sh\""
           },
           {
@@ -102,21 +100,36 @@
     "csharp-lsp@claude-plugins-official": false,
     "php-lsp@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "firecrawl@claude-plugins-official": true,
-    "caveman@caveman": true
+    "firecrawl@claude-plugins-official": false,
+    "pm-toolkit@pm-skills": false,
+    "pm-product-strategy@pm-skills": false,
+    "pm-product-discovery@pm-skills": false,
+    "pm-market-research@pm-skills": false,
+    "pm-data-analytics@pm-skills": false,
+    "pm-marketing-growth@pm-skills": false,
+    "pm-go-to-market@pm-skills": false,
+    "pm-execution@pm-skills": false
   },
   "extraKnownMarketplaces": {
-    "caveman": {
+    "cli-anything": {
       "source": {
         "source": "github",
-        "repo": "JuliusBrussee/caveman"
+        "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "pm-skills": {
+      "source": {
+        "source": "github",
+        "repo": "phuryn/pm-skills"
       }
     }
   },
-  "effortLevel": "medium",
+  "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "light",
+  "autoCompactEnabled": false,
   "terminalOutputLimit": 150000,
   "disableTelemetry": true,
   "disableErrorReporting": true,

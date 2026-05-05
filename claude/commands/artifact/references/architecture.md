@@ -1,3 +1,6 @@
+---
+---
+
 # Channel artifact — architecture
 
 Deeper notes on *why* the pattern is shaped this way, and where it's reasonable to deviate.

@@ -170,29 +170,12 @@ case "$effort" in
   *)          effort_bars="${b}${b}${g}" ;;
 esac
 
-# Caveman mode badge (reads flag file written by caveman-mode-tracker hook)
-caveman_badge=""
-if [ -f "$HOME/.claude/.caveman-active" ]; then
-  caveman_mode=$(cat "$HOME/.claude/.caveman-active" 2>/dev/null | tr -d '[:space:]')
-  if [ -n "$caveman_mode" ] && [ "$caveman_mode" != "off" ]; then
-    c_black=$'\033[1;30m'
-    case "$caveman_mode" in
-      full)   caveman_badge="${c_black}[CAVEMAN]${c_reset}" ;;
-      lite)   caveman_badge="${c_black}[CAVEMAN-L]${c_reset}" ;;
-      ultra)  caveman_badge="${c_black}[CAVEMAN-U]${c_reset}" ;;
-      *)      upper=$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')
-              caveman_badge="${c_black}[CAVEMAN:${upper}]${c_reset}" ;;
-    esac
-  fi
-fi
-
-# Build output - Line 1: model | costs | context | caveman
+# Build output - Line 1: model | costs | context
 line1=()
 model_seg="${model} ${effort_bars}"
 line1+=("🤖 ${model_seg}")
 [ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && line1+=("💰 ${cost_seg}")
 [ -n "$ctx" ] && line1+=("🧠 ${ctx}")
-[ -n "$caveman_badge" ] && line1+=("🪨 ${caveman_badge}")
 
 # Build output - Line 2: directory | git
 line2=()
