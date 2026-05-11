@@ -1,7 +1,7 @@
 ---
 name: linting:setup
 model: opus
-description: Set up the strictest possible linting, formatting, and type checking for the current repo with pre-commit hooks. Triggers on: setup linting, add linting, strict linting, configure prettier, configure eslint, add formatting, setup pre-commit hooks, enforce code style, add type checking, lint this repo, strict types
+description: Set up strict linting, formatting, type checking, and pre-commit hooks. Triggers on: setup linting, add formatting, pre-commit hooks
 allowed-tools: Agent, Bash, Read, Write, Edit, Glob, Grep, Skill
 ---
 

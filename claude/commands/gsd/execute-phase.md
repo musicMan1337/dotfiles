@@ -1,6 +1,6 @@
 ---
 name: gsd:execute-phase
-description: Execute all plans in a phase with wave-based parallelization
+description: Execute all plans in a phase with wave-based parallel subagents. Triggers on: execute phase, run phase, build phase
 argument-hint: "<phase-number> [--gaps-only]"
 allowed-tools:
   - Read

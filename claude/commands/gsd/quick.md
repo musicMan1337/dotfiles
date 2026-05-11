@@ -1,6 +1,6 @@
 ---
 name: gsd:quick
-description: Execute a quick task with GSD guarantees (atomic commits, state tracking) but skip optional agents
+description: Execute small ad-hoc tasks with GSD guarantees but skip optional agents. Triggers on: quick task, quick fix, small task
 argument-hint: "[--full] [--discuss]"
 allowed-tools:
   - Read

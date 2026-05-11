@@ -1,7 +1,7 @@
 ---
 name: obsidian:standup
 model: haiku
-description: Generate standup notes from today's Claude Code sessions and write to Obsidian. Triggers on: standup, standup notes, draft standup, what did I do today, yesterday's standup, generate standup
+description: Generate standup notes from Claude Code sessions and write to Obsidian. Triggers on: standup, draft standup, what did I do today
 ---
 
 # Standup Notes

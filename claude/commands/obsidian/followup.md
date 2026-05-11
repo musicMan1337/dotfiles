@@ -1,7 +1,7 @@
 ---
 name: obsidian:followup
 model: haiku
-description: Track follow-up items in Obsidian — things to circle back on, waiting on someone, blocked items. Triggers on: followup, follow up, remind me, circle back, waiting on, blocked on, follow-ups
+description: Track follow-up items in Obsidian — waiting on, blocked on, circle back. Triggers on: follow up, remind me, blocked on
 ---
 
 # Follow-up Tracker

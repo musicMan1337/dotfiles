@@ -1,7 +1,7 @@
 ---
 name: spec:implement
 model: opus
-description: Implement a spec file using parallel sub-agents, committing between waves. Triggers on: implement the spec, build this spec, execute spec, code the spec, implement spec file
+description: Implement a spec file via parallel sub-agents, committing between waves. Triggers on: implement spec, build spec, execute spec
 ---
 
 # spec-implement

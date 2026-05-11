@@ -1,7 +1,7 @@
 ---
 name: obsidian:pr-notes
 model: haiku
-description: Create PR notes in Obsidian from GitHub reviews and authored PRs. Triggers on: pr notes, pr review notes, log pr review, review notes, what prs did I review, my prs
+description: Create PR notes in Obsidian from GitHub reviews and authored PRs. Triggers on: pr notes, review notes, my prs
 ---
 
 # PR Notes

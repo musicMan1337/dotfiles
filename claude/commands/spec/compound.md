@@ -1,7 +1,7 @@
 ---
 name: spec:compound
 model: opus
-description: Document a just-solved problem into docs/solutions/ so future work compounds. Triggers on: compound this, capture learning, document solution, spec compound, that worked document it, write this up, add to solutions
+description: Document a solved problem into docs/solutions/ for future reuse. Triggers on: compound this, capture learning, document solution
 ---
 
 # spec-compound

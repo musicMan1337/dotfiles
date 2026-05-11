@@ -1,7 +1,7 @@
 ---
 name: research:execute
 model: opus
-description: Execute actions from synthesized research output using parallel sub-agents. Triggers on: execute the research, apply research findings, act on research, implement research results
+description: Execute actions from synthesized research via parallel sub-agents. Triggers on: execute research, apply findings, act on research
 ---
 
 # research-execute

@@ -1,7 +1,7 @@
 ---
 name: obsidian:decision
 model: haiku
-description: Log a decision to Obsidian with context and alternatives considered. Triggers on: decision, log decision, we decided, decided to, decision log, record decision
+description: Log a decision to Obsidian with context and alternatives. Triggers on: log decision, we decided, decision log
 ---
 
 # Decision Log

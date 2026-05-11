@@ -1,6 +1,6 @@
 ---
 name: gsd:health
-description: Diagnose planning directory health and optionally repair issues
+description: Diagnose planning directory health and optionally repair issues. Triggers on: planning health, diagnose planning, repair planning
 argument-hint: [--repair]
 allowed-tools:
   - Read

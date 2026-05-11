@@ -1,6 +1,6 @@
 ---
 name: gsd:add-todo
-description: Capture idea or task as todo from current conversation context
+description: Capture idea or task as structured todo from conversation. Triggers on: add todo, capture idea, save for later
 argument-hint: [optional description]
 allowed-tools:
   - Read

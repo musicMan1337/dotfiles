@@ -1,7 +1,7 @@
 ---
 name: obsidian:skill-tracker
 model: haiku
-description: Track skill usage stats and prune unused skills. Creates/updates skill-tracker.md in Obsidian. Triggers on: skill tracker, track skills, skill usage, which skills do I use, unused skills, prune skills, clean up skills, skill audit
+description: Track skill usage stats and prune unused skills via Obsidian note. Triggers on: track skills, skill usage, prune skills
 allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node *), Bash(ls *), Bash(readlink *), Bash(rm *), Bash(unlink *), Read, Edit, Glob
 ---
 

@@ -1,6 +1,6 @@
 ---
 model: opus
-description: Execute task fully autonomously via parallel sub-agents. Triggers: do this yourself, autonomous, hands-off, just do it, figure it out.
+description: Execute task autonomously without user input via parallel sub-agents. Triggers on: do this yourself, autonomous, figure it out
 ---
 
 # autonomous-mode

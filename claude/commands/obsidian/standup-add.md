@@ -1,7 +1,7 @@
 ---
 name: obsidian:standup-add
 model: haiku
-description: Add completed work to today's standup note and clear matching briefing TODOs. Triggers on: standup add, add to standup, mark done, completed, done with, finished, log work, wrapped up, just finished, I'm done, ship it to standup
+description: Add completed work to today's standup and clear matching briefing TODOs. Triggers on: add to standup, mark done, log work
 allowed-tools: Bash(source ~/.zprofile && obsidian *), Read
 ---
 

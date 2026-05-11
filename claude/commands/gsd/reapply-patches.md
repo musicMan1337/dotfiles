@@ -1,5 +1,5 @@
 ---
-description: Reapply local modifications after a GSD update
+description: Reapply local modifications after a GSD update. Triggers on: reapply patches, restore gsd patches, merge patches
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: gsd:insert-phase
-description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
+description: Insert urgent work as decimal phase between existing phases. Triggers on: insert phase, urgent phase, decimal phase
 argument-hint: <after> <description>
 allowed-tools:
   - Read

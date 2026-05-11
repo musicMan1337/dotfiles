@@ -1,6 +1,6 @@
 ---
 name: git:pr-suggestions
-description: Address unresolved review comments on a PR — bot, human, or otherwise. Triggers on: pr suggestions, review comments, address review, pr feedback, check suggestions, pr comments
+description: Address unresolved review comments on a PR. Triggers on: pr suggestions, review comments, address review
 allowed-tools: Bash(gh *), Bash(git *), Bash(dotnet *), Bash(npm run lint*), Bash(npx prettier*), Bash(grep*), Read, Write, Edit, Glob, Grep, Agent, Skill(git:commit), Skill(code-review:code-review)
 ---
 

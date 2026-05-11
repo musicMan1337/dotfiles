@@ -1,6 +1,6 @@
 ---
 name: gsd:update
-description: Update GSD to latest version with changelog display
+description: Update GSD to latest version with changelog display. Triggers on: update gsd, upgrade gsd, gsd latest
 allowed-tools:
   - Bash
   - AskUserQuestion

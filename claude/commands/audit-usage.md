@@ -1,6 +1,6 @@
 ---
 model: haiku
-description: Audit Claude Code session for context bloat and misconfigured settings. Triggers: audit usage, context/token audit, why am I hitting limits.
+description: Audit Claude Code session for context bloat and wasted tokens. Triggers on: audit usage, context bloat, token usage
 ---
 
 # Usage & Context Audit

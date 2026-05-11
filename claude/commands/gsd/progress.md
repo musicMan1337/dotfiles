@@ -1,6 +1,6 @@
 ---
 name: gsd:progress
-description: Check project progress, show context, and route to next action (execute or plan)
+description: Check project progress and route to next action. Triggers on: progress, what's next, project status
 allowed-tools:
   - Read
   - Bash

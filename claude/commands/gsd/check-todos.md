@@ -1,6 +1,6 @@
 ---
 name: gsd:check-todos
-description: List pending todos and select one to work on
+description: List pending todos and select one to work on. Triggers on: check todos, list todos, work on todo
 argument-hint: [area filter]
 allowed-tools:
   - Read

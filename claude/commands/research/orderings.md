@@ -1,7 +1,7 @@
 ---
 name: research:orderings
 model: sonnet
-description: Research a topic using multiple context orderings to minimize gaps and false positives. Triggers on: deep research, research this thoroughly, investigate, multi-angle research, comprehensive research
+description: Research a topic with multiple context orderings to minimize gaps. Triggers on: deep research, thorough investigation, multi-angle research
 ---
 
 # research-orderings

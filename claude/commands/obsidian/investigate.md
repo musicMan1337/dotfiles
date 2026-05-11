@@ -1,7 +1,7 @@
 ---
 name: obsidian:investigate
 model: haiku
-description: Create or append to an investigation note in Obsidian for debugging, research, or exploration. Triggers on: investigate, investigation, debug notes, research trail, what did I find, log investigation
+description: Create or append an investigation note in Obsidian for debugging research. Triggers on: investigate, debug notes, research trail
 ---
 
 # Investigation Journal

@@ -1,6 +1,6 @@
 ---
 name: gsd:settings
-description: Configure GSD workflow toggles and model profile
+description: Configure GSD workflow toggles and model profile interactively. Triggers on: gsd settings, gsd config, configure gsd
 allowed-tools:
   - Read
   - Write

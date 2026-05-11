@@ -1,6 +1,6 @@
 ---
 name: gsd:debug
-description: Systematic debugging with persistent state across context resets
+description: Systematic debugging via subagent with persistent state. Triggers on: debug this, systematic debug, investigate bug
 argument-hint: [issue description]
 allowed-tools:
   - Read

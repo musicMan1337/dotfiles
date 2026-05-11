@@ -1,6 +1,6 @@
 ---
 name: git:pr
-description: Create a pull request for the current branch. Triggers on: make a PR, open PR, create pull request, push and PR, submit PR
+description: Create a pull request for the current branch via Haiku subagent. Triggers on: make a PR, open PR, create pull request
 allowed-tools: Agent
 ---
 

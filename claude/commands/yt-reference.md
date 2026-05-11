@@ -2,7 +2,7 @@
 name: ffmpeg:yt-reference
 model: sonnet
 allowed-tools: Bash(yt-dlp:*), Bash(ffmpeg:*), Bash(ffprobe:*), Bash(ls:*), Bash(mkdir:*), Bash(cat:*), Bash(rm:*), Bash(wc:*), Bash(head:*), Bash(python3:*), Bash(file:*), Bash(cp:*), Bash(source:*), Bash(obsidian:*), Read(*), Write(*)
-description: Extract reference screenshots from YouTube videos aligned with transcript timestamps. Saves to Obsidian vault as references/<run>/ with images and transcript markdown. Triggers on: yt reference, youtube reference, youtube screenshots, design reference, grab frames from youtube, video reference, scrape a video for reference, screenshot that youtube video, pull frames from
+description: Extract timestamped screenshots and transcripts from YouTube videos to Obsidian. Triggers on: youtube reference, grab frames, video reference
 ---
 
 ## Activation

@@ -1,7 +1,7 @@
 ---
 name: obsidian:factory
 model: haiku
-description: Manage factory session files in Obsidian. Sub-agents write findings to session folders instead of returning to orchestrator. Triggers on: factory file, write factory session, factory obsidian, session file
+description: Manage factory session files in Obsidian for sub-agent findings. Triggers on: factory file, factory session, session file
 ---
 
 # Factory Session Files

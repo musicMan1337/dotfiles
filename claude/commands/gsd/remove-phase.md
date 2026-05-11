@@ -1,6 +1,6 @@
 ---
 name: gsd:remove-phase
-description: Remove a future phase from roadmap and renumber subsequent phases
+description: Remove a future phase from roadmap and renumber subsequent phases. Triggers on: remove phase, delete phase, cancel phase
 argument-hint: <phase-number>
 allowed-tools:
   - Read

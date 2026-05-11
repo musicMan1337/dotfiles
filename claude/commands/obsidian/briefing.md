@@ -1,7 +1,7 @@
 ---
 name: obsidian:briefing
 model: haiku
-description: Morning briefing — show where you left off, open follow-ups, pending reviews, and draft today's standup plan. Triggers on: briefing, morning briefing, start my day, where did I leave off, what's on my plate, daily briefing
+description: Morning briefing — restore context, list follow-ups, draft standup plan. Triggers on: briefing, start my day, where did I leave off
 ---
 
 # Daily Briefing

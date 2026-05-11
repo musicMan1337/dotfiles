@@ -1,6 +1,6 @@
 ---
 name: gsd:list-phase-assumptions
-description: Surface Claude's assumptions about a phase approach before planning
+description: Surface Claude's assumptions about a phase before planning. Triggers on: phase assumptions, list assumptions, what do you think
 argument-hint: "[phase]"
 allowed-tools:
   - Read

@@ -1,6 +1,6 @@
 ---
 name: gsd:join-discord
-description: Join the GSD Discord community
+description: Show the GSD Discord invite link. Triggers on: gsd discord, join discord, gsd community
 ---
 
 <objective>

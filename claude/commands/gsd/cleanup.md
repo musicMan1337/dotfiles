@@ -1,6 +1,6 @@
 ---
 name: gsd:cleanup
-description: Archive accumulated phase directories from completed milestones
+description: Archive accumulated phase directories from completed milestones. Triggers on: cleanup phases, archive phases, planning cleanup
 ---
 <objective>
 Archive phase directories from completed milestones into `.planning/milestones/v{X.Y}-phases/`.

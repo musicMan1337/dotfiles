@@ -1,6 +1,6 @@
 ---
 name: gsd:set-profile
-description: Switch model profile for GSD agents (quality/balanced/budget)
+description: Switch model profile for GSD agents (quality/balanced/budget). Triggers on: set profile, gsd profile, change model profile
 argument-hint: <profile>
 allowed-tools:
   - Read

@@ -1,6 +1,6 @@
 ---
 name: gsd:add-tests
-description: Generate tests for a completed phase based on UAT criteria and implementation
+description: Generate unit and E2E tests for a completed phase. Triggers on: add tests, generate tests, write tests for phase
 argument-hint: "<phase> [additional instructions]"
 allowed-tools:
   - Read

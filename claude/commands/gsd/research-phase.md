@@ -1,6 +1,6 @@
 ---
 name: gsd:research-phase
-description: Research how to implement a phase (standalone - usually use /gsd:plan-phase instead)
+description: Research how to implement a phase via subagent (standalone). Triggers on: research phase, investigate phase, phase research
 argument-hint: "[phase]"
 allowed-tools:
   - Read

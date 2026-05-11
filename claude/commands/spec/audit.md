@@ -1,7 +1,7 @@
 ---
 name: spec:audit
 model: opus
-description: Verify a spec file is fully and correctly implemented, then fix any gaps. Triggers on: audit the spec, check spec implementation, verify spec, is the spec done, spec review
+description: Verify a spec is fully implemented, then fix any gaps. Triggers on: audit spec, verify spec, spec review
 ---
 
 # spec-audit

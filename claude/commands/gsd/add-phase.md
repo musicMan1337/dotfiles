@@ -1,6 +1,6 @@
 ---
 name: gsd:add-phase
-description: Add phase to end of current milestone in roadmap
+description: Add a new phase to end of current milestone roadmap. Triggers on: add phase, new phase, append phase
 argument-hint: <description>
 allowed-tools:
   - Read

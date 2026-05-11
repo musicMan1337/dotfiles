@@ -1,6 +1,6 @@
 ---
 name: gsd:help
-description: Show available GSD commands and usage guide
+description: Show available GSD commands and usage guide. Triggers on: gsd help, gsd commands, gsd reference
 ---
 <objective>
 Display the complete GSD command reference.

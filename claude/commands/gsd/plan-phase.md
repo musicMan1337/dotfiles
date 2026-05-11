@@ -1,6 +1,6 @@
 ---
 name: gsd:plan-phase
-description: Create detailed phase plan (PLAN.md) with verification loop
+description: Create detailed phase plans with verification loop. Triggers on: plan phase, create plan, phase plan
 argument-hint: "[phase] [--auto] [--research] [--skip-research] [--gaps] [--skip-verify] [--prd <file>]"
 agent: gsd-planner
 allowed-tools:

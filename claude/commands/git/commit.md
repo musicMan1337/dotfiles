@@ -1,6 +1,6 @@
 ---
 name: git:commit
-description: Create a git commit with lint checks. Triggers on: commit, save changes, commit this, git commit
+description: Create a git commit with lint checks via Haiku subagent. Triggers on: commit, save changes, commit this
 allowed-tools: Agent
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: gsd:verify-work
-description: Validate built features through conversational UAT
+description: Validate built features through conversational UAT. Triggers on: verify work, uat, test built features
 argument-hint: "[phase number, e.g., '4']"
 allowed-tools:
   - Read

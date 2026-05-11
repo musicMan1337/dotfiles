@@ -1,7 +1,7 @@
 ---
 name: obsidian:notify
 model: haiku
-description: Write enriched notifications to Obsidian daily factory notes. Called by /factory:notify. One note per day, append-only. Triggers on: obsidian notify, factory note, write factory notification
+description: Write enriched notifications to Obsidian daily factory notes. Triggers on: factory note, factory notification
 ---
 
 # Obsidian Factory Notification

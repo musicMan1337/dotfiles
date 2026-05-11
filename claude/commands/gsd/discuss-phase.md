@@ -1,6 +1,6 @@
 ---
 name: gsd:discuss-phase
-description: Gather phase context through adaptive questioning before planning
+description: Gather phase context through adaptive questioning before planning. Triggers on: discuss phase, phase context, clarify phase
 argument-hint: "<phase> [--auto]"
 allowed-tools:
   - Read
