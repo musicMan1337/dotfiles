@@ -119,14 +119,7 @@ for TARGET in "$HOME/dotfiles/claude/hooks"/*; do
   check_and_create_link "$HOME/.claude/hooks/$BASENAME" "$TARGET"
 done
 
-# Skills/commands intentionally NOT symlinked into ~/.claude/commands.
-# Source of truth: ~/dotfiles/claude/commands. Discovered only inside dotfiles
-# via the repo-internal symlink ~/dotfiles/.claude/commands -> ../claude/commands.
-# Purge any pre-existing global symlinks from older versions of this script.
-if [ -e "$HOME/.claude/commands" ] || [ -L "$HOME/.claude/commands" ]; then
-  echo "Purging global ~/.claude/commands (skills are now repo-scoped)..."
-  rm -rf "$HOME/.claude/commands"
-fi
+check_and_create_directory_link "$HOME/.claude/commands" "$HOME/dotfiles/claude/commands"
 
 echo =======================================================================
 echo
