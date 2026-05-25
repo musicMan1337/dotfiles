@@ -1,5 +1,5 @@
 ---
-name: linting:setup
+name: setup:linting
 model: opus
 description: Set up strict linting, formatting, type checking, and pre-commit hooks. Triggers on: setup linting, add formatting, pre-commit hooks
 allowed-tools: Agent, Bash, Read, Write, Edit, Glob, Grep, Skill
