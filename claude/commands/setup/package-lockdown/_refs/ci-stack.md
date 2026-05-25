@@ -1,0 +1,93 @@
+# CI security stack
+
+Source: playbook §5. Defense in depth via **layered, non-overlapping** tools. More tools means more noise, not more security.
+
+## Recommended combination (each layer catches different things)
+
+| # | Layer | Tool | Frequency | Catches |
+|---|---|---|---|---|
+| 1 | Pre-install | Socket.dev Firewall | Local dev | Novel malware (T1, T2, T5) |
+| 2 | Pre-PR | dependency-review-action | PR open | License + vuln introduction |
+| 3 | Per-PR | OSV-Scanner | PR / merge | Known CVEs (cross-language) |
+| 4 | Per-PR | pip-audit | PR (Python) | Python-specific advisories |
+| 5 | Per-PR | pnpm audit + signatures | PR (Node) | Known CVEs + provenance |
+| 6 | Per-PR | Trivy | PR (Docker) | Container CVEs + secrets |
+| 7 | Per-PR | zizmor | PR (Actions) | Workflow misconfigs |
+| 8 | Continuous | Renovate | Daily | Outdated deps with cooldown |
+| 9 | Continuous | Dependabot (security) | Daily | Security-only PRs (backup) |
+| 10 | Post-deploy | SBOM (Syft) | Push to main | Inventory for IR (L8) |
+
+## Do not add (overlap = noise, not coverage)
+
+- Snyk + OSV-Scanner (overlap on CVEs; OSV is free and broader)
+- npm audit + pnpm audit (pnpm audit uses npm's DB)
+- Grype + Trivy (overlap)
+- Safety + pip-audit (pip-audit is the PyPA-official superset)
+
+## Renovate config template
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "security:minimumReleaseAgeNpm",
+    ":dependencyDashboard",
+    ":separateMajorReleases",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "minimumReleaseAge": null,
+    "automerge": false,
+    "labels": ["security", "vulnerability"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on Monday"],
+    "automerge": false
+  },
+  "packageRules": [
+    {
+      "description": "Majors require 14-day cooldown + manual review",
+      "matchUpdateTypes": ["major"],
+      "minimumReleaseAge": "14 days",
+      "automerge": false
+    },
+    {
+      "description": "Minor / patch: 7-day cooldown",
+      "matchUpdateTypes": ["minor", "patch"],
+      "minimumReleaseAge": "7 days",
+      "automerge": false
+    },
+    {
+      "description": "GitHub Actions: pin to SHAs, 3-day cooldown",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "ML / AI libraries: 14 days, always manual",
+      "matchPackageNames": ["torch", "transformers", "numpy", "spacy"],
+      "minimumReleaseAge": "14 days",
+      "automerge": false
+    }
+  ]
+}
+```
+
+Key: `vulnerabilityAlerts.minimumReleaseAge: null` bypasses cooldown only for security-flagged bumps. This resolves the cooldown-vs-fresh-fix tension.
+
+## Branch protection (required)
+
+```sh
+gh api repos/$ORG/$REPO/branches/main/protection \
+  --method PUT \
+  --field required_status_checks='{"strict":true,"contexts":["osv-scanner","pip-audit","pnpm-audit","dependency-review","ci"]}' \
+  --field enforce_admins=true \
+  --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":true}' \
+  --field required_linear_history=true \
+  --field allow_force_pushes=false \
+  --field allow_deletions=false
+```
