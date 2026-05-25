@@ -1,6 +1,7 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_WORKFLOWS": "1"
   },
   "attribution": {
     "commit": "",
@@ -33,7 +34,6 @@
       "Read(**/.next/**)",
       "Read(**/out/**)",
       "Read(**/*.lock)",
-      "Read(**/package-lock.json)",
       "Read(**/pnpm-lock.yaml)",
       "Read(**/yarn.lock)"
     ]
@@ -108,7 +108,9 @@
     "pm-data-analytics@pm-skills": false,
     "pm-marketing-growth@pm-skills": false,
     "pm-go-to-market@pm-skills": false,
-    "pm-execution@pm-skills": false
+    "pm-execution@pm-skills": false,
+    "splunk-mcp-plugin@tag-claude-plugins": true,
+    "viper-stage-plugin@tag-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "cli-anything": {
@@ -121,6 +123,12 @@
       "source": {
         "source": "github",
         "repo": "phuryn/pm-skills"
+      }
+    },
+    "tag-claude-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "TAGEmployerServices/claude-plugins"
       }
     }
   },
