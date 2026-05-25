@@ -1,0 +1,11 @@
+{
+  "_doc": "Map of repo-name -> install command. Used by /vuln:scan to install deps before osv-scanner runs. Keys must exactly match the repo name (basename of clone dir). Remove the _doc / _examples keys after filling in real entries.",
+  "_examples": {
+    "some-node-app": "pnpm install --frozen-lockfile",
+    "some-npm-app": "npm ci",
+    "some-yarn-app": "yarn install --frozen-lockfile",
+    "some-go-service": "go mod download",
+    "some-dotnet-svc": "dotnet restore",
+    "some-monorepo": "pnpm -r install --frozen-lockfile"
+  }
+}
