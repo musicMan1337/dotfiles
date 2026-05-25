@@ -170,24 +170,20 @@ case "$effort" in
   *)          effort_bars="${b}${b}${g}" ;;
 esac
 
-# Build output - Line 1: model | costs | context
-line1=()
+# Build output: model | costs | context | directory | git (single line)
+parts=()
 model_seg="${model} ${effort_bars}"
-line1+=("🤖 ${model_seg}")
-[ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && line1+=("💰 ${cost_seg}")
-[ -n "$ctx" ] && line1+=("🧠 ${ctx}")
+parts+=("🤖 ${model_seg}")
+[ -n "$cost_seg" ] && [ ! -f "$HOME/.claude/.hide-costs" ] && parts+=("💰 ${cost_seg}")
+[ -n "$ctx" ] && parts+=("🧠 ${ctx}")
+parts+=("📂 ${short_cwd}")
+[ -n "$git_seg" ] && parts+=("${git_seg}")
 
-# Build output - Line 2: directory | git
-line2=()
-line2+=("📂 ${short_cwd}")
-[ -n "$git_seg" ] && line2+=("${git_seg}")
-
-# Join each line with " | "
+# Join with " | "
 join_parts() {
   local IFS='|'
   local joined="${*}"
   echo "$joined" | sed 's/|/ | /g'
 }
 
-echo "$(join_parts "${line1[@]}")"
-echo "$(join_parts "${line2[@]}")"
+echo "$(join_parts "${parts[@]}")"
