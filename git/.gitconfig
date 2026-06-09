@@ -92,5 +92,5 @@ bdone = "!f() { \
 \
   git checkout \"$branch\"; \
   git pull -p; \
-  git branch -vv | grep ': gone]' | grep -v '\\*' | awk '{ print $1; }' | xargs -r git branch -D; \
+  git branch -vv | grep ': gone]' | grep -vE '^[ ]*[*+]' | awk '{ print $1; }' | xargs -r git branch -D; \
 }; f"
