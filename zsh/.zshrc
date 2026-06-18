@@ -87,13 +87,14 @@ plugins=(
   zsh-autosuggestions
   zsh-syntax-highlighting
   docker
-  docker-compose
   dotenv
   node
   npm
-  react-native
   dotnet
 )
+
+# Skip oh-my-zsh's compaudit insecure-directory scan on every startup (perf)
+ZSH_DISABLE_COMPFIX="true"
 
 source $ZSH/oh-my-zsh.sh
 
