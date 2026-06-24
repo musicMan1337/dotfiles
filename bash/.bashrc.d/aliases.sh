@@ -8,6 +8,7 @@ alias .5='cd ../../../../..'
 alias exp='explorer.exe .'
 alias c.='code .'
 alias c='clear'
+alias cc='claude --dangerously-skip-permissions'
 alias l.='ls -d .* --color=auto'
 
 #~ navigation
