@@ -7,3 +7,6 @@ __pycache__
 .factory
 .firecrawl
 files/
+
+# local artifact previews (preview-before-publish, see augment:artifact-design)
+artifacts/

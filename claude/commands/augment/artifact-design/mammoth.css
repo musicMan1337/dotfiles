@@ -1,0 +1,490 @@
+/*
+ * mammoth.css — "Warm Editorial" design spec for self-contained HTML artifacts.
+ *
+ * Ported from the mammoth-ui design system (~/code/mammoth-ui) into standalone,
+ * framework-free CSS. The shipped library uses Tailwind v4 `@theme`; this file
+ * lowers those tokens to plain `:root` custom properties so they work inside a
+ * single inlined <style> with no build step and no external requests.
+ *
+ * USAGE (augment:artifact-design): inline this whole file into the artifact's
+ * <style>, then build every color / type / motion decision off these tokens.
+ * Reference SEMANTIC tokens (--mm-*) in your rules, never the raw --color-*
+ * primitives. Light + dark are both wired (data-theme or prefers-color-scheme).
+ *
+ * Three layers below:
+ *   1. PRIMITIVES   — 9 warm OKLCH families × 11 steps (raw; do not reference)
+ *   2. SEMANTIC     — role tokens (--mm-*), light + dark
+ *   3. EDITORIAL    — fonts, fluid type, off-grid spacing, base element styling
+ *                     (the repo documents these as principles but ships them as
+ *                      Tailwind defaults; baked in here because an artifact is a
+ *                      typographic document, not a component library)
+ */
+
+/* ════════════════════════════════════════════════════════════════
+   FONT EMBED SLOT
+   Artifacts are CSP-sealed: no Google Fonts, no CDN, no remote woff2.
+   The stacks below NAME the intended faces first (Newsreader / DM Sans /
+   JetBrains Mono) and fall back to the closest warm, humanist system faces.
+   To get pixel-faithful type, paste base64 woff2 @font-face blocks HERE; the
+   stacks will pick them up automatically. Until then the fallbacks render.
+   ════════════════════════════════════════════════════════════════ */
+/* @font-face { font-family:'Newsreader'; src:url(data:font/woff2;base64,...) format('woff2'); font-weight:400 700; font-display:swap; } */
+
+/* ════════════════════════════════════════════════════════════════
+   1. PRIMITIVES — raw OKLCH ramps (never reference directly)
+   Hues: ivory 87° · clay 42° · moss 155° · ink 45° · sand 60°
+         sage 130° · amber 75° · ember 25° · slate 250° (the only cool tone)
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  /* IVORY — warm off-white (bg/surfaces) */
+  --color-ivory-50: oklch(97% 0.012 87);
+  --color-ivory-100: oklch(95.5% 0.015 87);
+  --color-ivory-200: oklch(93.5% 0.018 87);
+  --color-ivory-300: oklch(91% 0.02 87);
+  --color-ivory-400: oklch(87.5% 0.022 87);
+  --color-ivory-500: oklch(84% 0.024 87);
+  --color-ivory-600: oklch(78% 0.022 87);
+  --color-ivory-700: oklch(69% 0.02 87);
+  --color-ivory-800: oklch(56% 0.016 87);
+  --color-ivory-900: oklch(40% 0.012 87);
+  --color-ivory-950: oklch(29% 0.008 87);
+
+  /* CLAY — terracotta (primary brand accent) */
+  --color-clay-50: oklch(96.8% 0.018 42);
+  --color-clay-100: oklch(94% 0.038 42);
+  --color-clay-200: oklch(89.5% 0.072 42);
+  --color-clay-300: oklch(84% 0.108 42);
+  --color-clay-400: oklch(77% 0.14 42);
+  --color-clay-500: oklch(62% 0.14 42);
+  --color-clay-600: oklch(53% 0.133 42);
+  --color-clay-700: oklch(43.5% 0.115 42);
+  --color-clay-800: oklch(33.5% 0.085 42);
+  --color-clay-900: oklch(23.8% 0.055 42);
+  --color-clay-950: oklch(16.2% 0.03 42);
+
+  /* MOSS — jade green (secondary brand / logo) */
+  --color-moss-50: oklch(96.8% 0.018 155);
+  --color-moss-100: oklch(94.2% 0.035 155);
+  --color-moss-200: oklch(90% 0.058 155);
+  --color-moss-300: oklch(84.8% 0.082 155);
+  --color-moss-400: oklch(77.8% 0.105 155);
+  --color-moss-500: oklch(66.8% 0.115 155);
+  --color-moss-600: oklch(57.8% 0.105 155);
+  --color-moss-700: oklch(47.8% 0.086 155);
+  --color-moss-800: oklch(36.8% 0.064 155);
+  --color-moss-900: oklch(26% 0.042 155);
+  --color-moss-950: oklch(17.5% 0.024 155);
+
+  /* INK — warm near-black (text / dark surfaces) */
+  --color-ink-50: oklch(96.8% 0.008 45);
+  --color-ink-100: oklch(94% 0.012 45);
+  --color-ink-200: oklch(90% 0.016 45);
+  --color-ink-300: oklch(84% 0.018 45);
+  --color-ink-400: oklch(74% 0.02 45);
+  --color-ink-500: oklch(62% 0.02 45);
+  --color-ink-600: oklch(50% 0.018 45);
+  --color-ink-700: oklch(39% 0.016 45);
+  --color-ink-800: oklch(29.5% 0.013 45);
+  --color-ink-900: oklch(21.5% 0.01 45);
+  --color-ink-950: oklch(14.8% 0.007 45);
+
+  /* SAND — warm gray (borders / muted / neutrals) */
+  --color-sand-50: oklch(97% 0.01 60);
+  --color-sand-100: oklch(94.8% 0.016 60);
+  --color-sand-200: oklch(91.2% 0.022 60);
+  --color-sand-300: oklch(86% 0.026 60);
+  --color-sand-400: oklch(77.5% 0.03 60);
+  --color-sand-500: oklch(65.5% 0.03 60);
+  --color-sand-600: oklch(53.5% 0.026 60);
+  --color-sand-700: oklch(41.8% 0.022 60);
+  --color-sand-800: oklch(31.5% 0.018 60);
+  --color-sand-900: oklch(22% 0.014 60);
+  --color-sand-950: oklch(15.2% 0.01 60);
+
+  /* SAGE — yellow-green (success) */
+  --color-sage-50: oklch(96.8% 0.015 130);
+  --color-sage-100: oklch(94.2% 0.028 130);
+  --color-sage-200: oklch(90.2% 0.046 130);
+  --color-sage-300: oklch(85% 0.062 130);
+  --color-sage-400: oklch(78.2% 0.078 130);
+  --color-sage-500: oklch(67.5% 0.088 130);
+  --color-sage-600: oklch(57.8% 0.08 130);
+  --color-sage-700: oklch(47.5% 0.065 130);
+  --color-sage-800: oklch(36.5% 0.048 130);
+  --color-sage-900: oklch(25.8% 0.032 130);
+  --color-sage-950: oklch(17.5% 0.018 130);
+
+  /* AMBER — yellow-orange (warning) */
+  --color-amber-50: oklch(96.8% 0.022 75);
+  --color-amber-100: oklch(94.2% 0.045 75);
+  --color-amber-200: oklch(90.2% 0.078 75);
+  --color-amber-300: oklch(85.2% 0.112 75);
+  --color-amber-400: oklch(79% 0.142 75);
+  --color-amber-500: oklch(70% 0.155 75);
+  --color-amber-600: oklch(60% 0.145 75);
+  --color-amber-700: oklch(49% 0.12 75);
+  --color-amber-800: oklch(37.5% 0.088 75);
+  --color-amber-900: oklch(26.5% 0.056 75);
+  --color-amber-950: oklch(18.2% 0.033 75);
+
+  /* EMBER — warm red (error/danger) */
+  --color-ember-50: oklch(96.8% 0.022 25);
+  --color-ember-100: oklch(94% 0.048 25);
+  --color-ember-200: oklch(89.5% 0.085 25);
+  --color-ember-300: oklch(83.8% 0.125 25);
+  --color-ember-400: oklch(76.2% 0.16 25);
+  --color-ember-500: oklch(65% 0.172 25);
+  --color-ember-600: oklch(55.8% 0.162 25);
+  --color-ember-700: oklch(45.5% 0.135 25);
+  --color-ember-800: oklch(35% 0.098 25);
+  --color-ember-900: oklch(24.8% 0.062 25);
+  --color-ember-950: oklch(16.8% 0.037 25);
+
+  /* SLATE — cool blue-gray (info; the only cool tone) */
+  --color-slate-50: oklch(97% 0.01 250);
+  --color-slate-100: oklch(94.8% 0.018 250);
+  --color-slate-200: oklch(91% 0.028 250);
+  --color-slate-300: oklch(85.5% 0.036 250);
+  --color-slate-400: oklch(76.8% 0.042 250);
+  --color-slate-500: oklch(64.5% 0.044 250);
+  --color-slate-600: oklch(52.2% 0.04 250);
+  --color-slate-700: oklch(40.8% 0.034 250);
+  --color-slate-800: oklch(30.5% 0.026 250);
+  --color-slate-900: oklch(21.2% 0.018 250);
+  --color-slate-950: oklch(14.6% 0.012 250);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   2. SEMANTIC — role tokens. Reference THESE in artifact rules.
+   ════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme='light'] {
+  /* Surfaces */
+  --mm-surface-default: var(--color-ivory-50);
+  --mm-surface-raised: var(--color-ivory-100);
+  --mm-surface-overlay: var(--color-ivory-200);
+  --mm-surface-sunken: var(--color-ivory-300);
+  --mm-surface-disabled: var(--color-sand-100);
+
+  /* Text */
+  --mm-text-default: var(--color-ink-900);
+  --mm-text-body: var(--color-ink-700);
+  --mm-text-muted: var(--color-sand-600);
+  --mm-text-disabled: var(--color-sand-500);
+  --mm-text-inverse: var(--color-ivory-50);
+  --mm-text-on-emphasis: var(--color-ivory-50);
+
+  /* Brand accent (clay) — the primary interactive color */
+  --mm-accent-default: var(--color-clay-500);
+  --mm-accent-hover: var(--color-clay-600);
+  --mm-accent-active: var(--color-clay-700);
+  --mm-accent-text: var(--color-clay-600);
+  --mm-accent-subtle: var(--color-clay-50);
+  --mm-accent-disabled: var(--color-sand-300);
+
+  /* Secondary accent (moss) — brand, NOT success */
+  --mm-secondary-default: var(--color-moss-500);
+  --mm-secondary-hover: var(--color-moss-600);
+  --mm-secondary-active: var(--color-moss-700);
+  --mm-secondary-text: var(--color-moss-700);
+  --mm-secondary-subtle: var(--color-moss-50);
+
+  /* Borders */
+  --mm-border-default: var(--color-sand-300);
+  --mm-border-muted: var(--color-sand-200);
+  --mm-border-emphasis: var(--color-sand-400);
+  --mm-border-focus: var(--color-clay-500);
+  --mm-border-disabled: var(--color-sand-200);
+
+  /* Feedback (reserved for feedback only) */
+  --mm-success: var(--color-sage-600);
+  --mm-success-text: var(--color-sage-700);
+  --mm-success-subtle: var(--color-sage-100);
+  --mm-success-border: var(--color-sage-300);
+  --mm-success-icon: var(--color-sage-600);
+
+  --mm-warning: var(--color-amber-600);
+  --mm-warning-text: var(--color-amber-700);
+  --mm-warning-subtle: var(--color-amber-100);
+  --mm-warning-border: var(--color-amber-300);
+  --mm-warning-icon: var(--color-amber-600);
+
+  --mm-error: var(--color-ember-600);
+  --mm-error-hover: var(--color-ember-700);
+  --mm-error-active: var(--color-ember-800);
+  --mm-error-text: var(--color-ember-700);
+  --mm-error-subtle: var(--color-ember-100);
+  --mm-error-border: var(--color-ember-300);
+  --mm-error-icon: var(--color-ember-600);
+
+  --mm-info: var(--color-slate-600);
+  --mm-info-text: var(--color-slate-700);
+  --mm-info-subtle: var(--color-slate-100);
+  --mm-info-border: var(--color-slate-300);
+  --mm-info-icon: var(--color-slate-600);
+
+  /* Overlay */
+  --mm-overlay: oklch(0% 0 0 / 40%);
+  --mm-overlay-heavy: oklch(0% 0 0 / 70%);
+}
+
+[data-theme='dark'] {
+  --mm-surface-default: var(--color-ink-950);
+  --mm-surface-raised: var(--color-ink-900);
+  --mm-surface-overlay: var(--color-ink-800);
+  --mm-surface-sunken: oklch(10% 0.005 45);
+  --mm-surface-disabled: var(--color-ink-800);
+
+  --mm-text-default: var(--color-ivory-50);
+  --mm-text-body: var(--color-ivory-100);
+  --mm-text-muted: var(--color-sand-400);
+  --mm-text-disabled: var(--color-sand-600);
+  --mm-text-inverse: var(--color-ink-950);
+  --mm-text-on-emphasis: var(--color-ivory-50);
+
+  /* accents step LIGHTER on dark for contrast */
+  --mm-accent-default: var(--color-clay-400);
+  --mm-accent-hover: var(--color-clay-300);
+  --mm-accent-active: var(--color-clay-500);
+  --mm-accent-text: var(--color-clay-300);
+  --mm-accent-subtle: var(--color-clay-900);
+  --mm-accent-disabled: var(--color-ink-700);
+
+  --mm-secondary-default: var(--color-moss-400);
+  --mm-secondary-hover: var(--color-moss-300);
+  --mm-secondary-active: var(--color-moss-500);
+  --mm-secondary-text: var(--color-moss-300);
+  --mm-secondary-subtle: var(--color-moss-900);
+
+  --mm-border-default: var(--color-ink-700);
+  --mm-border-muted: var(--color-ink-800);
+  --mm-border-emphasis: var(--color-ink-600);
+  --mm-border-focus: var(--color-clay-400);
+  --mm-border-disabled: var(--color-ink-800);
+
+  --mm-success: var(--color-sage-400);
+  --mm-success-text: var(--color-sage-300);
+  --mm-success-subtle: var(--color-sage-900);
+  --mm-success-border: var(--color-sage-700);
+  --mm-success-icon: var(--color-sage-400);
+
+  --mm-warning: var(--color-amber-400);
+  --mm-warning-text: var(--color-amber-300);
+  --mm-warning-subtle: var(--color-amber-900);
+  --mm-warning-border: var(--color-amber-700);
+  --mm-warning-icon: var(--color-amber-400);
+
+  --mm-error: var(--color-ember-400);
+  --mm-error-hover: var(--color-ember-300);
+  --mm-error-active: var(--color-ember-500);
+  --mm-error-text: var(--color-ember-300);
+  --mm-error-subtle: var(--color-ember-900);
+  --mm-error-border: var(--color-ember-700);
+  --mm-error-icon: var(--color-ember-400);
+
+  --mm-info: var(--color-slate-400);
+  --mm-info-text: var(--color-slate-300);
+  --mm-info-subtle: var(--color-slate-900);
+  --mm-info-border: var(--color-slate-700);
+  --mm-info-icon: var(--color-slate-400);
+
+  --mm-overlay: oklch(0% 0 0 / 60%);
+  --mm-overlay-heavy: oklch(0% 0 0 / 80%);
+}
+
+/* System-preference fallback when no data-theme is set */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --mm-surface-default: var(--color-ink-950);
+    --mm-surface-raised: var(--color-ink-900);
+    --mm-surface-overlay: var(--color-ink-800);
+    --mm-surface-sunken: oklch(10% 0.005 45);
+    --mm-surface-disabled: var(--color-ink-800);
+
+    --mm-text-default: var(--color-ivory-50);
+    --mm-text-body: var(--color-ivory-100);
+    --mm-text-muted: var(--color-sand-400);
+    --mm-text-disabled: var(--color-sand-600);
+    --mm-text-inverse: var(--color-ink-950);
+    --mm-text-on-emphasis: var(--color-ivory-50);
+
+    --mm-accent-default: var(--color-clay-400);
+    --mm-accent-hover: var(--color-clay-300);
+    --mm-accent-active: var(--color-clay-500);
+    --mm-accent-text: var(--color-clay-300);
+    --mm-accent-subtle: var(--color-clay-900);
+    --mm-accent-disabled: var(--color-ink-700);
+
+    --mm-secondary-default: var(--color-moss-400);
+    --mm-secondary-hover: var(--color-moss-300);
+    --mm-secondary-active: var(--color-moss-500);
+    --mm-secondary-text: var(--color-moss-300);
+    --mm-secondary-subtle: var(--color-moss-900);
+
+    --mm-border-default: var(--color-ink-700);
+    --mm-border-muted: var(--color-ink-800);
+    --mm-border-emphasis: var(--color-ink-600);
+    --mm-border-focus: var(--color-clay-400);
+    --mm-border-disabled: var(--color-ink-800);
+
+    --mm-success: var(--color-sage-400);
+    --mm-success-text: var(--color-sage-300);
+    --mm-success-subtle: var(--color-sage-900);
+    --mm-success-border: var(--color-sage-700);
+    --mm-success-icon: var(--color-sage-400);
+
+    --mm-warning: var(--color-amber-400);
+    --mm-warning-text: var(--color-amber-300);
+    --mm-warning-subtle: var(--color-amber-900);
+    --mm-warning-border: var(--color-amber-700);
+    --mm-warning-icon: var(--color-amber-400);
+
+    --mm-error: var(--color-ember-400);
+    --mm-error-hover: var(--color-ember-300);
+    --mm-error-active: var(--color-ember-500);
+    --mm-error-text: var(--color-ember-300);
+    --mm-error-subtle: var(--color-ember-900);
+    --mm-error-border: var(--color-ember-700);
+    --mm-error-icon: var(--color-ember-400);
+
+    --mm-info: var(--color-slate-400);
+    --mm-info-text: var(--color-slate-300);
+    --mm-info-subtle: var(--color-slate-900);
+    --mm-info-border: var(--color-slate-700);
+    --mm-info-icon: var(--color-slate-400);
+
+    --mm-overlay: oklch(0% 0 0 / 60%);
+    --mm-overlay-heavy: oklch(0% 0 0 / 80%);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   3. EDITORIAL LAYER — type, motion, shape, base element styling
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  /* Type roles: editorial serif display + humanist sans body, never Inter/system-ui as the sole face.
+     Named faces resolve first if embedded above; warm humanist fallbacks otherwise. */
+  --mm-font-display: 'Newsreader', 'Lora', 'Iowan Old Style', 'Charter', 'Palatino Linotype', Palatino, Georgia, serif;
+  --mm-font-body: 'DM Sans', 'Avenir Next', Avenir, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mm-font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Fluid type scale (all-rem clamps, per design docs) */
+  --mm-text-display: clamp(2.5rem, 1.6rem + 4.2vw, 4.5rem);
+  --mm-text-h1: clamp(2rem, 1.4rem + 2.8vw, 3.25rem);
+  --mm-text-h2: clamp(1.5rem, 1.15rem + 1.6vw, 2.25rem);
+  --mm-text-h3: clamp(1.2rem, 1.05rem + 0.7vw, 1.5rem);
+  --mm-text-lead: clamp(1.12rem, 1.04rem + 0.4vw, 1.3rem);
+  --mm-text-body-size: 1.0625rem;
+  --mm-text-small: 0.875rem;
+  --mm-text-caption: 0.75rem;
+
+  /* Display tracking + line-height (tighten as size grows) */
+  --mm-tracking-display: -0.035em;
+  --mm-tracking-heading: -0.02em;
+  --mm-leading-display: 1.05;
+  --mm-leading-heading: 1.2;
+  --mm-leading-body: 1.6;
+
+  /* Reading measure */
+  --mm-measure: 68ch;
+
+  /* Off-grid spacing (5/9/14/22... breaks the mechanical 4/8 grid on purpose) */
+  --mm-space-3xs: 5px;
+  --mm-space-2xs: 9px;
+  --mm-space-xs: 14px;
+  --mm-space-sm: 22px;
+  --mm-space-md: 35px;
+  --mm-space-lg: 56px;
+  --mm-space-xl: 90px;
+
+  /* Shape — modest radii (matches rounded-md/-lg usage) */
+  --mm-radius-sm: 4px;
+  --mm-radius-md: 6px;
+  --mm-radius-lg: 8px;
+  --mm-radius-full: 9999px;
+
+  /* The "single weird texture": ONE hard-offset shadow as the system fingerprint.
+     Use it consistently on the one element type you choose; do not also use soft shadows. */
+  --mm-shadow-hard: 4px 4px 0 0 var(--color-ink-900);
+  --mm-shadow-soft: 0 14px 34px -22px oklch(21.5% 0.01 45 / 0.5);
+
+  /* Motion — per-property only; standard is the workhorse (NOT ease-in-out) */
+  --motion-duration-micro: 80ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 250ms;
+  --motion-duration-slow: 400ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.2); /* playful overshoot for entrances */
+  --motion-easing-enter: cubic-bezier(0, 0, 0.2, 1);
+  --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1); /* decisive, no bounce */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-micro: 0.01ms;
+    --motion-duration-fast: 0.01ms;
+    --motion-duration-base: 0.01ms;
+    --motion-duration-slow: 0.01ms;
+  }
+}
+
+/* ---- Base resets ---- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--mm-surface-default);
+  color: var(--mm-text-body);
+  font-family: var(--mm-font-body);
+  font-size: var(--mm-text-body-size);
+  line-height: var(--mm-leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--mm-font-display);
+  color: var(--mm-text-default);
+  text-wrap: balance; /* design docs: "AI never includes this" */
+  letter-spacing: var(--mm-tracking-heading);
+  line-height: var(--mm-leading-heading);
+  margin: 0 0 0.5em;
+  font-weight: 600;
+}
+h1 { font-size: var(--mm-text-h1); letter-spacing: var(--mm-tracking-display); line-height: var(--mm-leading-display); }
+h2 { font-size: var(--mm-text-h2); }
+h3 { font-size: var(--mm-text-h3); }
+
+p { margin: 0 0 1em; max-width: var(--mm-measure); }
+
+a {
+  color: var(--mm-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+a:hover { color: var(--mm-accent-hover); }
+
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--mm-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--mm-radius-sm);
+}
+
+code, pre, kbd, samp { font-family: var(--mm-font-mono); font-size: 0.9em; }
+code {
+  background: var(--mm-accent-subtle);
+  color: var(--mm-accent-text);
+  padding: 0.1em 0.4em;
+  border-radius: var(--mm-radius-sm);
+}
+pre { overflow-x: auto; }
+
+hr { border: none; border-top: 1px solid var(--mm-border-default); margin: var(--mm-space-md) 0; }
+
+::selection { background: var(--mm-accent-subtle); color: var(--mm-text-default); }
+
+img, svg, video, canvas { max-width: 100%; height: auto; }
