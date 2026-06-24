@@ -16,8 +16,7 @@
       "Glob(**)",
       "WebSearch",
       "WebFetch(*)",
-      "Skill(*)",
-      "mcp__*"
+      "Skill(*)"
     ],
     "deny": [
       "Bash(sudo *)",
@@ -38,6 +37,7 @@
       "Read(**/yarn.lock)"
     ]
   },
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -108,7 +108,8 @@
     "pm-data-analytics@pm-skills": false,
     "pm-marketing-growth@pm-skills": false,
     "pm-go-to-market@pm-skills": false,
-    "pm-execution@pm-skills": false
+    "pm-execution@pm-skills": false,
+    "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
     "cli-anything": {
@@ -122,17 +123,24 @@
         "source": "github",
         "repo": "phuryn/pm-skills"
       }
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
     }
   },
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "light",
+  "theme": "dark",
   "autoCompactEnabled": false,
   "terminalOutputLimit": 150000,
   "disableTelemetry": true,
   "disableErrorReporting": true,
   "disableFeedbackDisplay": true,
-  "autoCompactThreshold": 75
+  "autoCompactThreshold": 75,
+  "tui": "fullscreen"
 }

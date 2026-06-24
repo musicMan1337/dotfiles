@@ -91,6 +91,7 @@ if (-not (Test-Path $ghosttyDir)) { New-Item -ItemType Directory -Path $ghosttyD
 Check-And-Create-Link "$ghosttyDir\config" "$env:USERPROFILE\dotfiles\ghostty\config" $false
 
 Check-And-Create-Link "$env:USERPROFILE\.claude\settings.json" "$env:USERPROFILE\dotfiles\claude\settings.json" $false
+Check-And-Create-Link "$env:USERPROFILE\.claude\CLAUDE.md" "$env:USERPROFILE\dotfiles\claude\CLAUDE.md" $false
 
 foreach ($subdir in @("hooks", "commands", "scripts")) {
     $targetDir = "$env:USERPROFILE\dotfiles\claude\$subdir"
