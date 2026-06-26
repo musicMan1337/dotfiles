@@ -151,7 +151,6 @@
     "project:_refs:pillars": "user-invocable-only",
     "project:_refs:orchestration": "user-invocable-only",
     "research:execute": "user-invocable-only",
-    "research:orderings": "user-invocable-only",
     "convert-file": "user-invocable-only",
     "audit-usage": "user-invocable-only",
     "autonomous-mode": "user-invocable-only",
