@@ -65,6 +65,7 @@
     "splunk:viper": "user-invocable-only",
     "setup:ci": "user-invocable-only",
     "setup:linting": "user-invocable-only",
+    "setup:sub-agent-config": "user-invocable-only",
     "setup:package-lockdown": "user-invocable-only",
     "setup:package-lockdown:_refs:anti-patterns": "user-invocable-only",
     "setup:package-lockdown:_refs:bootstrap-day-zero": "user-invocable-only",
