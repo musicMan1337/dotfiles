@@ -16,7 +16,7 @@ Your only job is to launch the subagent and relay its one-line result.
 
 ## Spawn the subagent
 
-Use the Agent tool with `model: "haiku"` and this prompt (adapt the working directory if needed):
+Use the Agent tool with `subagent_type: "committer"` (a defined Haiku agent; the generic catch-all is blocked by the subagent gate and cannot run git) and this prompt (adapt the working directory if needed):
 
 ---
 
@@ -43,6 +43,7 @@ Then read the full diff. If `git diff HEAD` is >200 lines, use `--stat` and sele
    - No filler ("This commit", "I", "we", "now"), no emoji, no period on subject
    - Bullets use `-` not `*`
    - Reference issues: `Closes #42`, `Refs #17`
+   - **Validate before committing** (self-check, no external hook): subject MUST match `^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+`, be ≤72 chars, lowercase first word after the colon, imperative mood, no trailing period. If it fails any rule, rewrite the subject before running `git commit`.
 3. Commit using heredoc:
 ```bash
 git commit -m "$(cat <<'EOF'

@@ -119,6 +119,13 @@ for TARGET in "$HOME/dotfiles/claude/hooks"/*; do
   check_and_create_link "$HOME/.claude/hooks/$BASENAME" "$TARGET"
 done
 
+[ ! -d "$HOME/.claude/agents" ] && mkdir "$HOME/.claude/agents"
+shopt -s nullglob
+for TARGET in "$HOME/dotfiles/claude/agents"/*; do
+  BASENAME=$(basename "$TARGET")
+  check_and_create_link "$HOME/.claude/agents/$BASENAME" "$TARGET"
+done
+
 check_and_create_directory_link "$HOME/.claude/commands" "$HOME/dotfiles/claude/commands"
 
 echo =======================================================================
