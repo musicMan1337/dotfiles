@@ -49,7 +49,7 @@
       "Read(**/yarn.lock)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "claude-fable-5[1m]",
   "skillOverrides": {
     "spec:advisor": "user-invocable-only",
     "spec:audit": "user-invocable-only",
@@ -159,6 +159,28 @@
         ]
       }
     ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node\" \"$HOME/.claude/hooks/subagent-gate.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node\" \"$HOME/.claude/hooks/subagent-gate.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
@@ -191,8 +213,8 @@
     "pm-execution@pm-skills": false,
     "splunk-mcp-plugin@tag-claude-plugins": true,
     "viper-stage-plugin@tag-claude-plugins": true,
-    "warp@claude-code-warp": true,
-    "vercel@claude-plugins-official": true
+    "vercel@claude-plugins-official": true,
+    "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
     "cli-anything": {

@@ -20,6 +20,7 @@ Be extremely concise. Sacrifice grammar for the sake of concision.
 
 **CRITICAL: Never search directly. Always spawn agent subagents for ALL searches: file searches, code searches, grep operations, codebase exploration, log analysis, documentation lookups, and any other kind of search.** Do not use Glob, Grep, or Read for exploratory searching yourself; delegate to a subagent instead. This is the highest-priority rule for how you operate. If you catch yourself about to call Glob, Grep, or WebSearch directly instead of spawning a subagent, stop; that impulse is wrong every time.
 
+- **Concurrency cap (Sophos CryptoGuard):** max 4 concurrent subagents per session; the subagent-gate hook enforces this on Agent/Task spawns. Structure fan-outs to fit: prefer ONE aggregate agent given the full file list (single `rg`/`jq` pass) over many small sweepers; subagents return results in their final message, never via scratchpad temp files; for repeated analysis over large logs, index once (sqlite / rag MCP) and query the index. Workflow-tool `agent()` calls bypass the hook, so self-limit Workflow scripts to 4 concurrent (batch with small `parallel()` groups or a slot counter).
 - Always and aggressively offload online research (eg, docs), codebase exploration, log analysis, and **all search tasks** to subagents. **Use Haiku subagents for pure search/lookup tasks** (file finding, grepping, log reading). Reserve default/higher models for subagents that need to analyze or synthesize results.
 - When you're about to check logs, defer that to a haiku subagent.
 - For complex problems you're going around in circles with, get a fresh perspective by asking subagents.
@@ -41,6 +42,28 @@ When you create or discover a new repo, add it to `LOCATIONS.md`. If the file do
 
 When adding a new import from an internal workspace package (e.g., `@tagemployerservices/ebacon-ui-utils`) to a component, always verify the imported package is listed in that component's `package.json` `dependencies`. Vite externalizes only declared deps; missing declarations cause build failures in CI. Add the dependency if absent.
 
+# Terminal Tab Renaming (Warp only)
+
+When the user asks to rename the terminal tab, set the title to **EXACTLY** this format, no deviation:
+
+```
+{branch}
+```
+
+`{branch}` = current git branch, with a leading `Derek/` stripped (own branches only; other people's prefixes like `Josh/` are kept so authorship stays visible). Examples: `Derek/345279-FolderInheritance` → `345279-FolderInheritance`; `Josh/9596-BulkPunch` → `Josh/9596-BulkPunch`.
+
+**Hard rules (this is a strictly controlled action):**
+
+- **Only when inside Warp.** Gate on the env var `TERM_PROGRAM == WarpTerminal`. If it's anything else, do nothing, no message, no fallback. The OSC title is meaningless/wrong outside Warp.
+- **The format is fixed.** Never improvise a shorter, longer, or "nicer" name. No task descriptions, no emoji, no truncation, no repo name, no stripping the `Name/` prefix. `{branch}` only.
+- **Derive the branch from git, don't guess it.** Run the one-liner below; it computes the branch and only fires under Warp:
+
+```bash
+[ "$TERM_PROGRAM" = "WarpTerminal" ] && b="$(git rev-parse --abbrev-ref HEAD)" && rename-tab "${b#Derek/}"
+```
+
+`rename-tab` is defined in `bash/.bashrc.d/functions.sh` (sourced by zsh); it emits an OSC 0 title to the tab's pty (walks the process tree, so it works from the Bash tool's detached shell). Requires `WARP_DISABLE_AUTO_TITLE=true` (set in `zsh/.zshrc.d/exports.sh`). If the title doesn't change, the tab was manually renamed in Warp (Warp pins those and ignores OSC); mention that rather than retrying.
+
 # Numbered Options
 
 When presenting choices in plain text (approve/deny/alter, next steps, etc.), number each option so the user can reply by number. If a skill or tool uses the AskUserQuestion tool with multiple-choice options, use that instead; it already provides structured selection. Numbered options are for free-text responses only.
@@ -51,3 +74,7 @@ Example, instead of: "Approve this or make changes?"
 Write:
 1. Approve
 2. Make changes
+
+# Claude in Chrome — target the "Claude" profile only
+
+Before any browser automation, call `list_connected_browsers` and `select_browser` the **"Claude"** profile (the dedicated Chrome profile that has the Claude extension installed). Never drive my main browsing profile. If no "Claude" browser is connected, stop and tell me to open a "Claude"-profile window — do NOT fall back to whatever Chrome is connected.
