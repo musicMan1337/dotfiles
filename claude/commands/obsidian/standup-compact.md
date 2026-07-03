@@ -2,7 +2,7 @@
 name: obsidian:standup-compact
 model: haiku
 description: Compact a finalized standup into a concise top-section for posting, preserving the verbose original for reference. Triggers on: compact standup, summarize standup, shrink standup, condense standup, slack version
-allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(date *), Read
+allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Read
 ---
 
 # Standup Compact
@@ -20,50 +20,31 @@ Date resolution (default: yesterday — most common case is "yesterday's standup
 - "friday" / "monday" / etc. → that weekday in the current week (or prior week if not yet reached)
 - `YYYY-MM-DD` → that exact date
 
-## Step 1 — Resolve target date
+## Step 1 — Gather (resolve date + read + validate)
 
-Use this script — it handles Mon→Fri rollback for "yesterday" and weekday lookup:
-
-```bash
-today=$(date "+%Y-%m-%d"); dow=$(date "+%u"); \
-  if [ "$dow" = "1" ]; then yday=$(date -v-3d "+%Y-%m-%d"); \
-  elif [ "$dow" = "7" ]; then yday=$(date -v-2d "+%Y-%m-%d"); \
-  else yday=$(date -v-1d "+%Y-%m-%d"); fi; \
-  echo "today=$today yesterday=$yday"
-```
-
-For weekday names: `date -v-{N}d "+%Y-%m-%d"` where N walks back until the printed `+%A` matches.
-
-## Step 2 — Read the standup
+Run the gather script. It resolves the date (Mon→Fri rollback for "yesterday", weekday lookup), reads the standup file directly, and pre-computes the finalized/compacted checks:
 
 ```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+node ~/.claude/commands/obsidian/_lib/gather.mjs --for compact [DATE]
 ```
 
-If file does not exist → tell the user, stop.
+`DATE` is the resolved token: omit for `yesterday` (default), or pass `today`, a weekday name, or `YYYY-MM-DD`. The script owns the date math; never guess a date. The bundle gives `date`, `weekday`, and `standup` (`{exists, content, isFinalized, hasCompactedSection}`).
 
-## Step 3 — Validate finalized state (BLOCKING)
+If `standup.exists` is `false` → tell the user, stop.
+
+## Step 2 — Validate finalized state (BLOCKING)
 
 The standup MUST be finalized. Compaction is meaningless on raw work-in-progress files.
 
-**Reject and stop** if the file contains any of these `##` headers anywhere:
-- `## Today`
-- `## Completed`
-- `## Yesterday`
-- `## Open Follow-ups`
-- `## Active Investigations`
-- `## PRs Awaiting Your Review`
-- `## Your Open PRs`
+`standup.isFinalized` is already computed: `false` means the file still contains briefing `##` headers (`## Today`, `## Completed`, `## Yesterday`, `## Open Follow-ups`, `## Active Investigations`, `## PRs Awaiting Your Review`, `## Your Open PRs`). A finalized standup is a flat numbered list (`1. **...**` items with sub-bullets, no level-2 headers).
 
-A finalized standup is a flat numbered list — `1. **...**` items with sub-bullets, no level-2 headers.
+**If `standup.isFinalized` is `false`, reject and stop:**
 
-If rejecting, say:
+> "Standup YYYY-MM-DD isn't finalized yet, still has `## Today` / `## Completed` sections. Run `/obsidian:standup` on this date first to synthesize it down."
 
-> "Standup YYYY-MM-DD isn't finalized yet — still has `## Today` / `## Completed` sections. Run `/obsidian:standup` on this date first to synthesize it down."
+## Step 3 — Check for existing Compacted section
 
-## Step 4 — Check for existing Compacted section
-
-If the file already starts with `# Compacted`, ask the user:
+If `standup.hasCompactedSection` is `true` (file already starts with `# Compacted`), ask the user:
 
 ```
 Standup YYYY-MM-DD already has a # Compacted section.
@@ -74,7 +55,7 @@ Standup YYYY-MM-DD already has a # Compacted section.
 
 If 2, stop. Don't write.
 
-## Step 5 — Generate the compacted version
+## Step 4 — Generate the compacted version
 
 Read every numbered item in the original. For each:
 - Identify the **major work threads** — group related sub-bullets into themes (architecture, perf, docs, validation, etc.)
@@ -104,7 +85,7 @@ Variations:
 - If a sub-bullet runs past ~30 words, you're including too much — split a sub-thread out or trim.
 - The compacted version should be ~25–35% the size of the original. Smaller is fine if the day was a single thing; bigger means you didn't cut enough.
 
-## Step 6 — Show preview and get approval
+## Step 5 — Show preview and get approval
 
 Display the compacted block as a code block, not interleaved with prose. Then:
 
@@ -116,7 +97,7 @@ Display the compacted block as a code block, not interleaved with prose. Then:
 
 Wait for user reply. Do NOT write until approved.
 
-## Step 7 — Write back
+## Step 6 — Write back
 
 Build the full new file content:
 

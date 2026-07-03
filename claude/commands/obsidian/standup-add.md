@@ -2,7 +2,7 @@
 name: obsidian:standup-add
 model: haiku
 description: Add completed work to today's standup and clear matching briefing TODOs. Triggers on: add to standup, mark done, log work
-allowed-tools: Bash(source ~/.zprofile && obsidian *), Read
+allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Read
 ---
 
 # Standup Add
@@ -18,9 +18,15 @@ Append completed work to a standup note. If the note still has briefing structur
 - Specific text (e.g., "finished the auth middleware refactor") → add that verbatim
 - Both combined: "yesterday finished the auth refactor"
 
-## Step 1 — Determine target date and content
+## Step 1 — Gather + determine content
 
-Resolve date. Default: today.
+Run the gather script to resolve the date and pull the existing standup + wikilink targets in one call (reads the vault directly, no `obsidian read`/`obsidian files`):
+
+```bash
+node ~/.claude/commands/obsidian/_lib/gather.mjs --for add [DATE]
+```
+
+`DATE` is the resolved token: `today` (default), `yesterday`, a weekday name, or `YYYY-MM-DD`. The script owns the date math; never guess. The bundle gives `date`, `standup` (`{exists, content}`), and `wikilinkTargets`.
 
 ### Current session mode (no specific content provided)
 
@@ -37,13 +43,9 @@ Synthesize into outcome-focused bullets. "Fixed auth middleware token expiry bug
 
 Use their description as-is, lightly formatted into bullets if needed.
 
-## Step 2 — Read existing standup
+## Step 2 — Inspect the existing standup
 
-```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
-```
-
-If no standup file exists, create one as a flat numbered list (no section headings).
+Use `standup` from the gather bundle (Step 1). If `standup.exists` is `false`, create one as a flat numbered list (no section headings).
 
 ## Step 3 — Match and strike through TODOs
 
@@ -81,14 +83,9 @@ For each match: strike through the TODO → `~~original text~~`
 
 ### Wikilinks
 
-Before finalizing, check if completed items reference existing Obsidian notes:
-```bash
-source ~/.zprofile && obsidian files folder="investigations"
-source ~/.zprofile && obsidian files folder="decisions"
-source ~/.zprofile && obsidian files folder="reviews"
-```
+Before finalizing, check if completed items reference existing Obsidian notes. Use `wikilinkTargets` from the gather bundle (Step 1), no extra calls.
 
-Add inline wikilinks where real notes exist — same convention as the standup skill:
+Add inline wikilinks where real notes exist, same convention as the standup skill:
 - PR review work: `[[reviews/YYYY-MM-DD]]`
 - Investigation: `[[investigations/YYYY-MM-DD-slug|name]]`
 - Decision: `[[decisions/YYYY-MM-DD-slug|name]]`
@@ -102,7 +99,15 @@ Show the user a **focused diff**, not the entire file:
 
 **Do not write until the user confirms.** This is a hard gate.
 
-## Step 6 — Write to Obsidian
+## Step 6 — Re-gather, merge, then write
+
+Other sessions write to the same standup note; the Step 1 snapshot may be stale by the time the user approves. `overwrite` clobbers whatever landed in between. So, immediately before writing:
+
+1. **Re-run the gather script** (same command as Step 1) and compare against the Step 1 snapshot.
+2. **Content changed since Step 1:** rebase your additions onto the CURRENT content: re-apply the strike-throughs and append the Completed items to the fresh version. Never write from the stale snapshot; that silently deletes another session's work.
+3. **Idempotency check:** if the fresh content already contains your items (same PR number, branch, or feature: an earlier invocation this session, or another session, already logged it), skip the write entirely and tell the user it's already there. Do not create a second entry and do not rewrite the file just to change wording.
+
+Then write:
 
 ```bash
 source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
@@ -111,6 +116,8 @@ source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..."
 ## Gotchas
 
 - **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **Concurrent sessions are the norm, not the edge case.** Multiple Claude sessions add to the same day's standup; the Step 6 re-gather + merge is mandatory. Blind overwrite from a stale read has caused real data loss.
+- **Double invocation happens.** The skill gets invoked twice for the same work (retry, habit, chained ritual). The second run must detect the existing entry via the Step 6 idempotency check and no-op with a note, never duplicate.
 - **Don't duplicate completed items.** If the same work already appears in Completed, enrich it with new sub-bullets — don't create a second entry.
 - **Fuzzy matching is judgment, not string matching.** "Review Alex's resource PR" and "Reviewed PR #9248 resource budgeting" are the same thing. PR numbers and branch names are the most reliable match signals.
 - **Current session synthesis — outcomes only.** "Fixed auth bug" not "Read 12 files and edited 3". Tool usage counts are never standup-worthy.

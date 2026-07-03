@@ -8,6 +8,9 @@ case ":$PATH:" in
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+# warp: stop auto-renaming tabs so manual OSC titles (rename-tab) stick
+export WARP_DISABLE_AUTO_TITLE=true
+
 # php overrides
 export PATH="/opt/homebrew/opt/php@7.2/bin:$PATH"
 export PATH="/opt/homebrew/opt/php@7.2/sbin:$PATH"

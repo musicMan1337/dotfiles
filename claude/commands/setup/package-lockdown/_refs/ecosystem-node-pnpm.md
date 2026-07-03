@@ -2,6 +2,21 @@
 
 Use when `package.json` detected. Source: playbook §4.1.
 
+> **pnpm 11 config-location correction (verified against https://pnpm.io/settings 2026-06-25).**
+> In pnpm 11 ALL supply-chain settings live in `pnpm-workspace.yaml` (camelCase keys). The
+> `pnpm` field in `package.json` is **ignored** for config, and `.npmrc` is restricted to
+> **auth/registry only** (`registry=`, `_authToken`). So the `.npmrc` hardening block and the
+> `package.json#pnpm.overrides` block shown below are **v10-era**; in v11 put `overrides:`,
+> `engineStrict`, and exact-pinning in `pnpm-workspace.yaml` instead. Key-name corrections:
+> save-exact is **`savePrefix: ''`** (no `saveExact` key); build allowlist is **`allowBuilds`**
+> (a matcher→bool map; `onlyBuiltDependencies`/`neverBuiltDependencies` were removed in v11);
+> `minimumReleaseAge` value is in **minutes** and defaults to 1440 (24h) in v11. Verified-real
+> v11 keys: `minimumReleaseAge`, `minimumReleaseAgeStrict`, `minimumReleaseAgeExclude`,
+> `strictDepBuilds` (default true), `dangerouslyAllowAllBuilds` (default false), `allowBuilds`,
+> `blockExoticSubdeps` (default true), `trustPolicy: no-downgrade`, `verifyStoreIntegrity`
+> (default true), `engineStrict`, `savePrefix`. Single-package repo: a `pnpm-workspace.yaml`
+> with NO `packages:` key is valid and includes the root package.
+
 Why pnpm vs npm/Yarn/Bun: pnpm v11+ has `minimumReleaseAge`, `strictDepBuilds`, `blockExoticSubdeps`, `trustPolicy: no-downgrade`, content-addressable store, no phantom deps, built-in. Other managers require external tooling for the same defenses; Bun has no postinstall blocking.
 
 ## Install

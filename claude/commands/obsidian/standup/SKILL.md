@@ -22,61 +22,38 @@ Generate concise standup bullet points by scanning Claude Code session history, 
   - "from 8 to 22" / "8am-10pm" → override both
 - Parse these into integer hours (24h). Defaults remain 6am start, 5pm (17) end.
 
-## Step 1 — Run PR notes first (if needed)
+## Step 1 — Gather everything (one deterministic call)
 
-Check if PR notes already exist for the target date:
-```bash
-source ~/.zprofile && obsidian read path="reviews/YYYY-MM-DD.md"
-```
-
-If no PR notes file exists for the target date, invoke the `/obsidian:pr-notes` skill (via the Skill tool) for that date before proceeding. PR review work should be captured in PR notes first so the standup can reference them with wikilinks.
-
-If PR notes already exist, skip this step.
-
-## Step 2 — Extract session data
-
-Run the extraction script. Resolve the target date first, then execute:
+Run the gather script. It resolves the date, reads the vault files directly from the filesystem (no fragile `obsidian read` calls), extracts session activity, and returns one JSON bundle:
 
 ```bash
-node ~/.claude/commands/obsidian/standup/lib/extract-sessions.js [YYYY-MM-DD] [--start HH] [--end HH]
+node ~/.claude/commands/obsidian/_lib/gather.mjs --for standup [DATE] [--start HH] [--end HH]
 ```
 
-Pass `--start` and/or `--end` (24h integer) if the user specified a custom time range. Otherwise omit them to use the defaults (6am-5pm).
+- `DATE` is the resolved target token: `today` (default), `yesterday`, a weekday name (`monday`..`friday`), or `YYYY-MM-DD`. Map the user's request to one of these; the script owns the actual date math, so never compute or guess a date yourself.
+- Pass `--start`/`--end` (24h integers) only if the user specified a custom time range. Defaults: 6am-5pm. For "all day" pass `--start 0 --end 24`.
 
-The script scans `~/.claude/history.jsonl` and session JSONL files for activity within the time window on the target date. It outputs JSON with per-session summaries: prompts, tool usage, files edited/created, git commits, and branches.
+The bundle contains:
+- `date`, `weekday` — authoritative resolved date
+- `sessions` — per-session prompts, tools, files edited/created, commits, branches (within the window)
+- `reviews` — `{exists, content}` for `reviews/<date>.md` (PR notes)
+- `followups.completedForDate` — `[{item, note}]` for follow-ups closed on the target date
+- `standup` — `{exists, content, isFinalized, completedBlock}` for the existing standup file
+- `wikilinkTargets` — `{investigations, decisions, reviews}` note slugs for Step 3b
 
-## Step 2b — Check for completed follow-ups
+### PR notes prerequisite
 
-Read the follow-ups file:
-```bash
-source ~/.zprofile && obsidian read path="followups.md"
-```
+If `reviews.exists` is `false`, invoke the `/obsidian:pr-notes` skill (via the Skill tool) for `date`, then **re-run the gather call** so the bundle picks up the new PR notes. PR review work belongs in PR notes first so the standup can wikilink it. PR reviews are real work, give them their own bullet (e.g., "Reviewed PR #1234, feedback on error handling in auth flow").
 
-Scan for entries completed on the target date — look for sub-bullets matching `**Completed YYYY-MM-DD:**` where the date is the target standup date. These represent follow-ups the user closed that day, along with their notes about the outcome.
+### Completed follow-ups
 
-Collect the original follow-up item and its completion notes — these will be included in the standup as their own bullet(s) (e.g., "Followed up with Chris on PHP PR — tests pass, merged").
+`followups.completedForDate` lists follow-ups the user closed that day plus their outcome notes. Each becomes its own standup bullet (e.g., "Followed up with Chris on PHP PR, tests pass, merged").
 
-## Step 2c — Read PR notes
+### Existing Completed items are LOCKED (critical for incremental synthesis)
 
-Read the PR notes file (created in Step 1 or already existing):
-```bash
-source ~/.zprofile && obsidian read path="reviews/YYYY-MM-DD.md"
-```
+The briefing skill creates the standup earlier in the day; `/obsidian:standup-add` appends to its `## Completed` section throughout the day in the user's own voice.
 
-PR reviews are real work — they should appear in the standup as their own bullet (e.g., "Reviewed PR #1234 — feedback on error handling in auth flow"). Authored PRs that received activity should also be noted.
-
-## Step 2d — Read existing standup (CRITICAL for incremental synthesis)
-
-Read the existing standup file for the target date:
-```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
-```
-
-The briefing skill (`/obsidian:briefing`) typically creates this file earlier in the day with `## Yesterday`, `## Today`, and `## Completed` sections. Throughout the day, `/obsidian:standup-add` appends completed work to the `## Completed` section in the user's own voice and detail level.
-
-**When synthesizing for a day that already has a `## Completed` section, those items are LOCKED — they stay verbatim.** Do not rewrite, condense, re-word, or reorganize them. The user has already captured that work with the phrasing and detail they want.
-
-Enumerate the existing Completed items. Your job in Step 3 is purely additive: find work from session data that is NOT already represented in the existing Completed section and propose ONLY those as new items.
+**If `standup.completedBlock` is present, those items are frozen, they stay verbatim.** Do not rewrite, condense, re-word, or reorganize them. Your job in Step 3 is purely additive: find work in `sessions` that is NOT already represented in `completedBlock` and propose ONLY those as new items.
 
 ## Step 3 — Synthesize into standup bullets
 
@@ -116,12 +93,7 @@ Aim for 3-6 numbered sections. **Weight the number of sub-bullets proportionally
 
 Before writing, scan the approved bullets for any investigations, decisions, or PR reviews that have Obsidian notes. If a bullet references something with a matching note, add an inline wikilink.
 
-Search for matches:
-```bash
-source ~/.zprofile && obsidian files folder="investigations"
-source ~/.zprofile && obsidian files folder="decisions"
-source ~/.zprofile && obsidian files folder="reviews"
-```
+Use `wikilinkTargets` from the gather bundle (already fetched in Step 1, no extra calls) as the list of real note slugs to match against.
 
 **How to add links:**
 - If a bullet mentions research that produced an investigation note: `[[investigations/YYYY-MM-DD-slug|React-First Migration]]`
@@ -136,12 +108,7 @@ Use the Obsidian CLI to write a per-day file. The CLI requires `source ~/.zprofi
 
 **File path:** `standup/YYYY-MM-DD.md` (e.g., `standup/2026-03-18.md`)
 
-Check if the file already exists first:
-```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
-```
-
-If the file exists and has content, ask the user whether to overwrite or skip.
+The gather bundle's `standup.exists`/`content` already tells you whether a file is there, no extra read needed. If it exists and has content beyond the locked Completed items, ask the user whether to overwrite or skip.
 
 **CRITICAL: You MUST show the user the draft and wait for their approval before writing to Obsidian.** Do not write the file until the user confirms or requests changes. This is a hard gate — never skip it.
 

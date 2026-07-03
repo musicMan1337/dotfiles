@@ -23,6 +23,8 @@ You are walking Derek through his daily ownership review for services he owns. T
 
 More services will be added as ownership transitions. To add one, see the bottom of this file.
 
+The checklist also runs a **Dependabot review queue** check (read-only PR count, not a service) — see its section below the Vault content.
+
 ---
 
 ## Vault
@@ -130,6 +132,44 @@ Useful one-liners for follow-up if something is flagged:
 | Any sealed events in last day | `... earliest=-24h sealed=true` |
 | Max disk usage in last 24h | `... | stats max(data_disk_used_pct) max(logs_disk_used_pct)` |
 | Lease count growth | `... event=metrics_snapshot | timechart span=1h max(lease_count)` |
+
+## Dependabot review queue (Viper)
+
+Surface whether outstanding Dependabot PRs need attention. **This is a count-and-flag check only.** Do NOT run the `/dev:viper-dependabot` workflow, do NOT audit/install/build, do NOT comment on any PR. Derek runs the real skill afterward as a daily scheduled item; this check just tells him whether it's worth running today.
+
+### Step 1: list unhandled Dependabot PRs
+
+All `gh` calls go to `tagemployerservices/Viper`. Derek's GH login is `musicMan1337`; Dependabot's author handle is `app/dependabot`.
+
+```bash
+gh pr list --repo tagemployerservices/Viper \
+    --author "app/dependabot" --state open \
+    --json number,title,url,createdAt
+```
+
+For each PR, check whether Derek already commented or reviewed (either counts as handled):
+
+```bash
+gh pr view <num> --repo tagemployerservices/Viper \
+    --json reviews,comments \
+    --jq '[.reviews[].author.login, .comments[].author.login] | map(select(. == "musicMan1337")) | length'
+```
+
+Non-zero → handled, exclude. Zero → unhandled, count it.
+
+### Step 2: build the verdict
+
+- **0 unhandled** → 🟢 `Dependabot: 🟢 queue clear`
+- **1–4 unhandled** → 🟡 `Dependabot: 🟡 N PRs awaiting review`
+- **5+ unhandled, or any open >14 days** → 🔴 `Dependabot: 🔴 N PRs (oldest <X>d) — backlog building`
+
+List unhandled PRs one per line as clickable links (`[#NUM](url) title`), oldest first. End the section with the pointer (never auto-run it):
+
+```
+Run /dev:viper-dependabot to audit + build these.
+```
+
+If `gh` is unreachable, flag 🟡 `Dependabot: 🟡 couldn't reach GitHub` and move on. Don't block the rest of the checklist.
 
 ## How to add a new service
 

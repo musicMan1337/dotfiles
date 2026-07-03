@@ -12,10 +12,15 @@
 // "reader" (haiku) instead; planning routes to "planner" (opus).
 //
 // Gate 2 (concurrency cap): caps concurrent subagents per session at
-// SUBAGENT_CAP (default 4). Sophos CryptoGuard flags the file-I/O burst of
-// wide agent fan-outs (concurrent transcript JSONL appends + scratch writes)
-// as ransomware-like; capping the fan-out kills the burst signature.
-// Per-session only by design: parallel sessions each get their own cap.
+// SUBAGENT_CAP (default 4) AND machine-wide across all sessions at
+// SUBAGENT_GLOBAL_CAP (default 6; 0 disables the global gate). Sophos
+// CryptoGuard flags the file-I/O burst of wide agent fan-outs (concurrent
+// transcript JSONL appends + scratch writes) as ransomware-like; capping the
+// fan-out kills the burst signature. The global pool exists because teammate
+// topologies (agent teams / SendMessage fleets) run each teammate as its OWN
+// session: N teammates x per-session cap still bursts machine-wide, which is
+// exactly how the 2026-07-01 CryptoGuard trip happened. Global slots are
+// tagged with their session id so stop/end events release the right entries.
 //
 // Slot accounting (this script is registered for three hook events):
 //   PreToolUse (Agent|Task)  -> prune stale slots, deny if >= cap, else claim
@@ -41,8 +46,16 @@ const os = require('os');
 
 const DENIED = new Set(['general-purpose', 'claude', 'Explore', 'Plan']);
 const CAP = Math.max(1, parseInt(process.env.SUBAGENT_CAP || '4', 10) || 4);
+// 0 disables the machine-wide gate; any positive value caps concurrent
+// subagents across ALL sessions on this machine.
+const GLOBAL_CAP = (() => {
+  const n = parseInt(process.env.SUBAGENT_GLOBAL_CAP || '6', 10);
+  return Number.isFinite(n) && n >= 0 ? n : 6;
+})();
 const SLOT_TTL_MS = 10 * 60 * 1000;
 const STATE_DIR = path.join(os.homedir(), '.claude', 'tmp', 'subagent-slots');
+// Leading dot keeps it disjoint from sanitized session ids (dots are replaced).
+const GLOBAL_FILE = path.join(STATE_DIR, '.global.json');
 
 function slotFile(sessionId) {
   // session_id is harness-generated, but sanitize anyway before using as a filename.
@@ -63,6 +76,25 @@ function readSlots(sessionId) {
 function writeSlots(sessionId, slots) {
   fs.mkdirSync(STATE_DIR, { recursive: true });
   fs.writeFileSync(slotFile(sessionId), JSON.stringify(slots));
+}
+
+// Global slots: [{t: claimedAtMs, s: sessionId}], TTL-pruned on read.
+function readGlobalSlots() {
+  try {
+    const arr = JSON.parse(fs.readFileSync(GLOBAL_FILE, 'utf8'));
+    if (!Array.isArray(arr)) return [];
+    const now = Date.now();
+    return arr.filter(
+      (e) => e && typeof e.t === 'number' && now - e.t < SLOT_TTL_MS
+    );
+  } catch (e) {
+    return [];
+  }
+}
+
+function writeGlobalSlots(slots) {
+  fs.mkdirSync(STATE_DIR, { recursive: true });
+  fs.writeFileSync(GLOBAL_FILE, JSON.stringify(slots));
 }
 
 function deny(reason) {
@@ -95,6 +127,15 @@ process.stdin.on('end', () => {
         const slots = readSlots(sessionId);
         slots.sort((a, b) => a - b).shift(); // release oldest claim
         writeSlots(sessionId, slots);
+        if (GLOBAL_CAP > 0) {
+          const gslots = readGlobalSlots();
+          const idx = gslots
+            .map((e, i) => (e.s === sessionId ? i : -1))
+            .filter((i) => i >= 0)
+            .sort((a, b) => gslots[a].t - gslots[b].t)[0];
+          if (idx !== undefined) gslots.splice(idx, 1); // release this session's oldest global claim
+          writeGlobalSlots(gslots);
+        }
       }
       process.exit(0);
     }
@@ -104,6 +145,9 @@ process.stdin.on('end', () => {
         try {
           fs.unlinkSync(slotFile(sessionId));
         } catch (e) {}
+        if (GLOBAL_CAP > 0) {
+          writeGlobalSlots(readGlobalSlots().filter((e) => e.s !== sessionId));
+        }
       }
       process.exit(0);
     }
@@ -144,6 +188,26 @@ process.stdin.on('end', () => {
         );
         process.exit(0);
       }
+
+      // Gate 3: machine-wide cap across ALL sessions (teammate fleets count).
+      if (GLOBAL_CAP > 0) {
+        const gslots = readGlobalSlots();
+        if (gslots.length >= GLOBAL_CAP) {
+          writeGlobalSlots(gslots); // persist the TTL prune
+          deny(
+            `Machine-wide subagent cap: ${GLOBAL_CAP} concurrent subagents already running ` +
+              `across all sessions on this machine (teammate/agent-team sessions count; Sophos ` +
+              `CryptoGuard keys on the aggregate file-I/O burst, not per-session). Do NOT retry immediately.\n` +
+              `  1. Wait for any session's subagent to finish, then retry (stale slots expire after ${SLOT_TTL_MS / 60000} min).\n` +
+              `  2. If you are orchestrating a fleet of teammates, shrink the fleet: batch the work through fewer, longer-lived agents.\n` +
+              `  3. Restructure: ONE aggregate agent over the full work list beats many small sweepers.`
+          );
+          process.exit(0);
+        }
+        gslots.push({ t: Date.now(), s: sessionId });
+        writeGlobalSlots(gslots);
+      }
+
       slots.push(Date.now());
       writeSlots(sessionId, slots);
     }

@@ -126,6 +126,19 @@ Documented in override block with reason + case-study cross-reference, so future
 
 Anti-pattern: disabling `trustPolicy` for the install. Removes defense globally to fix one transitive case. Use overrides scoped to the specific package, not global policy weakening.
 
+## Case: esbuild dev-server CORS via drizzle-kit (Kosher audit, 2026-06-25) — deferred-risk by reachability
+
+`pnpm audit` / osv-scanner flagged GHSA-67mh-4wv8-2f99 (esbuild <0.25.0 dev-server CORS, CVSS 5.3 moderate). Chain: `drizzle-kit -> @esbuild-kit/esm-loader -> @esbuild-kit/core-utils -> esbuild@0.18.20` (the deprecated `@esbuild-kit/*` packages, replaced upstream by tsx, pin esbuild ~0.18).
+
+Why neither structural-bump nor override was correct:
+- **Structural fix unavailable:** drizzle-kit was already latest and still bundles the deprecated `@esbuild-kit` chain. No parent to bump.
+- **Override too brittle:** forcing `esbuild: ">=0.25.0"` spans many esbuild 0.x breaking changes onto a 0.18-era consumer; high risk of breaking drizzle-kit's config bundling (db:generate/migrate/push).
+- **Vulnerable path is unreachable:** the advisory triggers only in esbuild `serve` (dev-server) mode. drizzle-kit uses esbuild `transform`/`build` to bundle `drizzle.config.ts` and never starts the dev server, so the CORS code path never executes. Dev-only dep; nothing ships to production.
+
+**Right call:** accept as documented deferred risk (inline in `pnpm-workspace.yaml`), with the durable fix being upstream drizzle-kit migrating off `@esbuild-kit`. Renovate (`vulnerabilityAlerts.minimumReleaseAge: null`) PRs the bump when it lands.
+
+**Reachability is a legitimate fourth option** alongside bump-parent / override / wait-for-upstream: when a fix exists but is unadoptable (brittle) AND the vulnerable code path is provably not invoked by the consumer's usage, document deferred risk rather than forcing a breaking override. Don't swap the whole dependency (e.g. a different ORM) over a dev-only unreachable moderate — alternatives carry their own transitive baggage (Prisma adds a native postinstall query engine; the runtime ORM package was already advisory-free).
+
 ## Bootstrap iteration log (Tundra, 2026-05-25): full sweep
 
 Trust downgrades resolved via override (parent-bump unavailable):

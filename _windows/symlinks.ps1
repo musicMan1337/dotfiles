@@ -92,7 +92,7 @@ Check-And-Create-Link "$ghosttyDir\config" "$env:USERPROFILE\dotfiles\ghostty\co
 
 Check-And-Create-Link "$env:USERPROFILE\.claude\settings.json" "$env:USERPROFILE\dotfiles\claude\settings.json" $false
 
-foreach ($subdir in @("hooks", "commands", "scripts")) {
+foreach ($subdir in @("hooks", "commands", "scripts", "agents")) {
     $targetDir = "$env:USERPROFILE\dotfiles\claude\$subdir"
     $linkDir = "$env:USERPROFILE\.claude\$subdir"
     if (-not (Test-Path $linkDir)) { New-Item -ItemType Directory -Path $linkDir | Out-Null }

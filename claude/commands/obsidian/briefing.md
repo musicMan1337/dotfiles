@@ -16,36 +16,32 @@ No args needed — defaults to "brief me for today". The user might also say:
 - "briefing for monday" (if catching up after a weekend)
 - "what did I miss yesterday"
 
-## Step 0 — Compute dates (MANDATORY, first action)
+## Step 0 — Gather (MANDATORY, first action)
 
-Do not guess the weekday. Run this before anything else to get authoritative `$TODAY` and `$YESTERDAY` (Mon→Fri handled):
+Do not guess dates or issue per-file `obsidian read` calls. Run the gather script first, it returns authoritative dates plus all the local-vault context in one call (reads the vault directly):
 
 ```bash
-today=$(date "+%Y-%m-%d"); dow=$(date "+%u"); \
-  if [ "$dow" = "1" ]; then yday=$(date -v-3d "+%Y-%m-%d"); \
-  elif [ "$dow" = "7" ]; then yday=$(date -v-2d "+%Y-%m-%d"); \
-  else yday=$(date -v-1d "+%Y-%m-%d"); fi; \
-  echo "today=$today ($(date '+%A'))"; echo "yesterday=$yday"
+node ~/.claude/commands/obsidian/_lib/gather.mjs --for briefing
 ```
 
-Use the printed `today` / `yesterday` values everywhere below — never substitute a guessed date.
+The bundle contains:
+- `today`, `yesterday`, `weekdayToday` — authoritative; use these everywhere, never substitute a guessed date
+- `yesterdayStandup` — `{exists, content, isFinalized}` for the prior workday's standup (Step 1 gate)
+- `todayStandup` — `{exists, content}` (Step 5 existence check)
+- `followups` — `{content, unchecked}` (Step 2A)
+- `activeInvestigations` — `[{slug, content}]` already filtered to `Status: Active` (Step 2B)
+- `standupFiles` — all standup slugs for the Step 6 archive check
 
 ## Step 1 — Check prior day's standup (BLOCKING)
 
-This step gates the entire briefing. Do NOT proceed to Step 2 until resolved.
+This step gates the entire briefing. Do NOT proceed to Step 2 until resolved. Use `yesterdayStandup` from the gather bundle, no extra read.
 
-Read the prior workday's standup file:
-
-```bash
-source ~/.zprofile && obsidian read path="standup/$yday.md"
-```
-
-**A completed standup is just a title and bullet points — no sections like `## Today`, `## Completed`, `## Yesterday`, etc.** If the file has section headers, it hasn't been finalized by `/obsidian:standup` yet.
+**A completed standup is just a title and bullet points — no sections like `## Today`, `## Completed`, `## Yesterday`, etc.** `yesterdayStandup.isFinalized` is already computed.
 
 **The standup is incomplete if ANY of these are true:**
-- File does not exist
-- File contains section headers (`##`) — this means it's still a raw work-in-progress plan/log, not a finalized standup
-- File content is clearly raw/unsynthesized (just dumped session data, no clean bullet summary)
+- `yesterdayStandup.exists` is `false`
+- `yesterdayStandup.isFinalized` is `false` (still has `##` section headers, a raw work-in-progress plan/log)
+- Content is clearly raw/unsynthesized (just dumped session data, no clean bullet summary)
 
 **If the standup is incomplete**, do not silently proceed. Stop and tell the user:
 
@@ -58,16 +54,10 @@ If the user says yes, invoke `/obsidian:standup` via the Skill tool with the pri
 Run these in parallel to collect all the data. Note: yesterday's standup was already read in Step 1 for the completeness gate — do NOT re-read or display it here. The user opens yesterday's notes themselves.
 
 ### A. Open follow-ups
-```bash
-source ~/.zprofile && obsidian read path="followups.md"
-```
-Filter to unchecked items (`- [ ]`). Flag any that are past their date as overdue.
+Use `followups.unchecked` from the gather bundle (already filtered to `- [ ]`). Flag any past their date as overdue.
 
 ### B. Active investigations
-```bash
-source ~/.zprofile && obsidian search query="Status: Active" path="investigations"
-```
-Read any active investigation files to get their summaries.
+Use `activeInvestigations` from the gather bundle (already filtered to `Status: Active`, with each note's content for summaries).
 
 ### C. PRs awaiting your review
 
@@ -95,6 +85,22 @@ Or batch it by fetching from known repos:
 gh pr list --author musicMan1337 --state open --repo OWNER/REPO --json number,title,url,headRefName,reviewDecision --limit 10
 ```
 
+### E. Outstanding Dependabot PRs (Viper) — these ARE TODO items
+
+Unlike the open-PR sections above (visibility only), Dependabot PRs Derek hasn't handled are real action items — they go in today's plan. List open Dependabot PRs on `tagemployerservices/Viper` that Derek hasn't already commented on or reviewed:
+
+```bash
+gh pr list --repo tagemployerservices/Viper --author "app/dependabot" --state open \
+    --json number,title,url,createdAt
+```
+
+For each, exclude any Derek already handled (commented OR reviewed):
+```bash
+gh pr view <num> --repo tagemployerservices/Viper --json reviews,comments \
+    --jq '[.reviews[].author.login, .comments[].author.login] | map(select(. == "musicMan1337")) | length'
+```
+Non-zero → handled, drop it. Zero → unhandled, keep it. Do NOT run `/dev:viper-dependabot` or audit/build anything here — just list the queue so it becomes a today item.
+
 ## Step 3 — Present the briefing
 
 Show the user a structured summary. Do NOT include a Yesterday section — the user opens yesterday's notes themselves.
@@ -116,6 +122,10 @@ Show the user a structured summary. Do NOT include a Yesterday section — the u
 ## Your Open PRs
 - [Repo #456](https://github.com/OWNER/REPO/pull/456) "Title" — [branch] — [approved/changes requested/pending review]
 (or "None" if clear)
+
+## Dependabot PRs (Viper) — action items
+- [Viper #789](https://github.com/tagemployerservices/Viper/pull/789) "bump axios 1.6.2 → 1.7.4" — opened Nd ago
+(or "None" if clear)
 ```
 
 **Every PR MUST be a clickable markdown link.** Format: `[Repo #NUMBER](https://github.com/OWNER/REPO/pull/NUMBER)`. Use the PR's `html_url` from the `gh api` response — never write a bare `#123` or plain repo-number. This applies to both the presented briefing AND the written standup file.
@@ -127,6 +137,7 @@ The **Open PRs** sections aren't necessarily TODO items — they're visibility b
 Based on everything above, draft a "Today" section with planned bullets. Use judgment:
 - Overdue follow-ups become today items
 - PRs awaiting your review become today items
+- **Outstanding Dependabot PRs (Step 2E) become today items** — e.g. "Review N Viper Dependabot PRs (`/dev:viper-dependabot`)". Roll the queue into one bullet rather than one per PR unless the user wants them itemized.
 - Active investigations carry forward
 - Open PRs that need attention (changes requested, stale) carry forward
 - Leave room — don't over-schedule, 3-6 bullets is ideal
@@ -173,23 +184,23 @@ source ~/.zprofile && obsidian create path="standup/$today.md" content="..." ove
 ## Your Open PRs
 
 [PRs from Step 2 — each as `[Repo #NUMBER](html_url) "Title" — branch — status` — or "None"]
+
+## Dependabot PRs (Viper)
+
+[unhandled Dependabot PRs from Step 2E — each as `[Viper #NUMBER](html_url) "Title" — opened Nd ago` — or "None". These are action items, also reflected in the Today plan.]
 ```
 
 **Every PR entry MUST be a clickable markdown link** using the PR's `html_url` from `gh api`. No bare `#123`.
 
 The empty `## Completed` section is preemptive — `/obsidian:standup-add` appends to it throughout the day instead of creating it.
 
-If today's standup file already exists, read it first and ask the user whether to overwrite or skip.
+If `todayStandup.exists` (from the gather bundle) is `true`, ask the user whether to overwrite or skip before writing.
 
 ## Step 6 — Archive old standups
 
 After writing today's standup, archive any files in `standup/` beyond the 10 most recent. Keep the 10 newest in `standup/` root; move the rest to `standup/archive/`.
 
-```bash
-source ~/.zprofile && obsidian files folder="standup"
-```
-
-Parse the output — filter to files directly under `standup/` (exclude `standup/archive/...`). Sort by filename descending (dates as `YYYY-MM-DD.md` sort naturally). Keep the first 10; move the rest.
+Use `standupFiles` from the gather bundle (the slugs directly under `standup/`, already excluding `standup/archive/...`). Sort descending (dates as `YYYY-MM-DD` sort naturally). Keep the first 10; move the rest.
 
 For each file to archive:
 ```bash
@@ -209,3 +220,4 @@ Skip archiving if there are 10 or fewer files in `standup/` root.
 - **The user's additions are the most important part.** The automated stuff is just a starting point. Always ask for additions before writing.
 - **gh CLI failures:** If GitHub is unreachable, skip the PR sections and note it. Don't block the whole briefing.
 - **Open PRs are visibility, not action items.** Don't auto-promote every open PR to a TODO. Only PRs that need attention (review requested, changes requested, stale) should become Today items.
+- **Dependabot PRs ARE action items.** Unlike your own open PRs, unhandled Viper Dependabot PRs (Step 2E) always become a today bullet. But the briefing only *lists* them — it never runs `/dev:viper-dependabot`; that's Derek's call during the day.
