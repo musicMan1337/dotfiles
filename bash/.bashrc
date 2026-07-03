@@ -26,8 +26,13 @@ esac
 
 export STARSHIP_DISTRO=$ICON
 
-#~ Initial Load Message
-eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
+#~ Initial Load Message (interactive shells only)
+#~ Printing to stdout while a non-interactive shell sources this file corrupts
+#~ environment snapshots (e.g. Claude Code's) — the banner bleeds into $PATH and
+#~ breaks child `node`/`cmd`/`powershell` resolution. Guard it behind $- == *i*.
+if [[ $- == *i* ]]; then
+  eval 'bash ~/hereDocs/asciiArt/loadMessage.txt'
+fi
 
 #~ Base PS1 (fallback)
 parse_git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'; }
