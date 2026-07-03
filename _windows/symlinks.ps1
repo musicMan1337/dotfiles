@@ -100,6 +100,10 @@ foreach ($subdir in @("hooks", "commands", "scripts", "agents")) {
     Get-ChildItem -Path $targetDir -File -ErrorAction SilentlyContinue | ForEach-Object {
         Check-And-Create-Link "$linkDir\$($_.Name)" $_.FullName $false
     }
+    # Link nested command/hook/script directories (e.g. commands\research, commands\8bit) as junctions
+    Get-ChildItem -Path $targetDir -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+        Check-And-Create-Link "$linkDir\$($_.Name)" $_.FullName $true
+    }
 }
 
 # Start-Process to keep the window open at the end
