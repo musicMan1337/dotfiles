@@ -35,4 +35,13 @@ Key symlinked paths: `bash/*`, `zsh/*`, `git/*`, `hereDocs/`, `language-configs/
 
 - Config is split into small sourced files under `.bashrc.d/` and `.zshrc.d/` rather than one monolithic rc file
 - Git aliases favor short commands (`ac` = add+commit, `acp` = add+commit+push, `cob` = checkout+branch+push)
-- The repo assumes `~/dotfiles` as the clone location — symlink scripts depend on this path
+- The repo assumes `~/dotfiles` as the clone location; symlink scripts depend on this path
+
+## Harness Engineering Conventions (`claude/` dir)
+
+Bitter Lesson discipline for every rule, skill, hook, or agent added under `claude/`. Master question first: is this (a) an environment fact the model cannot infer, (b) an authority boundary, or (c) an encoding of how a human thinks the task should be done? Keep (a) and (b) freely. (c) is scaffolding: it must name the model weakness or cost fact it patches, dated, with a re-test trigger, or it doesn't go in.
+
+- Greppable annotation for scaffolding: `(scaffold: patches <weakness or cost fact>; added <YYYY-MM>; retest <trigger>)`. Larger techniques get a "Dated premise" paragraph instead (see `claude/commands/research/orderings.md` for the shape).
+- Prefer goals + constraints over step recipes; encode facts, not knowledge the model already has; point at ground truth rather than copying it (copies drift).
+- Model tier policy lives in `claude/TIERS.md`, one place only. Enforcement belongs in hooks (subagent-gate, check-hook-wiring), not in emphatic prose.
+- After each model upgrade, run `/harness:model-upgrade` to re-test dated scaffolding and delete what the new model has internalized. The harness should shrink as models improve.
