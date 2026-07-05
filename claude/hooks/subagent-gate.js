@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 // Subagent Gate: PreToolUse hook (HARD block) + per-session concurrency cap.
 //
-// Gate 1 (model pinning): forces every subagent spawn to NAME a model-pinned
-// agent instead of falling back to types that silently inherit the main
-// session model (e.g. Opus) and caused the Opus cost blowout.
-// Policy: DENYLIST. Blocked are the generic catch-alls ("general-purpose" /
-// "claude"), an empty/missing type (which defaults to a catch-all), AND the
-// unpinned built-ins "Explore" and "Plan": their agent definitions declare no
-// `model:`, so they inherit the session model just like the catch-alls (same
-// cost risk, and no way to know the resolved tier). Read/grep sweeps route to
-// "reader" (haiku) instead; planning routes to "planner" (opus).
+// Gate 1 (model pinning): the Opus cost blowout came from spawns that
+// SILENTLY inherited the premium session model. The gate therefore requires
+// an explicit model somewhere: either the spawn names an agent whose
+// definition pins a model, or the call itself passes a `model` param
+// (an explicit choice is a stated cost intent, whatever the tier).
+// Denied only: catch-alls / unpinned built-ins ("general-purpose", "claude",
+// "Explore", "Plan") or a missing type, WITHOUT a model param. The deny
+// message lists the currently available pinned agents by scanning
+// ~/.claude/agents/*.md frontmatter at runtime, so it never goes stale.
 //
 // Gate 2 (concurrency cap): caps concurrent subagents per session at
 // SUBAGENT_CAP (default 4) AND machine-wide across all sessions at
@@ -52,7 +52,12 @@ const GLOBAL_CAP = (() => {
   const n = parseInt(process.env.SUBAGENT_GLOBAL_CAP || '6', 10);
   return Number.isFinite(n) && n >= 0 ? n : 6;
 })();
-const SLOT_TTL_MS = 10 * 60 * 1000;
+// Wall-clock slot expiry: proxy for "the spawn burst is over" (Sophos keys on
+// bursts). Tunable because task horizons lengthen as models improve.
+const SLOT_TTL_MS = (() => {
+  const n = parseInt(process.env.SUBAGENT_SLOT_TTL_MIN || '10', 10);
+  return (Number.isFinite(n) && n > 0 ? n : 10) * 60 * 1000;
+})();
 const STATE_DIR = path.join(os.homedir(), '.claude', 'tmp', 'subagent-slots');
 // Leading dot keeps it disjoint from sanitized session ids (dots are replaced).
 const GLOBAL_FILE = path.join(STATE_DIR, '.global.json');
@@ -95,6 +100,29 @@ function readGlobalSlots() {
 function writeGlobalSlots(slots) {
   fs.mkdirSync(STATE_DIR, { recursive: true });
   fs.writeFileSync(GLOBAL_FILE, JSON.stringify(slots));
+}
+
+// Live roster of model-pinned agents from ~/.claude/agents/*.md frontmatter.
+// Runtime scan instead of a hardcoded list so the message survives agent
+// additions, removals, and model-tier reassignments without edits here.
+function pinnedAgentRoster() {
+  try {
+    const dir = path.join(os.homedir(), '.claude', 'agents');
+    const lines = [];
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith('.md')) continue;
+      const head = fs.readFileSync(path.join(dir, f), 'utf8').slice(0, 2000);
+      const fm = head.match(/^---\n([\s\S]*?)\n---/);
+      if (!fm) continue;
+      const model = (fm[1].match(/^model:\s*(\S+)/m) || [])[1];
+      if (!model || model === 'inherit') continue;
+      const name = (fm[1].match(/^name:\s*(\S+)/m) || [])[1] || f.replace(/\.md$/, '');
+      lines.push(`  - "${name}" (${model})`);
+    }
+    return lines.length ? lines.join('\n') + '\n' : '  (no pinned agents found in ~/.claude/agents)\n';
+  } catch (e) {
+    return '  (could not scan ~/.claude/agents)\n';
+  }
 }
 
 function deny(reason) {
@@ -158,18 +186,16 @@ process.stdin.on('end', () => {
 
     const ti = data.tool_input || {};
     const requested = ti.subagent_type || ti.agentType || ti.subagentType || '';
+    const explicitModel = typeof ti.model === 'string' && ti.model.trim() !== '';
 
-    // Gate 1: block the catch-alls and the no-type-given case (which defaults to one).
-    if (!requested || DENIED.has(requested)) {
+    // Gate 1: deny only catch-alls / unpinned types that ALSO omit a model
+    // param. An explicit `model` on the call is a stated cost intent: allow.
+    if ((!requested || DENIED.has(requested)) && !explicitModel) {
       deny(
-        `Subagent gate: "${requested || '(no type given)'}" inherits the session ` +
-          `model (expensive) or has no pinned model. Pick a model-pinned agent and retry:\n` +
-          `  • read/grep/lookup  → "reader" (haiku)\n` +
-          `  • read + classify   → "classifier" (sonnet)\n` +
-          `  • heavy synthesis   → "synthesizer" (opus, only when truly needed)\n` +
-          `  • planning          → "planner" (opus)\n` +
-          `  • a purpose-built / plugin agent for its domain\n` +
-          `The session must choose a pinned agent explicitly: no catch-all, no Explore/Plan.`
+        `Subagent gate: "${requested || '(no type given)'}" silently inherits the ` +
+          `premium session model. Either pass an explicit \`model\` param (cheapest that ` +
+          `can do the job) or name a model-pinned agent:\n${pinnedAgentRoster()}` +
+          `A purpose-built / plugin agent for the domain also works.`
       );
       process.exit(0);
     }
@@ -182,9 +208,8 @@ process.stdin.on('end', () => {
           `Subagent cap: ${CAP} concurrent subagents already running in this session ` +
             `(Sophos CryptoGuard flags wider file-I/O fan-outs as ransomware-like). Do NOT retry immediately. Instead:\n` +
             `  1. Wait for a running subagent to finish, then retry (a slot frees on each SubagentStop; stale slots expire after ${SLOT_TTL_MS / 60000} min).\n` +
-            `  2. Better: restructure: ONE aggregate agent given the full file list (single rg/jq pass) instead of many small sweepers.\n` +
-            `  3. For repeated analysis over large logs, index once (sqlite / rag MCP), then query the index.\n` +
-            `Agents must return results in their final message, never via scratchpad temp files.`
+            `  2. Better: restructure to fewer, wider agents (e.g. one aggregate agent over the full file list) instead of many small sweepers.\n` +
+            `Agents must return results in their final message, never via scratchpad temp files (burst-of-small-writes is the AV trigger signature).`
         );
         process.exit(0);
       }
