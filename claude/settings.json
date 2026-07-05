@@ -134,7 +134,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node\" \"$HOME/.claude/hooks/subagent-gate.js\"",
+            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/subagent-gate.js\"",
             "timeout": 5
           }
         ]
@@ -164,7 +164,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node\" \"$HOME/.claude/hooks/subagent-gate.js\"",
+            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/subagent-gate.js\"",
             "timeout": 5
           }
         ]
@@ -175,7 +175,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node\" \"$HOME/.claude/hooks/subagent-gate.js\"",
+            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/subagent-gate.js\"",
             "timeout": 5
           }
         ]
@@ -187,6 +187,11 @@
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/sync-theme.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/check-hook-wiring.js\"",
+            "timeout": 5
           }
         ]
       }
