@@ -140,15 +140,6 @@
         ]
       },
       {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/check-large-file-read.sh\""
-          }
-        ]
-      },
-      {
         "matcher": "Skill",
         "hooks": [
           {
