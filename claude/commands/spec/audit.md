@@ -74,7 +74,7 @@ If any fix agent reports uncertainty or partial resolution, spawn a targeted re-
 
 ## Phase 3 — Commit
 
-Once all issues are resolved, invoke `/git-commit`.
+Once all issues are resolved, invoke `/git:commit`.
 
 ---
 

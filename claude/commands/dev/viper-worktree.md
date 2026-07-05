@@ -318,13 +318,7 @@ ls PLAN_*.md 2>/dev/null
 
 ### Step B1.5: Rename the terminal tab
 
-Rename the Warp tab per the global **Terminal Tab Renaming** convention (`{branch}`, Warp-only) in `~/.claude/CLAUDE.md`. Run from the worktree root:
-
-```bash
-[ "$TERM_PROGRAM" = "WarpTerminal" ] && b="$(git rev-parse --abbrev-ref HEAD)" && rename-tab "${b#Derek/}"
-```
-
-Do this silently, no prompt. Follow the global format exactly (only a leading `Derek/` is stripped; don't otherwise shorten the branch, and no repo name).
+Silently rename the tab per the global **Terminal Tab Renaming** convention in `~/.claude/CLAUDE.md` (one-liner and format live there), run from the worktree root.
 
 ### Step B2: Summarize the plan
 

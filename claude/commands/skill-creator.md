@@ -166,7 +166,7 @@ Use constraints to set boundaries (via gotchas), not to dictate every step. Leav
 
 **Note:** Commands can be more prescriptive than skills since they're simpler tasks. But even commands shouldn't be so rigid that context doesn't matter.
 
-**Exception — operational constraints:** The flexibility above applies to *goals and outputs*. For **how the skill operates** — model selection, delegation to subagents, tool choice, execution strategy — be direct and emphatic. Claude has a strong default to do everything itself with the most capable model available, and polite suggestions get ignored. If the skill should delegate research to Haiku subagents instead of searching directly with Opus, say so forcefully and explain the cost/speed/context reason. Operational instructions need stronger language than output instructions because you're fighting Claude's priors.
+**Operational constraints (model selection, delegation, tool choice):** state the constraint once, plainly, WITH its reason (cost, context economics, AV cap, security), and prefer pointing at shared policy (`claude/TIERS.md`, the subagent-gate) over restating it per skill. Do not reach for ALWAYS/NEVER emphasis by default; a stated reason beats forceful language, and enforcement belongs in hooks, not adjectives. (A 2025-era observation that "polite suggestions get ignored" motivated forceful phrasing here; treat that as a dated model behavior to re-verify per release, not doctrine.)
 
 ### 3. Gotchas Are the Most Valuable Section
 
@@ -238,7 +238,7 @@ Apply the decision framework from above. **Tell the user your classification and
 6. Add config.json if the skill will be shared with others needing different settings
 
 **Shared frontmatter rules:**
-- `model`: Use `haiku` for focused/lookup tasks, `opus` for deep reasoning or creativity. Default to `haiku`.
+- `model`: pick per the tier policy in `claude/TIERS.md` (cheapest tier that can do the job; prefer cheap and promote on observed quality misses). Annotate non-obvious picks with a dated comment.
 - `description`: Include 3-5 trigger phrases a user would actually say.
 - `allowed-tools`: Only include to sandbox (restrict what the command/skill can do).
 
@@ -257,6 +257,7 @@ Before presenting, verify:
 - [ ] Are there gotchas documented? (at least 2-3)
 - [ ] Is reference material in separate files? (progressive disclosure)
 - [ ] Are scripts pre-built for any API interactions?
+- [ ] **Durability:** for each operational constraint, which model weakness or cost fact does it patch, and is that written down with a date? Anything compensating for a current-model deficiency needs a re-test trigger, or a better model can never unlock it.
 - [ ] Is data persistence set up if needed?
 - [ ] Are hooks defined if security matters?
 

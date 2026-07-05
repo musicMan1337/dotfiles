@@ -55,7 +55,7 @@ In a **single message**, launch one Agent tool call per section in the wave. Eac
 
 ### 3b. Commit After the Wave Completes
 
-After ALL agents in the wave finish, invoke `/git-commit` before proceeding to the next wave.
+After ALL agents in the wave finish, invoke `/git:commit` before proceeding to the next wave.
 
 ### 3c. Repeat
 

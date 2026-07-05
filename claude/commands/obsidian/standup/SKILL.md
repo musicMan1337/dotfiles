@@ -1,5 +1,8 @@
 ---
 name: obsidian:standup
+# haiku = cost pick (2026-07, see claude/TIERS.md): gather.mjs does the deterministic
+# heavy lifting and a human approves before write. Promote a tier if grouping/
+# weighting quality misses recur.
 model: haiku
 description: Generate standup notes from Claude Code sessions and write to Obsidian. Triggers on: standup, draft standup, what did I do today
 ---
