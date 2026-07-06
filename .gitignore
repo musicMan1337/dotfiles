@@ -13,3 +13,10 @@ artifacts/
 
 # crash dumps
 *.stackdump
+
+# SECURITY: the attack-surface inventory maps eBacon prod infra and must NEVER
+# land in this PUBLIC repo. It lives at ~/eBacon/attacksurface.md (outside any
+# repo); this pattern is a belt-and-suspenders guard in case a copy is dropped in.
+attacksurface.md
+attacksurface.*
+**/attacksurface.md
