@@ -10,7 +10,7 @@ Scout + gate + launcher + reporter for the attack-surface assessment workflow. T
 
 ## Constants
 
-- **Inventory file (`THE_FILE`):** `/Users/derek/eBacon/attacksurface.md` — sensitive, lives **outside every git repo** (dotfiles is public). Never commit it, never paste it externally.
+- **Inventory file (`THE_FILE`):** `/Users/derek/eBacon/attacksurface.md`, sensitive, lives **outside every git repo** (dotfiles is public). Never commit it, never paste it externally.
 - **Workflow script:** `/Users/derek/dotfiles/claude/commands/security/assess-attack-surface.workflow.mjs`
 - **Scope:** `TAGEmployerServices` org repos only.
 
@@ -33,9 +33,9 @@ Scout + gate + launcher + reporter for the attack-surface assessment workflow. T
 
    ```
    Assess 3 systems:
-   1. Viper        🔴 Critical  — overdue (never assessed)   [deep: 6 dims, 2-vote verify]
-   2. Texting      🟠 High      — overdue                     [deep: 6 dims]
-   3. Snout        🟡 Medium    — annual, due                 [light: 4 dims]
+   1. Viper        🔴 Critical , overdue (never assessed)   [deep: 6 dims, 2-vote verify]
+   2. Texting      🟠 High     , overdue                     [deep: 6 dims]
+   3. Snout        🟡 Medium   , annual, due                 [light: 4 dims]
 
    Run the assessment workflow over these 3?
    1. Yes
@@ -67,10 +67,10 @@ Workflow({
 The workflow runs in the background; you are notified on completion. Use `/workflows` to watch live progress. It returns `{ assessments: [...] }`, each matching `ASSESSMENT_SCHEMA`: `system, recommended_criticality, recommended_cadence, cadence_rationale, cost_note, next_due, log_row, summary, confirmed[]`.
 
 **What the workflow does per system** (depth scales with criticality, so cost tracks risk):
-- **Recon** (Sonnet) — confirm the live surface + report drift vs the inventory entry.
-- **Assess** (Sonnet, Opus for Critical / injection+authz dims) — 6 security dimensions for Critical/High, 4 for Medium, 3 for Low.
-- **Verify** (Opus for C/H findings, else Sonnet) — adversarial skeptics try to REFUTE each finding; majority kills false positives.
-- **Score** (Opus) — risk score + cadence, starting from a deterministic prior that already weighs criticality, exposure, worst finding, and this run's agent cost.
+- **Recon** (Sonnet), confirm the live surface + report drift vs the inventory entry.
+- **Assess** (Sonnet, Opus for Critical / injection+authz dims), 6 security dimensions for Critical/High, 4 for Medium, 3 for Low.
+- **Verify** (Opus for C/H findings, else Sonnet), adversarial skeptics try to REFUTE each finding; majority kills false positives.
+- **Score** (Opus), risk score + cadence, starting from a deterministic prior that already weighs criticality, exposure, worst finding, and this run's agent cost.
 
 ## Phase 3: Report + write back
 
@@ -99,5 +99,5 @@ The workflow runs in the background; you are notified on completion. Use `/workf
 - **Security-review agents are pinned to Sonnet/Opus, never the session model.** The session model (Fable) false-refuses cyber review (that is why the pinned auditor agents avoid it). The workflow sets an explicit non-Fable `model` on every agent; do not "simplify" that away.
 - **Depth is the cost lever.** A Critical system costs ~15-25 agents (6 dims + 2-vote verify + score); a Low system costs ~5. That asymmetry is intentional. Assess `overdue` regularly rather than `all` every time.
 - **Cadence is risk ÷ cost, not just criticality.** The workflow down-ranks cadence for low-risk systems that are expensive to assess, so a public-but-simple service does not get pointless monthly reviews. Trust the rationale; override with judgment if you disagree, and edit the entry.
-- **Drift is a signal.** If recon reports drift vs the inventory, the entry is stale — run `/security:attack-surface update <system>` to refresh it (this command reports drift but does not re-discover the full entry).
+- **Drift is a signal.** If recon reports drift vs the inventory, the entry is stale, run `/security:attack-surface update <system>` to refresh it (this command reports drift but does not re-discover the full entry).
 - **Resume after a hang.** One system's deep pass hanging does not lose the others; relaunch with `Workflow({scriptPath, resumeFromRunId})`.

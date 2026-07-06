@@ -24,29 +24,29 @@ Maintains the single running inventory of eBacon's deployed attack surface. This
 
 Dispatch on the argument. If none, default to `status`.
 
-### `status` (default) — show the current map
+### `status` (default): show the current map
 Read `THE_FILE`, print the At-a-glance table plus anything overdue: any system whose Last-assessed + its Cadence is in the past (or "never"), and the top of the findings backlog. Terse. Do not re-run discovery.
 
-### `add <repo>` — inventory a new system
+### `add <repo>`: inventory a new system
 1. Resolve the repo path under `~/eBacon/` and confirm its origin is in the TAG org (rule 4). If it is not, stop and say so.
 2. Run scoped discovery (see **Discovery method**) for that one repo.
 3. Write a new `### <criticality> <name>` entry following the **Entry template** exactly, inserted in criticality order. Add its row to the At-a-glance table and any new hosts/domains to the Cross-system perimeter table. Assign a seed criticality + cadence per the Cadence model already in the file.
 4. Report what you added and any findings (rule 2 applies to secrets).
 
-### `update <system>` — re-discover one existing system
+### `update <system>`: re-discover one existing system
 1. Re-run scoped discovery for that system's repo.
 2. Rewrite **only that system's entry** and its At-a-glance row. Diff against the old entry and call out what changed (new endpoint, new secret location, changed exposure, new dependency). Never rewrite unrelated entries.
 3. Leave the Assessment Log alone (that is the assess workflow's surface).
 
-### `refresh` — re-discover stale entries
+### `refresh`: re-discover stale entries
 Re-run discovery for every system, or only those not touched since a date the user gives. Batch by the **Discovery method**'s concurrency rules. Rewrite each entry in place; summarize the diff per system. This is the periodic "has anything drifted" pass.
 
-### `sync-tables` — repair consistency
+### `sync-tables`: repair consistency
 No discovery. Just reconcile the At-a-glance table, the perimeter table, and the per-system entries so they agree (e.g. after manual edits). Report mismatches fixed.
 
 ## Discovery method
 
-Discovery extracts deployment/security facts from **repo metadata only** — never a full source-tree read. The signal lives in:
+Discovery extracts deployment/security facts from **repo metadata only**: never a full source-tree read. The signal lives in:
 `README*`, `package.json` / `composer.json` / `*.csproj`, `Dockerfile`, `docker-compose*`, `.env.example`, `appsettings*.json`, `web.config`, `*.ini`, `.github/workflows/*`, `action.yml`, `cloudbuild.yaml` / `app.yaml` / OpenAPI gateway specs, `terraform/*.tf`, `scripts/*`, `policies/*.hcl`, `CODEOWNERS`.
 
 Delegate the reading to subagents so their bulky output never enters this session; you keep only the structured result and do the file edit.
