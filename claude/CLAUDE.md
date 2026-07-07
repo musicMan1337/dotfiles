@@ -43,16 +43,6 @@ When you create or discover a new repo, add it to `LOCATIONS.md`. If the file do
 
 CI hard-fails on undeclared internal workspace deps: when importing `@tagemployerservices/*` in a component, the package must be listed in that component's `package.json` `dependencies` (add it if absent).
 
-# Terminal Tab Renaming (Warp only)
-
-Title = the current git branch exactly, with a leading `Derek/` stripped (own prefix only; keep others like `Josh/` so authorship stays visible). Warp only: gate on `TERM_PROGRAM == WarpTerminal`, otherwise do nothing (the OSC title is meaningless elsewhere). One-liner:
-
-```bash
-[ "$TERM_PROGRAM" = "WarpTerminal" ] && b="$(git rev-parse --abbrev-ref HEAD)" && rename-tab "${b#Derek/}"
-```
-
-`rename-tab` lives in `bash/.bashrc.d/functions.sh`; requires `WARP_DISABLE_AUTO_TITLE=true` (`zsh/.zshrc.d/exports.sh`). If the title doesn't change, the tab was manually renamed (Warp pins those and ignores OSC); say so rather than retrying.
-
 # Numbered Options
 
 When presenting choices in plain text (approve/deny/alter, next steps, etc.), number each option so the user can reply by number. If a skill or tool uses the AskUserQuestion tool with multiple-choice options, use that instead; it already provides structured selection. Numbered options are for free-text responses only.
