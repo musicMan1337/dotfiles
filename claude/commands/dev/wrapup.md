@@ -26,12 +26,14 @@ Replaces the "commit push pr standup-add [cleanup]" chain. Run the steps in orde
 
 Push the current branch. No upstream yet: `git push -u origin <branch>`. Never force-push, never pull/rebase to resolve a rejected push; if the push is rejected, stop the chain and report, with numbered options for how to proceed.
 
-### 3. PR
+### 3. PR (with soft review gate)
 
-Skip if `no-pr` or the branch is `master`/`main`. Otherwise `gh pr view --json url,state` for the current branch:
+Skip if `no-pr` or the branch is `master`/`main`. Otherwise:
 
-- Open PR exists: reuse it, print the URL.
-- None (or closed): invoke `/git:pr`.
+- **Soft review gate (offer, never block).** Unless the diff is trivial (docs/config/test-only) or the user already reviewed this session, offer before the PR goes up (numbered): 1. run `/code-review` on the branch diff first, 2. skip and open the PR. On 1, run it and surface findings; the user decides fix-now vs ship. A declined or skipped review never stops the chain.
+- Then `gh pr view --json url,state` for the current branch:
+  - Open PR exists: reuse it, print the URL.
+  - None (or closed): invoke `/git:pr`.
 
 ### 4. Case-note sentence
 
