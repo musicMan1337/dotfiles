@@ -68,6 +68,15 @@ For larger tasks, group steps into waves:
 
 4. **Continue to next wave.**
 
+### Exit criteria (decide BEFORE you loop)
+
+Never iterate open-endedly. Fix a stopping rule up front; the first to trip ends it:
+- **Round cap:** max review-and-fix rounds per unit of work (default 3). After the cap, stop and report residual issues; don't keep polishing.
+- **Severity threshold:** stop once no medium/high issues remain. Don't chase low or cosmetic findings, or 1-in-a-million edge cases.
+- **Budget:** a hard token/time/spawn ceiling (on a self-paced loop, an explicit max total spend, not just a wake delay).
+
+Verify the common user flows, not every branch, and state what you did NOT cover. If a loop runs long, re-check that its success signal still reflects reality: grade against intent, constraints, and the running system, never against the original plan.
+
 ### Step 4 — Verify & Report
 
 After all work is done:

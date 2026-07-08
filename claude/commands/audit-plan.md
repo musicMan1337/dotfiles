@@ -38,3 +38,4 @@ Then offer next steps (numbered):
 - **Auditor is read-only and independent by design.** Never let the session that wrote the code also edit the report; the value is the fresh set of eyes.
 - **One agent, not a fan-out.** All lenses live in the single plan-auditor pass (CryptoGuard).
 - **No plan means degraded mode, not a fake plan.** Never synthesize a plan from the diff and then "audit" against it; that just grades the diff against itself.
+- **Plan-adherence is not reality.** The auditor checks the code against durable intent and constraints and flags what only execution can settle; it does not prove the feature works. A clean audit is necessary, not sufficient: run /verify on the runtime-only rows.
