@@ -18,35 +18,50 @@
       "WebSearch",
       "WebFetch(*)",
       "Skill(*)",
-      "mcp__exa__*",
+      "mcp__exa__web_search_exa",
+      "mcp__exa__web_fetch_exa",
       "mcp__rag__*",
       "mcp__agentic-coding-school__*",
       "mcp__claude-in-chrome__*",
       "mcp__context7__*",
       "mcp__sql-server__*",
-      "mcp__claude_ai_Fathom__*",
-      "mcp__claude_ai_HubSpot__*",
-      "mcp__claude_ai_Microsoft_365__*",
+      "mcp__claude_ai_Fathom__authenticate",
+      "mcp__claude_ai_Fathom__complete_authentication",
+      "mcp__claude_ai_HubSpot__authenticate",
+      "mcp__claude_ai_HubSpot__complete_authentication",
+      "mcp__claude_ai_Microsoft_365__authenticate",
+      "mcp__claude_ai_Microsoft_365__complete_authentication",
       "mcp__plugin_playwright_playwright__*",
       "mcp__plugin_splunk-mcp-plugin_splunk-mcp__*",
       "mcp__plugin_viper-stage-plugin_viper-stage__*"
+    ],
+    "ask": [
+      "mcp__rag__rag_insert_text",
+      "mcp__rag__rag_upload",
+      "mcp__rag__rag_track"
     ],
     "deny": [
       "Bash(sudo *)",
       "Bash(rm -rf /)",
       "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
       "Bash(dd *)",
       "Bash(diskutil erase*)",
       "Bash(diskutil partitionDisk*)",
       "Bash(shutdown*)",
       "Bash(reboot*)",
+      "Bash(npm publish*)",
+      "Bash(pnpm publish*)",
+      "Read(/Users/derek/.ssh/**)",
+      "Read(**/.env)",
+      "mcp__sql-server__execute_sp",
+      "mcp__plugin_playwright_playwright__browser_run_code_unsafe",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__agentic-coding-school__share_insights",
       "Read(**/dist/**)",
       "Read(**/build/**)",
       "Read(**/.next/**)",
-      "Read(**/out/**)",
-      "Read(**/*.lock)",
-      "Read(**/pnpm-lock.yaml)",
-      "Read(**/yarn.lock)"
+      "Read(**/out/**)"
     ]
   },
   "model": "opus[1m]",
@@ -95,6 +110,12 @@
     "obsidian:notify": "user-invocable-only",
     "obsidian:skill-tracker": "user-invocable-only",
     "obsidian:investigate": "user-invocable-only",
+    "dev:viper-case-note": "user-invocable-only",
+    "dev:wrapup": "user-invocable-only",
+    "git:pr": "user-invocable-only",
+    "git:pr-suggestions": "user-invocable-only",
+    "test:gh-actions": "user-invocable-only",
+    "harness:model-upgrade": "user-invocable-only",
     "init": "off",
     "review": "off",
     "security-review": "off",
@@ -148,6 +169,26 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/bash-egress-guard.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/sensitive-write-guard.sh\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -181,7 +222,7 @@
           },
           {
             "type": "command",
-            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/check-hook-wiring.js\"",
+            "command": "\"$(command -v node || echo /Users/derek/.local/share/fnm/node-versions/v24.15.0/installation/bin/node)\" \"$HOME/.claude/hooks/check-hook-wiring.js\" || echo 'WIRING CHECK FAILED TO RUN (check-hook-wiring.js missing or errored)'",
             "timeout": 5
           }
         ]
@@ -239,9 +280,9 @@
     }
   },
   "effortLevel": "xhigh",
-  "autoUpdatesChannel": "latest",
+  "autoUpdatesChannel": "stable",
   "tui": "fullscreen",
-  "autoDreamEnabled": true,
+  "autoDreamEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "light",
   "autoCompactEnabled": false,
