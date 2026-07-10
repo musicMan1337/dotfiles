@@ -35,11 +35,6 @@
       "mcp__plugin_splunk-mcp-plugin_splunk-mcp__*",
       "mcp__plugin_viper-stage-plugin_viper-stage__*"
     ],
-    "ask": [
-      "mcp__rag__rag_insert_text",
-      "mcp__rag__rag_upload",
-      "mcp__rag__rag_track"
-    ],
     "deny": [
       "Bash(sudo *)",
       "Bash(rm -rf /)",
@@ -62,6 +57,11 @@
       "Read(**/build/**)",
       "Read(**/.next/**)",
       "Read(**/out/**)"
+    ],
+    "ask": [
+      "mcp__rag__rag_insert_text",
+      "mcp__rag__rag_upload",
+      "mcp__rag__rag_track"
     ]
   },
   "model": "opus[1m]",
@@ -286,6 +286,7 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "light",
   "autoCompactEnabled": false,
+  "switchModelsOnFlag": false,
   "terminalOutputLimit": 150000,
   "disableTelemetry": true,
   "disableErrorReporting": true,
