@@ -43,5 +43,5 @@ PS1="\[\033[38;5;9m\]\u\[$(tput sgr0)\]\[\033[38;5;10m\][\[$(tput sgr0)\]\[\033[
 export PATH="$PATH:/Users/derek/.lmstudio/bin"
 # End of LM Studio CLI section
 
-alias claude-up='npm update -g @anthropic/claude-cli'
+alias claude-up='npm update -g @anthropic-ai/claude-code'
 alias claude-d='claude --dangerously-skip-permissions'
