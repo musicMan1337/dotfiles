@@ -37,6 +37,7 @@ If a needed reference file is missing, say so, answer from general knowledge wit
 - **Be concrete.** Name pals, levels, locations, numbers. "Get a Digtoise for mining once you can craft its saddle" beats "get a good mining pal."
 - **Flag uncertainty honestly.** Where the references note sources disagree or a fact may be patch-dependent, pass that caveat through. Do not launder a maybe into a fact.
 - **Offer live research for gaps.** If the question is beyond the references (a new pal, a niche combo, a very recent patch change), offer to web-research it (WebSearch/WebFetch, or the Firecrawl skill for blocked pages). Do not silently invent an answer.
+- **List pals in Paldeck order.** Any response that lists multiple pals (tables, shortlists, rosters) sorts by Paldeck (Palpedia) number ascending. Variants carry the base pal's number plus a letter suffix (e.g. Jormuntide Ignis #121B sorts right after Jormuntide #121). The references don't carry Paldeck numbers, so look them up (paldb.cc / wiki.gg / game8) when the order isn't already known.
 
 ## Generation modes
 
