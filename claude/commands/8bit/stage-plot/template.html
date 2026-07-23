@@ -1,0 +1,501 @@
+<!--
+  8 Bit Mammoth stage-plot SHELL / template.
+  Design system (tokens, both themes, pixel-block tiles, print CSS) is complete below.
+  Fill the body: band name, config chips, stage grid, input list, monitor mixes, requirements.
+  Grid + side conventions are documented in the stage-floor comment.
+  A fully worked example lives at dotfiles/artifacts/8bit-stage-plot.html.
+-->
+<title>Band Name &middot; Stage Plot</title>
+<style>
+  :root {
+    --bg: #0f1119;
+    --panel: #161a26;
+    --panel-2: #1e2333;
+    --stage: #0a0c13;
+    --ink: #ece7d8;
+    --ink-dim: #929ab5;
+    --line: #2a3044;
+    --grid-line: rgba(255,255,255,0.045);
+    --scan: rgba(0,0,0,0.16);
+    --cyan: #46cfe6;
+    --cyan-soft: #7fe0ef;
+    --cyan-shadow: #1c6b7a;
+    --amber: #ffb347;
+    --amber-soft: #ffcd82;
+    --amber-shadow: #93611c;
+    --shadow-hard: rgba(0,0,0,0.5);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #ece5d4;
+      --panel: #f5f0e4;
+      --panel-2: #ffffff;
+      --stage: #ded4bd;
+      --ink: #23262f;
+      --ink-dim: #6b7182;
+      --line: #d5ccb6;
+      --grid-line: rgba(0,0,0,0.055);
+      --scan: rgba(0,0,0,0.035);
+      --cyan: #0d8298;
+      --cyan-soft: #0d8298;
+      --cyan-shadow: #b9d6dc;
+      --amber: #bf6f16;
+      --amber-soft: #bf6f16;
+      --amber-shadow: #e6d0a8;
+      --shadow-hard: rgba(120,104,70,0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1119; --panel: #161a26; --panel-2: #1e2333; --stage: #0a0c13;
+    --ink: #ece7d8; --ink-dim: #929ab5; --line: #2a3044;
+    --grid-line: rgba(255,255,255,0.045); --scan: rgba(0,0,0,0.16);
+    --cyan: #46cfe6; --cyan-soft: #7fe0ef; --cyan-shadow: #1c6b7a;
+    --amber: #ffb347; --amber-soft: #ffcd82; --amber-shadow: #93611c;
+    --shadow-hard: rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    --bg: #ece5d4; --panel: #f5f0e4; --panel-2: #ffffff; --stage: #ded4bd;
+    --ink: #23262f; --ink-dim: #6b7182; --line: #d5ccb6;
+    --grid-line: rgba(0,0,0,0.055); --scan: rgba(0,0,0,0.035);
+    --cyan: #0d8298; --cyan-soft: #0d8298; --cyan-shadow: #b9d6dc;
+    --amber: #bf6f16; --amber-soft: #bf6f16; --amber-shadow: #e6d0a8;
+    --shadow-hard: rgba(120,104,70,0.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  .rider {
+    --mono: ui-monospace, "Cascadia Code", "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    min-height: 100%;
+    padding: clamp(16px, 3.5vw, 40px);
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 26px;
+  }
+  .brand { display: flex; flex-direction: column; gap: 8px; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(30px, 6vw, 54px);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .title .eight { color: var(--amber); }
+  .title .mam { color: var(--ink); }
+  .meta { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--ink-dim);
+    box-shadow: 3px 3px 0 var(--shadow-hard);
+  }
+  .chip.on-cyan { color: var(--cyan-soft); border-color: var(--cyan); }
+  .chip.on-amber { color: var(--amber-soft); border-color: var(--amber); }
+  .rev { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); letter-spacing: 0.08em; }
+
+  /* ---------- stage ---------- */
+  .stage-wrap { margin-bottom: 30px; }
+  .edge {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    text-align: center;
+    padding: 9px 0;
+    background: var(--panel);
+    border: 1px solid var(--line);
+  }
+  .edge.back { border-bottom: none; }
+  .edge.front {
+    border-top: none;
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .edge.front .arrow { color: var(--cyan); letter-spacing: 0; }
+
+  .stage-scroll { overflow-x: auto; }
+  .stage-floor {
+    min-width: 660px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(3, minmax(74px, 1fr));
+    gap: 12px;
+    padding: 18px;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+
+  .unit {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border: 2px solid var(--line);
+    box-shadow: 5px 5px 0 var(--u-shadow, var(--shadow-hard));
+  }
+  .unit .ch {
+    position: absolute;
+    top: 8px; right: 10px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-dim);
+  }
+  .unit .inst {
+    font-weight: 800;
+    font-size: clamp(15px, 1.7vw, 20px);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--u-ink, var(--ink));
+  }
+  .unit .detail {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .unit.rhythm { border-color: var(--cyan); --u-shadow: var(--cyan-shadow); --u-ink: var(--cyan-soft); }
+  .unit.horn { border-color: var(--amber); --u-shadow: var(--amber-shadow); --u-ink: var(--amber-soft); }
+
+  /* monitor wedges */
+  .wedge {
+    grid-row: 4;
+    align-self: center;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--ink-dim);
+    clip-path: polygon(0 0, 100% 0, 87% 100%, 13% 100%);
+  }
+
+  /* ---------- disclaimer ---------- */
+  .disclaimer {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: 5px 5px 0 var(--shadow-hard);
+    padding: 13px 16px;
+    margin-bottom: 24px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+  }
+  .disclaimer .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    flex: 0 0 auto;
+  }
+  .disclaimer strong { color: var(--ink); font-weight: 700; }
+
+  .note {
+    margin: 12px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+  }
+  .note em { color: var(--cyan-soft); font-style: normal; }
+
+  /* ---------- detail panels ---------- */
+  .details {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: 5px 5px 0 var(--shadow-hard);
+  }
+  .card + .card { margin-top: 22px; }
+  .card-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  }
+  .card-head .sub { color: var(--ink-dim); letter-spacing: 0.08em; font-size: 11px; }
+  .card-body { padding: 6px 16px 16px; }
+
+  /* input list */
+  table.io { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12.5px; }
+  table.io th {
+    text-align: left;
+    font-weight: 400;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10.5px;
+    padding: 10px 8px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  table.io td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.io tr:last-child td { border-bottom: none; }
+  table.io .ch-col { color: var(--ink-dim); font-variant-numeric: tabular-nums; width: 34px; }
+  table.io .src { color: var(--ink); }
+  table.io .mic { color: var(--ink-dim); }
+  .dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; transform: translateY(1px); }
+  .dot.c { background: var(--cyan); }
+  .dot.a { background: var(--amber); }
+
+  /* monitor + reqs lists */
+  .mixlist, .reqlist { list-style: none; margin: 0; padding: 0; }
+  .mixlist li, .reqlist li {
+    display: flex;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .mixlist li:last-child, .reqlist li:last-child { border-bottom: none; }
+  .mixlist .lbl {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--cyan-soft);
+    letter-spacing: 0.06em;
+    flex: 0 0 34px;
+  }
+  .reqlist .lbl {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    flex: 0 0 88px;
+    padding-top: 1px;
+  }
+  .mixlist .val, .reqlist .val { color: var(--ink); }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; }
+  .legend .item { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim); letter-spacing: 0.04em; }
+  .legend .sw { width: 14px; height: 14px; border: 2px solid; }
+  .legend .sw.c { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 22%, transparent); }
+  .legend .sw.a { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 22%, transparent); }
+  .legend .sw.w { border: none; background: var(--ink-dim); clip-path: polygon(0 0,100% 0,80% 100%,20% 100%); }
+
+  /* footer */
+  .foot {
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 2px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 30px;
+  }
+  .field { display: flex; align-items: baseline; gap: 10px; font-family: var(--mono); font-size: 12px; }
+  .field .k { color: var(--ink-dim); letter-spacing: 0.1em; text-transform: uppercase; font-size: 10.5px; }
+  .field .blank { min-width: 150px; border-bottom: 1px solid var(--ink-dim); align-self: flex-end; height: 1em; }
+
+  @media (max-width: 720px) {
+    .details { grid-template-columns: 1fr; }
+    .masthead { align-items: flex-start; }
+    .meta { align-items: flex-start; }
+    .chips { justify-content: flex-start; }
+  }
+
+  /* ---------- print / PDF (Ctrl+P → Save as PDF) ---------- */
+  @page { size: letter portrait; margin: 10mm; }
+  @media print {
+    .rider {
+      padding: 0;
+      max-width: none;
+      zoom: 0.74; /* scale the whole sheet to land on one page */
+      /* force an ink-friendly light palette regardless of screen theme */
+      --bg: #ffffff; --panel: #ffffff; --panel-2: #ffffff; --stage: #f5f1e7;
+      --ink: #191b21; --ink-dim: #545a6a; --line: #b9b19d;
+      --grid-line: rgba(0,0,0,0.07); --scan: transparent;
+      --cyan: #0c7d92; --cyan-soft: #0a6c80; --cyan-shadow: transparent;
+      --amber: #ad6210; --amber-soft: #97560c; --amber-shadow: transparent;
+      --shadow-hard: transparent;
+    }
+    .masthead { padding-bottom: 14px; margin-bottom: 18px; }
+    .stage-wrap { margin-bottom: 20px; }
+    .disclaimer { margin-bottom: 18px; padding: 10px 14px; }
+    table.io td { padding: 4px 8px; }
+    .unit, .card, .chip, .disclaimer { box-shadow: none; }
+    .stage-scroll { overflow: visible; }
+    .stage-floor { min-width: 0; }
+    .details, .card, .stage-wrap, .unit { break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+
+<div class="rider">
+  <header class="masthead">
+    <div class="brand">
+      <span class="kicker">Stage Plot &middot; Tech Rider</span>
+      <!-- FILL: band name. .eight = amber accent word(s), .mam = default ink. -->
+      <h1 class="title"><span class="eight">Band</span> <span class="mam">Name</span></h1>
+    </div>
+    <div class="meta">
+      <!-- FILL: config chips. First chip = piece count; on-cyan = rhythm count; on-amber = horn count; last = input count. -->
+      <div class="chips">
+        <span class="chip">N-Piece</span>
+        <span class="chip on-cyan">N Rhythm</span>
+        <span class="chip on-amber">N Horns</span>
+        <span class="chip">N Inputs</span>
+      </div>
+      <span class="rev">REV YYYY.MM &middot; VIEW FROM AUDIENCE</span>
+    </div>
+  </header>
+
+  <section class="stage-wrap" aria-label="Stage layout">
+    <div class="edge back">Back of Stage</div>
+    <div class="stage-scroll">
+      <!--
+        STAGE GRID: 12 columns, one grid-row per physical row (back = row 1, front = highest row).
+        Plot is drawn VIEW FROM AUDIENCE, so page-left = performers' Stage RIGHT, page-right = Stage LEFT.
+        Place each player with inline grid-column (start/end, 1..13) + grid-row.
+        Add grid-template-rows in the CSS if you need more/less than 3 rows.
+        Class .rhythm = cyan (drums/bass/gtr/keys), .horn = amber (brass/reeds).
+        .ch = channel badge, .inst = name, .detail = mic/DI + (SL/SR) tag.
+      -->
+      <div class="stage-floor">
+        <!-- back row -->
+        <div class="unit rhythm" style="grid-column:5/7;grid-row:1;">
+          <span class="ch">CH n</span>
+          <span class="inst">Drums</span>
+          <span class="detail">detail</span>
+        </div>
+        <!-- FILL: remaining back-row players -->
+
+        <!-- middle row(s): rhythm -->
+        <div class="unit rhythm" style="grid-column:1/3;grid-row:2;">
+          <span class="ch">CH n</span>
+          <span class="inst">Keys</span>
+          <span class="detail">detail (SL)</span>
+        </div>
+        <!-- FILL: remaining rhythm -->
+
+        <!-- front row: horns -->
+        <div class="unit horn" style="grid-column:1/4;grid-row:3;">
+          <span class="ch">CH n</span>
+          <span class="inst">Trumpet</span>
+          <span class="detail">clip/mic</span>
+        </div>
+        <!-- FILL: remaining horns, spread evenly across the front row -->
+      </div>
+    </div>
+    <div class="edge front"><span>Front of Stage</span><span class="arrow">&#9660;&#9660;&#9660;</span><span>Audience</span></div>
+  </section>
+
+  <!-- Boilerplate disclaimer: keep verbatim. -->
+  <div class="disclaimer">
+    <span class="tag">Note</span>
+    <span>Everything below is a <strong>reference setup</strong>, not a requirement. In-house sound is welcome to run inputs, mics, and monitors however they prefer.</span>
+  </div>
+
+  <section class="details">
+    <div class="col">
+      <div class="card">
+        <div class="card-head">Input List <span class="sub">N channels</span></div>
+        <div class="card-body">
+          <!-- FILL: one row per channel. dot c = rhythm, dot a = horn. Add a "* footnote" via <p class="note"> for special gear. -->
+          <table class="io">
+            <thead>
+              <tr><th class="ch-col">Ch</th><th>Source</th><th>Mic / DI</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ch-col">1</td><td class="src"><span class="dot c"></span>Source</td><td class="mic">mic / DI</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <div class="card-head">Monitor Mixes <span class="sub">wedge / IEM</span></div>
+        <div class="card-body">
+          <!-- FILL: one mix per line. -->
+          <ul class="mixlist">
+            <li><span class="lbl">M1</span><span class="val">who: what they want</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Stage Requirements</div>
+        <div class="card-body">
+          <!-- FILL/trim as needed. Power SL/SR must match the plot (view from audience). -->
+          <ul class="reqlist">
+            <li><span class="lbl">Stage</span><span class="val">min stage size</span></li>
+            <li><span class="lbl">Power</span><span class="val">outlet count + sides; isolated from lighting</span></li>
+            <li><span class="lbl">Backline</span><span class="val">who brings what</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Legend</div>
+        <div class="card-body">
+          <div class="legend">
+            <span class="item"><span class="sw c"></span>Rhythm</span>
+            <span class="item"><span class="sw a"></span>Horns</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="field"><span class="k">Tech Contact</span><span class="blank"></span></span>
+    <span class="field"><span class="k">Phone / Email</span><span class="blank"></span></span>
+    <span class="field"><span class="k">Show Date</span><span class="blank"></span></span>
+  </footer>
+</div>
