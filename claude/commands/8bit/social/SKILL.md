@@ -53,7 +53,7 @@ Two things make this work. First, the date belongs *in the image*, because a scr
 There is not enough time for an announce to compound, and most of the room is already coming or not. Do not hand over a thinned-out version of the table and call it a plan. Lead with the capture decision instead, because that is the highest-value thing still open at this range.
 
 1. **Capture first.** Who is shooting, where the tripod goes, what the audio source is. See "Gig footage." Settle this before discussing posts.
-2. **Everything promotional lands at once, today:** event page, announce post, Story reshare of the announce.
+2. **Everything promotional lands at once, today:** event page, announce post, Story reshare of the announce, plus the venue ask and the personal push (see "Beyond the band accounts"). At this range those last two matter more than anything on the band's own feed.
 3. **Midweek:** one Story with a who-is-coming prompt, one reminder in the event discussion.
 4. **Day before:** Story, plus a rehearsal snippet if there is a rehearsal.
 5. **Day of:** morning Story, soundcheck Story, doors time.
@@ -69,6 +69,38 @@ At an established room the venue usually already has the show listed. A second e
 - **Venue keeps a website calendar but does not use Facebook events:** create the event, link their calendar page in the body.
 
 Never point the audience at two places to RSVP.
+
+## Beyond the band accounts
+
+The band's own Instagram and Facebook are the smallest audience in play. For a local show the two bigger levers are the venue's list and the members' personal networks, and neither happens on its own. Any plan that only schedules posts to the band accounts has skipped the important part.
+
+### The venue
+
+- **Ask early and bundle the asks.** Timing, co-hosting, and asset delivery in one message rather than three.
+- **Tell them when to post.** A venue push that lands the day before a ticketed show is close to worthless. Ask for early in show week.
+- **Send paste-ready copy and an image.** Someone with a blurb in hand posts sooner and better than someone who has to write it. Hand over a 60 to 90 word blurb in **third person** (the band's first-person voice reads strangely from a venue account) plus both crops of the art.
+- **Say what to lead with.** Do not assume they will find the show's sharpest angle on their own.
+- **Stagger against them.** Do not push the same asset the same day they do; spread the touches across the week.
+- **Never gate the band's own posting on theirs**, whatever they have promised.
+
+### Personal and bandmate accounts
+
+For a local show these usually out-reach the band Page. Page organic reach is throttled, while a personal friend list is actual local people with a relationship to the player.
+
+- **Share the event from personal profiles**, with one line in that person's own voice.
+- **Invite local friends to the Facebook event from personal accounts.** Filter to plausible locals; blanket invites get tuned out. This is the most direct conversion mechanism Facebook still offers for a local show.
+- **Ask every member to do both**, and send them the link and the image so there is no friction. A full band's networks dwarf the band Page's following. Do this early in the week, not the day before.
+- **Never paste band promo copy into a personal account.** It reads as an ad forwarded by a friend, which defeats the entire reason personal shares work. One plain line, no hashtags.
+
+## Ticketed shows
+
+The arc above assumes RSVP is the action. A paid ticket changes several things.
+
+- **Lead time matters more.** A $35 ticket is a planned purchase, not a walk-up decision. Promotion landing the day before mostly does not convert.
+- **The ticket link belongs in the Facebook event's ticket field**, not only in the body text.
+- **A stalled sales count is a trigger, not a verdict.** Several days at zero means the promo is unworked or the angle is wrong. Act on it.
+- **Access terms are usually the sharpest unused hook.** Student pricing, all ages, group rates. These routinely go unmentioned by everyone involved while the copy talks about the music. Give them their own post rather than a parenthetical.
+- **Ticket counts live with the ticketing platform, not on-platform.** See "What to measure."
 
 ## Between shows
 
@@ -132,6 +164,8 @@ Game and anime music has active, aggressive rightsholders, and a posted cover ca
 - **Inbound asks:** "when are you playing next," booking DMs, venue inquiries.
 - **Ignore follower count.** A local band with 400 engaged local followers outdraws one with 4,000 scattered ones.
 
+**Keep a per-show log.** The numbers that actually decide anything are not in Instagram or Facebook analytics. Reach and saves are inputs; tickets sold and bodies in the room are the outcome, and those live with the ticketing platform and the door. After each show add a row: date, venue, tickets sold, door count, Facebook Going, posts made, best-performing post, anything unusual. A handful of shows of this is worth more than any platform dashboard, and it is what retires the guessed numbers in this file.
+
 ## Audit mode
 
 When the user says the account is dead or asks what is wrong, check in this order and report findings before proposing a plan.
@@ -158,4 +192,4 @@ The fix is almost always footage plus cadence, not a new content idea.
 
 Numbers here are starting points, not findings. When the band's own data contradicts them, the data wins: adjust the mix, the cadence, and the arc timings in this file and note what drove the change. Voice corrections belong in `../references/voice-tone.md`, not here.
 
-**Dated premise.** The content mix percentages, the weekly cadence floor, and the promo-arc timings are prescriptive scaffolding, not environment facts. They encode a reasonable default for a local gigging band absent any real performance data. (scaffold: patches missing band-specific engagement data; added 2026-07; retest once the band has a few shows of post-level analytics, or on any model upgrade, and replace with observed numbers or delete if the model plans a better arc unaided.) The platform roster, the title surface split, the claims risk, and the phone-mic clipping fact are environment facts and stay regardless.
+**Dated premise.** The content mix percentages, the weekly cadence floor, and the promo-arc timings are prescriptive scaffolding, not environment facts. They encode a reasonable default for a local gigging band absent any real performance data. (scaffold: patches missing band-specific engagement data; added 2026-07; retest once the per-show log under "What to measure" has a handful of rows, or on any model upgrade, and replace with observed numbers or delete if the model plans a better arc unaided.) The platform roster, the title surface split, the claims risk, and the phone-mic clipping fact are environment facts and stay regardless.

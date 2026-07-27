@@ -1,4 +1,4 @@
-# 8 Bit Mammoth — Band Overview
+# 8 Bit Mammoth: Band Overview
 
 The factual core. Other skills read this to ground any copy in real specifics.
 
@@ -9,8 +9,8 @@ A horn-driven instrumental ensemble that arranges video game, anime, and TV musi
 ## Stylistic identity
 
 - **Primary languages:** funk and jazz. Think tight horn writing, deep pocket, room for improvisation.
-- **Default tempo/feel:** uptempo grooves, swing, funk, fusion-adjacent. **Ballads are rare and should not be reached for as a default style descriptor.** When describing what the band does to source material, lean on "grooves," "horn arrangements," "rebuilt as funk/jazz," "room to solo" — not "ballads," not "delicate," not "slow burn."
-- **Source material:** game/anime/TV soundtracks reimagined as live arrangements — not novelty covers, not chiptune.
+- **Default tempo/feel:** uptempo grooves, swing, funk, fusion-adjacent. **Ballads are rare and should not be reached for as a default style descriptor.** When describing what the band does to source material, lean on "grooves," "horn arrangements," "rebuilt as funk/jazz," "room to solo," not "ballads," not "delicate," not "slow burn."
+- **Source material:** game/anime/TV soundtracks reimagined as live arrangements, not novelty covers, not chiptune.
 - **Reading depth:** the music is taken seriously. But in promo copy, *don't say* "the charts are real / the solos are live / we mean it." Saying it out loud reads as defensive. Let the description of what we play imply the seriousness.
 
 ## Repertoire snapshot
