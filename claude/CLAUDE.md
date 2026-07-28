@@ -22,6 +22,11 @@ Conventional Commits, terse; the format spec lives in `/git:commit`, which is th
 - **Nothing is "done" until it's exercised.** A new config value must be shown to be consumed by the code that reads it; a new script must run once cleanly; a new endpoint must be hit. Run /verify for nontrivial changes before declaring completion. "I wrote it" is not "it works."
 - **Never assert DB behavior from inference.** If a SQL MCP is connected, check the actual schema/sproc/data before claiming how the database behaves or writing queries against guessed column names.
 - **Generated files: print the path, nothing else.** When you generate a scratchpad/output file (HTML, report, export), print its absolute path and stop. Never auto-open a browser or app; I open files myself via URL or file explorer.
+- **SQL scripts go in `/Users/derek/eBacon/SQL/queries/cc/`, not `/private/tmp/*`.** Ad-hoc SQL scripts (queries, one-offs, exploratory `.sql`) belong there; the dir is gitignored (safe scratch, won't be committed). Skills with their own output convention override this (e.g. `dev:viper-case-creation` → `/private/tmp/viper-sql/`, `dev:sql` → worktree).
+
+# Testing
+
+**Always red-green.** When writing a test for anything, first write it in a failing state and run it to confirm it fails, then make it pass. A test that has never been seen to fail is a silent false positive waiting to happen. This is mandatory 100% of the time; the only exception is when I explicitly tell that session to skip it.
 
 # Subagent Strategy
 
@@ -58,4 +63,11 @@ Write:
 
 # Claude in Chrome: target the "Claude" profile only
 
-Before any browser automation, call `list_connected_browsers` and `select_browser` the **"Claude"** profile (the dedicated Chrome profile that has the Claude extension installed). Never drive my main browsing profile. If no "Claude" browser is connected, stop and tell me to open a "Claude"-profile window; do NOT fall back to whatever Chrome is connected.
+Before any browser automation, call `list_connected_browsers` and `select_browser` the dedicated Chrome profile that has the Claude extension (the Chrome window whose profile chip reads **"Claude"**, separate from my "Derek" / "derek@ebacon.com" browsing profiles). Never drive my main browsing profiles.
+
+**Gotcha: the Claude-profile browser does NOT report its name as "Claude".** It connects under the default display name **"Browser 1"** (deviceId `d01f0c30-898f-4a5d-b90b-b0e8f3b003ec` on this machine, as of 2026-07). Do not reject it for not being literally named "Claude" — that mistake cost a round-trip. How to connect:
+
+- `list_connected_browsers` → if the known Claude-profile deviceId (`d01f0c30-...`) is present, `select_browser` it directly. If exactly one browser is connected and it's that deviceId, it's the Claude profile; just select it.
+- `switch_browser` (the "prompt every extension" path) returns **"No other browsers available"** when the Claude profile is the only one connected, so it does NOT help distinguish/confirm — don't rely on it here.
+- Confirm identity by the Chrome **profile chip reading "Claude"** (visible in a screenshot), not by the MCP display name.
+- If no browser is connected at all, stop and tell me to open/activate the extension in the "Claude"-profile window; do NOT fall back to a non-Claude profile. If the connected deviceId differs from the one above (extension reinstalled), confirm with me before driving it.

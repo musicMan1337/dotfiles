@@ -1,6 +1,6 @@
 ---
 name: dev:wrapup
-description: End-of-task close-out chain, one command instead of the hand-typed ritual. Commits via /git:commit, pushes, opens a PR via /git:pr if none exists, prints a pithy case-note sentence when the branch has a case ID, logs the work via /obsidian:standup-add, and optionally tears down the Viper worktree. Triggers on, wrapup, wrap up, wrap it up, close out, close this out, ship and log, commit push pr standup-add, commit push standup-add, commit push pr, commit push standup, standdup-add, /dev:wrapup.
+description: End-of-task close-out chain, one command instead of the hand-typed ritual. Commits via /git:commit, pushes, opens a PR via /git:pr if none exists, leaves the case note (Viper branch, posts it to the prod case via the /case-note PR-comment CI action; otherwise prints a pithy sentence), logs the work via /obsidian:standup-add, and optionally tears down the Viper worktree. Triggers on, wrapup, wrap up, wrap it up, close out, close this out, ship and log, commit push pr standup-add, commit push standup-add, commit push pr, commit push standup, standdup-add, /dev:wrapup.
 ---
 
 # /dev:wrapup
@@ -35,9 +35,16 @@ Skip if `no-pr` or the branch is `master`/`main`. Otherwise:
   - Open PR exists: reuse it, print the URL.
   - None (or closed): invoke `/git:pr`.
 
-### 4. Case-note sentence
+### 4. Case note
 
-If the branch matches `<Name>/<CaseId>-<desc>`, print 1-2 pithy sentences describing the fix, labeled `Case note (<CaseId>):`, ready to paste into the case. Outcome-focused, no file lists. No case ID in the branch: skip silently.
+If the branch matches `<Name>/<CaseId>-<desc>`, leave the case note; otherwise skip silently. Depends on step 3 having produced a PR.
+
+- **Viper PR (the branch has a PR in `TAGEmployerServices/Viper`):** post the note to the prod case via the repo's case-note CI action, do NOT print a paste-ready sentence. Comment the pragma on the PR:
+  ```bash
+  gh pr comment <pr-number> --body-file <file>   # body starts with: /case-note <CaseId> <note>
+  ```
+  `.github/workflows/manual-case-note.yml` (trigger: an `issue_comment` whose body starts with `/case-note`, gated to org OWNER/MEMBER/COLLABORATOR) parses `/case-note <CaseId> <note text>` and writes the note to the prod Viper case via `tagemployerservices/actions/case-note`. Rules: the comment body MUST start with `/case-note` (the workflow regex anchors on it); the note is 1-2 pithy outcome-focused sentences, no file lists (multiline is allowed). Use `--body-file` (a scratchpad file), never inline `--body`, so apostrophes/backslashes in the note don't get mangled by the shell. This writes to a real prod case, a genuine side effect, but the user opted into it by invoking wrapup for a Viper case branch, so do it without re-prompting. After posting, confirm the action fired: `gh run list --workflow manual-case-note.yml --limit 2` should show a `success` run (a second `skipped` run is normal, the bot's own ✅ reply re-triggers and no-ops); the bot also reacts 🚀 and replies `✅ Case note added to Case-<CaseId>`. If the run failed, surface it.
+- **No Viper PR (`no-pr`, `master`, or a non-Viper repo without the action):** fall back to printing 1-2 pithy sentences labeled `Case note (<CaseId>):`, outcome-focused, no file lists, ready to paste into the case.
 
 ### 5. Standup
 
@@ -49,7 +56,7 @@ Inside a Viper worktree (`pwd` under `/Users/derek/eBacon/Viper/.worktrees/`): i
 
 ### 7. Hand back
 
-One short block: branch, new commit hash(es), PR URL, the case-note sentence, standup status, cleanup status. No prose recap beyond that.
+One short block: branch, new commit hash(es), PR URL, case-note status (posted to the case via the PR pragma with the run/confirmation link, or the printed sentence for non-Viper), standup status, cleanup status. No prose recap beyond that.
 
 ## Gotchas
 

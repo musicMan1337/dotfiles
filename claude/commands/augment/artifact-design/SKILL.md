@@ -94,6 +94,54 @@ Reference **semantic tokens** (`--mm-*`) in your rules, never the raw
 - The hero → features → testimonials → CTA template layout
 - A vivid accent used on more than ~5% of the view
 
+## Required page furniture (every artifact)
+
+Two elements ship on **every** artifact, whatever the type:
+
+**1. Theme toggle button.** `mammoth.css` wires light + dark in both directions
+(`[data-theme]` overrides plus a `prefers-color-scheme` default), so a button that
+flips `data-theme` on `:root` works with zero extra CSS. Put a pill button at the
+top-right of the masthead/header, and the flip script once before `</body>`.
+
+CSS (semantic tokens only):
+```css
+.themebtn{flex:none;font-family:var(--mm-font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--mm-text-muted);border:1px solid var(--mm-border-default);border-radius:9999px;padding:6px 14px;cursor:pointer;transition:color .15s var(--motion-easing-standard),border-color .15s var(--motion-easing-standard)}
+.themebtn:hover{color:var(--mm-text-default);border-color:var(--mm-border-emphasis)}
+```
+
+Markup (in the header, opposite the title):
+```html
+<button class="themebtn" id="themeToggle" type="button" aria-label="Toggle light/dark theme">Theme</button>
+```
+
+Script (seeds from the OS preference on first click so the first toggle always
+flips visibly):
+```html
+<script>
+(function(){
+  var b=document.getElementById('themeToggle'),r=document.documentElement;
+  b.addEventListener('click',function(){
+    var c=r.getAttribute('data-theme');
+    if(!c)c=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    r.setAttribute('data-theme',c==='dark'?'light':'dark');
+  });
+})();
+</script>
+```
+
+The viewer's own theme control also stamps `data-theme` on `:root`; because
+mammoth wires both directions, that path keeps working alongside this button.
+
+**2. Prepared date, top of page.** Every artifact shows the date it was prepared,
+in the masthead metadata near the eyebrow/title (not buried in a footer). Real
+date, format `YYYY-MM-DD`, in the mono/muted meta style:
+```html
+<div class="meta"> ... <span>2026-07-21</span> ... </div>
+```
+Take the date from the current environment (the session's "Today's date"), never
+guess. If the masthead already carries other metadata (source, counts), the date
+is just one more `<span>` in that row.
+
 ## Fonts in CSP-sealed artifacts
 
 Artifacts **cannot load CDN/Google fonts** (the CSP blocks all external hosts,
@@ -123,6 +171,26 @@ get explicit approval first.
 4. **Publish only on approval**: call the `Artifact` tool with that same file
    path. Iterate on the local file (re-`open` to re-preview) until approved.
 
+## Register in the artifacts manifest (on every publish)
+
+Every artifact is tracked in the Obsidian manifest at
+`/Users/derek/eBacon/obsidian/eBacon/Artifacts Manifest.md`. That file is the **source of
+truth**; Derek rebuilds the Excel tracker (`~/dotfiles/artifacts/artifacts-manifest.xlsx`)
+from it. Whenever you publish (call the `Artifact` tool), update the manifest in the same
+turn:
+
+- **New artifact (new URL):** append ONE row to the table between the
+  `<!-- artifacts:start -->` and `<!-- artifacts:end -->` markers. Column order:
+  `Group | ID | Title | Type | Status | Rec | Location | Updated | Link | Local file | Description | Notes`.
+  - `Group`: the closest existing content group already in the table, or a short new one.
+  - `ID`: next `P<n>` after the highest `P` number already present (use `L<n>` if it will stay local-only).
+  - `Status`: `Current`. `Rec`: `✅ Keep`. `Location`: `Published + Local`. `Updated`: today's date (`YYYY-MM-DD`, from the environment).
+  - `Link`: `[open](<artifact url>)`. `Local file`: the `` `<slug>.html` ``. `Description`: one concrete sentence (what it contains). `Notes`: `distinct`, or the id it overlaps / supersedes.
+- **Updated artifact (same URL/file):** edit that artifact's existing row (`Updated` + `Description`); do NOT add a duplicate row.
+- Bump the `> Last updated:` line and the header counts.
+- Keep every cell em-dash-free (house rule): use `-`, `:`, `(`, `)`, `;`. Escape any literal `|` as `\|`.
+- If the manifest file is missing, create it with the `> Last updated` line, a `# Artifacts Manifest` heading, the two markers, and a header + separator row, then append.
+
 ## Build checklist
 
 - [ ] Built locally to `artifacts/<slug>.html` and previewed (`open`) BEFORE publishing
@@ -131,5 +199,8 @@ get explicit approval first.
 - [ ] Serif display + humanist sans; `text-wrap: balance` on headings; 68ch measure
 - [ ] Per-property transitions on the standard easing; reduced-motion respected
 - [ ] One signature texture, applied consistently
+- [ ] Theme toggle button (pill, top of masthead) + flip script before `</body>`
+- [ ] Prepared date (`YYYY-MM-DD`, from the environment) in the masthead metadata
 - [ ] Empty/error/loading states designed, not default
 - [ ] Nothing from the exclusion list present
+- [ ] Row appended/updated in the Obsidian artifacts manifest (source of truth for the Excel tracker)

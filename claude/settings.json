@@ -280,7 +280,7 @@
     }
   },
   "effortLevel": "xhigh",
-  "autoUpdatesChannel": "stable",
+  "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "autoDreamEnabled": false,
   "skipDangerousModePermissionPrompt": true,

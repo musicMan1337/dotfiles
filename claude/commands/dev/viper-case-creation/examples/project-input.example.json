@@ -1,0 +1,27 @@
+{
+  "project": {
+    "name": "Q3 Security Hardening Findings",
+    "client": "TAGClient",
+    "creator": "TAGClient-NellisD",
+    "assignee": "TAGClient-NellisD",
+    "impact": "High",
+    "todo_priority": "High",
+    "milestone": "Q3 2026",
+    "confidential": true,
+    "description": "Umbrella project grouping the Q3 security-hardening findings. Each child case is one finding; each todo on this project links to its child case."
+  },
+  "items": [
+    {
+      "title": "Rotate exposed SFTP credential in payroll export job",
+      "description": "The nightly payroll export reads an SFTP credential from a request-supplied client id. Scope it to the session identity and rotate the leaked key.",
+      "category": "Credentials",
+      "tags": "security|sftp|q3-hardening"
+    },
+    {
+      "title": "Parameterize the report filter query in LaborExplorer",
+      "description": "Report filter builds raw SQL by string concatenation. Move to parameterized query with ? placeholders.",
+      "category": "SQL Injection",
+      "tags": "security|sql-injection|q3-hardening"
+    }
+  ]
+}
