@@ -90,6 +90,14 @@ Add inline wikilinks where real notes exist, same convention as the standup skil
 - Investigation: `[[investigations/YYYY-MM-DD-slug|name]]`
 - Decision: `[[decisions/YYYY-MM-DD-slug|name]]`
 
+### External-reference links (cases, PRs, artifacts)
+
+Wikilinks above are for internal Obsidian notes. Anything outside the vault gets a normal markdown link so the note is click-through. Only ever link a real target; never fabricate a URL.
+
+- **Case system numbers** (Viper `caseid`): link the number as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)`. In a header, `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it.
+- **PR numbers**: `[Repo #NUMBER](html_url)` using the PR's real `html_url` (e.g. `[Viper #9914](https://github.com/TAGEmployerServices/Viper/pull/9914)`), never a bare `#9914`.
+- **Artifacts, dashboards, other URLs**: wrap the reference in a markdown link whenever you have the URL; never paste a bare URL or mention it link-less.
+
 ## Step 5 — Show draft and get approval
 
 Show the user a **focused diff**, not the entire file:

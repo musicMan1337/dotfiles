@@ -60,7 +60,7 @@ If 2, stop. Don't write.
 Read every numbered item in the original. For each:
 - Identify the **major work threads** — group related sub-bullets into themes (architecture, perf, docs, validation, etc.)
 - Each major item gets **2–4 sub-bullets** in the compacted version (occasionally 1 if it's a small item, occasionally 5 if it's a huge one). Not a flat one-liner.
-- Keep PR numbers, branch names, and case IDs — they're load-bearing.
+- Keep PR numbers, branch names, and case IDs (they're load-bearing). Link them per the linking conventions below; a compacted line without its clickable case/PR link is useless for posting.
 - Keep concrete signal that makes the line readable: file paths when load-bearing, percentages and metric deltas, key function/component names. Drop ceremony (option-2 view pattern names, exhaustive sub-attribute lists).
 - **Cut low-signal sub-bullets entirely.** Folder moves, namespace updates, lint config tweaks, doc-only style changes — these don't earn a line in a posted standup. If it was just "moved a thing" or "renamed a thing in five places," drop it.
 - **Combine related fixes** into one sub-bullet with a semicolon or em-dash. Three sub-bullets that all configure the same docker-compose file should fuse into "Login fixes: A, B".
@@ -84,6 +84,11 @@ Variations:
 - Concrete > abstract. "Pinned bsqldev DNS in compose" beats "improved Docker networking".
 - If a sub-bullet runs past ~30 words, you're including too much — split a sub-thread out or trim.
 - The compacted version should be ~25–35% the size of the original. Smaller is fine if the day was a single thing; bigger means you didn't cut enough.
+
+**Linking conventions (compacted block only).** The verbatim original below the `---` is never touched. In the NEW compacted block, wrap load-bearing references in markdown links so the posted line is click-through. Only ever link a real target; never fabricate a URL.
+- **Case system numbers** (Viper `caseid`): link the number as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)`; in a header, `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it (even when the original wrote a bare number).
+- **PR numbers**: `[Repo #NUMBER](html_url)`, never a bare `#9914`. Reuse the link already in the original when present; the compact examples above assume this form.
+- **Artifacts, dashboards, other URLs**: wrap in a markdown link whenever the URL is known (in the original, or from the published artifact); never a bare URL.
 
 ## Step 5 — Show preview and get approval
 

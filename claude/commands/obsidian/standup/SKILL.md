@@ -105,6 +105,14 @@ Use `wikilinkTargets` from the gather bundle (already fetched in Step 1, no extr
 
 Only add wikilinks where a real note exists — don't fabricate paths. Keep the bullet readable; the link should wrap a natural phrase, not be tacked on awkwardly.
 
+## Step 3c: Link external references (cases, PRs, artifacts)
+
+Wikilinks (Step 3b) are for internal Obsidian notes. Everything that lives outside the vault gets a normal markdown link instead, so the posted note is click-through. Only ever link a real target; never fabricate a URL.
+
+- **Case system numbers** (Viper `caseid`): link the number as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)`. In a header, write `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it.
+- **PR numbers**: `[Repo #NUMBER](html_url)` using the PR's real `html_url` (e.g. `[Viper #9914](https://github.com/TAGEmployerServices/Viper/pull/9914)`), never a bare `#9914`.
+- **Artifacts, dashboards, other URLs**: wrap the reference in a markdown link whenever you have the URL (published artifact link, Splunk dashboard, external doc); never paste a bare URL or mention it link-less.
+
 ## Step 4 — Write to Obsidian
 
 Use the Obsidian CLI to write a per-day file. The CLI requires `source ~/.zprofile &&` before each `obsidian` command.

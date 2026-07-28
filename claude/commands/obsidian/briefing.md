@@ -130,6 +130,8 @@ Show the user a structured summary. Do NOT include a Yesterday section — the u
 
 **Every PR MUST be a clickable markdown link.** Format: `[Repo #NUMBER](https://github.com/OWNER/REPO/pull/NUMBER)`. Use the PR's `html_url` from the `gh api` response — never write a bare `#123` or plain repo-number. This applies to both the presented briefing AND the written standup file.
 
+**Case system numbers MUST be clickable too.** Any Viper `caseid` in a Today bullet (or anywhere in the file) links as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)` (link the number), or in a header `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it. Same rule for artifacts/dashboards/other URLs: wrap in a markdown link when you have the URL, never paste it bare. Never fabricate a URL.
+
 The **Open PRs** sections aren't necessarily TODO items — they're visibility bumps so PRs don't get forgotten. Include the branch name and review status so the user can quickly gauge which need attention.
 
 ## Step 4 — Draft today's plan
