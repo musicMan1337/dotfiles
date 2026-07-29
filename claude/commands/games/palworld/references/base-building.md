@@ -13,6 +13,15 @@ Current as of the 1.0 full release. Base level cap, pal limits, and the raid sys
 - **Palbox:** the base anchor. Defines the base location and its circular boundary (faint blue disc; yellow warning line near the edge). Anything built outside the circle does not count as "in base" (pals ignore it, it decays). Also stores captured pals: 32 boxes x 30 slots = **960 storage slots**, separate from working-pal limits.
 - **Base footprint:** roughly 9 foundation tiles radius (safely ~8, since circle vs square grid); vertical limit ~16 tiles. A structure counts as in-base if ~half its footprint overlaps the circle, so push bulky buildings outward to reclaim interior space.
 - **Moving a base:** the Palbox cannot be picked up; you must dismantle it. Dismantling refunds base-exclusive structures (100% materials dropped on the ground); general structures (chests, houses, walls) remain but decay outside a new Palbox radius; stored pals are always safe. Because extra base slots are cheap, most guides say build a new base rather than relocate.
+- **Building on water:** possible in 1.0 via the **Foundation Kit** (Ancient Tech unlock at **Lv66**, late).
+
+## World Settings
+
+Free multipliers worth tuning:
+- **Structure Deterioration OFF:** builds can sprawl beyond the Palbox circle without decay (pals still only WORK inside the circle).
+- **Halve the damage-to-structure multiplier** to blunt raids.
+- **Grazing/ranch production-rate multiplier up to 3x.**
+- **Pal appearance rate ~1.9x:** many extra spawns without the duplicate-boss spawns that begin at 2.0x (community tip, unverified).
 
 ## Placement strategy
 
@@ -31,14 +40,19 @@ Named locations (coords approximate):
 | Twilight Dunes (central desert, Anubis spawn) | (desert) | Best early coal. |
 | Volcano peak behind Tower of the Brothers (Mount Obsidian W) | ~(-594, -525) | Best sulfur; fast travel nearby. |
 | Astral Mountain / Garden Beneath | ~(-210, 250) | Best pure quartz (9+ nodes); also raid-safe elevation. |
-| Sunlit Isle (east of start) | — | Early crude oil (6 nodes), easy to defend, but no nearby ore; good as a dedicated oil base. |
+| Sunlit Isle (east of start, near spawn) | near spawn | Early crude oil (a creator guide counts two oil wells + a pond; other sources say 6 nodes), easy to defend, room for a second base, reachable very early; no nearby ore, good as a dedicated oil base. |
+| Moonflower Tower area (NW; cherry blossoms, triple waterfall) | NW (approx) | Two oil nodes + sulfur nodes + flat terrain; cliff-vulnerable from one side. Cited as one of the best overall, reachable later. |
+| Isles of Murmur | (approx) | Natural water/wall defense, single raid opening; large enough for two bases side by side. |
 | Sakurajima Oil Fields | (-646, 270) | Endgame oil farm. |
+
+Multi-node clusters cited (coords not given): 9 sulfur + 1 ore + 6 pure quartz in one radius; 9 coal near the Alpha Suzaku desert; 3 Hexalite Quartz + 1 crude-oil node (lets you use the cheap extractor); two Sky-Island spots with 6 Sulfurite nodes each.
 
 Recommended split:
 1. **Main/hub base:** flat, safe, near spawn/fast-travel, some ore+coal so early smelting needs no hauling (Sealed Realm plateau is the favorite).
 2. **Dedicated mining base:** built on a dense ore/single-resource cluster; miners only, no plantation clutter.
 3. **Oil / sulfur / quartz outpost:** on the richest single-resource cluster.
 4. **Breeding base:** doesn't need resources; breeding pals skip normal hunger/sanity drain (aside from cake), so it runs flat-out with just farms, incubators, and a cake supply.
+5. **Byproduct / drop-farm base:** organs, fluids, leather, bones from ranch drop-pals (see [base-pals.md](base-pals.md)). Oil can share with a mining or crop base, but not with breeding.
 
 ## Layout & pathing
 
@@ -46,6 +60,7 @@ Palworld's pathing AI is a known weak point. Design around it:
 - **Build on flat ground, or flatten with foundations first.** Prevents stuck pals, falls, starvation/sanity loss from unreachable food/beds.
 - **Don't cram stations.** Leave clearance around every building for approach paths; packed layouts cause idling.
 - **Keep pal-interactive stations on ground level, not indoors/under roofs.** Pals often won't path to elevated/enclosed stations.
+- **Leave vertical clearance for large pals:** at least 2 walls high (3 for the biggest); don't place a roof too close above the Palbox.
 - **Keep walls short (2–5 tiles) near work areas.** Tall walls near stations increase clipping/stuck chance.
 - **Station worker caps matter:** e.g. the Sphere Assembly Line maxes at 3 workers; a 4th produces nothing. Check each station's cap before overstaffing.
 - **Centralize the Feed Box** (or run multiple in a large base). A distant/unreachable feed box is the #1 cause of "randomly idle" pals.
@@ -85,6 +100,42 @@ Community/exploit-adjacent tricks (unverified for 1.0, may be patched): pillow-s
 
 Storage: use Chest Settings to filter categories into dedicated chests (berries chest by the plantation, ore chest by the mine); keep chests near their production point to cut pal travel.
 
+Other structures worth building:
+- **Pal Monitoring Stand** (~Lv14-15): lock fixed per-pal work assignments (keep a ranch pal ranching only; allow/disallow breeding/gathering/transporting) instead of manually shuffling pals.
+- **Viewing Cage** (Lv15): +40 pal display/storage slots separate from the Palbox; pairs with the **Global Pal Box** (copy a pal between saves).
+- **Pal Labor Research Lab** (Lv19): researches permanent base work/facility buffs (steep first-unlock cost; plan for it).
+- **Easy Bulk Storage** button (bottom-right of inventory, available Lv1): auto-deposits carried items into matching base storage from anywhere in the base.
+- **Pal-box storage expansion** item: a second 320-slot pal store (vs the 32-box standard); stored pals can't run expeditions but swap freely.
+
+## Resource automation
+
+Once built, these stations auto-produce raw materials in-base (no map nodes needed):
+
+| Station | Unlock Lv | Produces |
+|---|---|---|
+| Logging Site / Stone Pit | 7 | Wood / Stone |
+| Ore Mining Site | 24 | Ore (Ore Mining Site 2 at Lv39, straight upgrade) |
+| Coal Quarry | 37 | Coal |
+| Logging Site 2 | 43 | Hardwood (NEW 1.0 material; distinct station, not a replacement) |
+| Sulfur Quarry | 46 | Sulfur |
+| Crude Oil Extractor | 50 | Crude Oil (needs an oil node under it) |
+| High-Pressure Crude Oil Extractor | 51 | Crude Oil (no node required, placeable anywhere, but heavy electricity draw) |
+| Quartz Quarry | 52 | Pure Quartz |
+| Hexalite Quartz Mine | 62 | Hexalite Quartz |
+| Sulfurite Quarry | 72 | Sulfurite (Sky Island material) |
+
+The **Ore Mining Site is gated to Lv24** (behind defeating Lily & Lyleen), so early bases must sit on a wild ore cluster; the auto-site does not save you early.
+
+**Crusher conversions (passive material loops):** Stone -> Palladium at 5:1; the **Refrigerated Crusher** converts Ore -> Palladium at 2:1 (better); Wood -> Fiber at 2:1 (still the only fiber automation late-game); Meteorite Fragments -> Palladium at a good rate. Meteorite trick: set the World Setting meteor/supply-drop rate to 1 so a meteor spawns ~every minute, farmable as Palladium feedstock.
+
+## Endgame resource farming
+
+Manual methods (no auto-station) for late materials:
+- **Chromite:** any cave on **Feybreak Island**; **Smokie** (caption "Smokey") Partner Skill reveals Chromite; a specific cave with the **Silvegis** (caption "Silverghes") Alpha yields a few hundred per trip.
+- **Corium Ore:** ride a swimming mount around the Feybreak coast, use a **Powerful Fishing Magnet** per salvage spot; **Jellroy** (caption "Gelaroy") Partner Skill boosts salvage yield.
+- **Sulfurite / Hexalite:** Sky Island nodes and Feybreak dungeons; break the glowing weak-spot on Sulfurite nodes with the multi-cutter; a ridden **Mammorest** boosts manual mining.
+- **Ancient Civilization Parts:** any pal with a mapped Alpha drops them; a **bred Alpha** of the same species shares the boss drop pool, so butcher bred/found Alpha eggs. Guarantee Alpha offspring with condensed **Broncherry + Broncherry Aqua**; raise egg count with Vegetable Cake + **Grintale**; breed in **Lavish Hospitality (+100%)** or **Service-Minded (+50%)** to boost butcher-drop quantity.
+
 ## Sanity (SAN)
 
 The biggest hidden lever on production. A base of low-SAN pals crawls regardless of layout.
@@ -120,6 +171,7 @@ The biggest hidden lever on production. A base of low-SAN pals crawls regardless
 - **Cake pipeline** (~lvl 17, needs Cooking Pot): 5 Flour + 8 Red Berries + 7 Milk + 8 Egg + 2 Honey. Honey is the bottleneck (no vendor; breed/rank Beegarde/Beakon-line). Milk can be bought from a merchant; eggs are easy via mass Chikipi-line capture. Store cakes in the Breeding Farm box.
 - **Divide labor across bases** (hub + mining + oil/sulfur/quartz + breeding) rather than one do-everything base.
 - **Electricity:** central Power Generator, Electric Pylon for recharge; remember it self-throttles at 100%/80%, so the electric pal isn't "always on."
+- **Gold farming:** best passive gold is a **Dumud Gild** ranch (oil + gold); best active gold is selling specific pals. CONFLICT: a video claims a Dumud Gild sells for ~55,000 gold at ~Lv50, but paldb lists ~19,900, so verify the sell price in-game. ("Turdical Terra", a claimed ~40k-gold sale pal, could not be confirmed to exist.)
 
 ## Common mistakes
 

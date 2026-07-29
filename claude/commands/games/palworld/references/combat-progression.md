@@ -13,7 +13,7 @@ Compiled July 2026, post-launch (build 1.100.427, released July 10, 2026). Flags
 | Tower fight timer | 10 min | **5 min** |
 | Regions | Palpagos + Sakurajima + Feybreak | + **Sunreach** (sky islands) + **World Tree** (endgame) + 7 small islands |
 | New materials | — | **Soralite** (Sunreach ore) and **Paloxite** (World Tree ore, top energy weapons) |
-| New endgame system | — | **Awakening** (Radiant Gems → Awakening Gem → +50% stats) |
+| New endgame system | — | **Awakening** (Radiant Gems → Awakening Gem → +50% stats; magnitude flag: a creator video instead says a flat ~111 stat points, verify) |
 | Breeding | passive/IV averaging | + **Mutation** (rare stronger hatch) + 4 new cakes |
 | Combat | dodge-roll | reworked into a **dash** (attack/reload mid-dash) |
 | Raids | ammo-consuming, fixed waves | wave-based, defenses don't consume ammo, scales to Work Pals, Negotiator can cancel for gold |
@@ -119,16 +119,18 @@ Tower bosses (9, in order; timer now 5 min, be a few levels above each):
 - **Lucky pals (shiny):** rare, larger, sparkling; spawn higher-level, always carry the **Lucky** passive (+15% Work/ATK), pre-loaded with a random Active Skill. Much stronger than a same-level normal.
 - **Dungeons:** time-limited caves; rooms → chests (Copper/Silver/Gold keys, better in 1.0) → guaranteed Alpha boss. Leave/re-enter to reroll spawns. Great stacked gold + loot + catch XP.
 - **Ancient Technology Points (ATP):** mainly from first-time defeat/capture of a mapped Alpha (1 pt) and Tower/World Boss fights; Ancient Technical Manuals from high-tier chests also grant ATP. NOT from routine dungeon clears.
+- **Pal Expedition Station:** reward scales with the condensed firepower of the assigned pals (missions still finish below 100% but pay less), so condensing feeds it directly. Named destinations: Astral Mountains Cavern (Ancient Civilization Cores) and a dark cavern (Chromite, not yet auto-farmable); also a source of high-tier spheres, Giant Pal Souls, and cavern mushrooms.
+- **Area/pal level doesn't scale with the local Alpha** (leftover from multiplayer design): a Lv17 or Lv31 Alpha can guard a zone whose wild pals are single-digit level. Don't assume a zone is high-level just from its boss.
 
 ## Progression roadmap (1 → 80)
 
-**Early (1–20):** don't skip the reworked tutorial; early stat points into Weight/Work Speed/Stamina; catch broadly for the 5/species bonus; grab Cattiva turn 1 (+50 carry per copy in party) then a Nitewing-tier flyer by hour 5–10; ore is the early bottleneck (site base 2 over a copper cluster); clear Zoe & Grizzbolt (Lv10) for tech.
+**Early (1–20):** don't skip the reworked tutorial; early stat points into Weight/Work Speed/Stamina; catch broadly for the 5/species bonus; grab Cattiva turn 1 (+50 carry per copy in party) then a Nitewing-tier flyer by hour 5–10; ore is the early bottleneck (site base 2 over a copper cluster); clear Zoe & Grizzbolt (Lv10) for tech; the village/Small Settlement vendors are undervalued, buy Wheat + Berry seeds to skip the farming bottleneck (Wheat Plantation is Lv15) and check the pal vendor for species you lack (a Gobfin for a party attack boost, a Direhowl to ride).
 
-**Mid (20–50):** push towers 2–5 in step with level; dungeon-farm chests + ATP + XP; stand up arrow-production XP; start a breeding operation once target passives are identified.
+**Mid (20–50):** push towers 2–5 in step with level; dungeon-farm chests + ATP + XP; stand up arrow-production XP; revisit roaming merchant/raider camps once they refresh for rare pals (Jolthog, Bristla, Mau, Dumud, Arsox) and a rescue item worth ~3,000 gold each (or usable to raise a low-level pal's trust/stats); start a breeding operation once target passives are identified; condense duplicate species as you catch them instead of hoarding for a "perfect" copy (invested stats/souls transfer to a better-statted dupe, and two pals at 1 star beat one partway to 2 stars; see [base-pals.md](base-pals.md) / [breeding.md](breeding.md)).
 
 **Late (50–68):** Sakurajima + Feybreak towers; start raids (Bellanoir → Libero); hunt the four Legendary Alphas once geared for Lv50; unlock the **Ancient Hatchery at Lv76** (makes perfect-IV breeding almost trivially reliable, the real breeding-endgame gate).
 
-**Endgame (68–80):** Sunreach opens with tower 8 (Auri & Shaolong) + Soralite gear; World Tree opens after all towers + a Panthalus questline (craft Echoing Flute from 4 Echobones, catch Panthalus at Deserted Islet); expect Lv75+ enemies, bring a Gas Mask for the radiation biome. **Awakening**: farm Radiant Gems in World Tree → 50 Radiant Gems + 10 World Tree Holy Water at the **Ancient Workbench** (unlocks Lv67) → element-matched Awakening Gem → +50% stat on a same-element pal. Endgame loop: raid rotation (Blazamut Ryu → Hartalis → Xenolord → Ultra), breed 4–5 perfect passives + high IVs via the Lv76 Ancient Hatchery, chase Mutations, grind Paloxite/Soralite gear.
+**Endgame (68–80):** Sunreach opens with tower 8 (Auri & Shaolong) + Soralite gear; any landmark you can see is travelable in 1.0 (plateau, volcano, icy peaks, islands), the lone exception being the background World Tree, which opens after all towers + a Panthalus questline (craft Echoing Flute from 4 Echobones, catch Panthalus at Deserted Islet); expect Lv75+ enemies, bring a Gas Mask for the radiation biome. **Awakening**: farm Radiant Gems in World Tree → 50 Radiant Gems + 10 World Tree Holy Water at the **Ancient Workbench** (unlocks Lv67) → element-matched Awakening Gem → +50% stat on a same-element pal (magnitude flag: a creator video instead describes a flat ~111 stat points once per pal; mechanic + materials agree, the magnitude does not, verify in-game). Endgame loop: raid rotation (Blazamut Ryu → Hartalis → Xenolord → Ultra), breed 4–5 perfect passives + high IVs via the Lv76 Ancient Hatchery (buy cake ingredients (milk, eggs, berries, wheat) and organs/electric-organs in bulk from vendors instead of farming them), chase Mutations, grind Paloxite/Soralite gear.
 
 ## Catching tips
 

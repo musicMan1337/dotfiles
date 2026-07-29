@@ -31,18 +31,21 @@ Mounted combat / partner skills (apply while mounted): elemental infusion (Ragna
 | Endgame (60+) | Necromus or Paladius (both Lv61) | Frostallion (Lv62) → Xenolord (Lv66) → Jetragon (Lv79) | Neptilius (~Lv63–64) |
 
 Notes:
-- **Direhowl** (early ground): cheap Lv9 saddle, common plains catch. Unique: Partner Skill speed bonus scales with Condensation (up to +10%), the only mount with a condense-linked speed buff.
+- **Direhowl** (early ground): cheap Lv9 saddle, common plains catch. Partner Skill speed bonus scales with Condensation (up to +10%). Condense-linked ride speed applies to only some mounts (e.g. Fenglope 4-star = +20%, creator claim, verify), so Direhowl's buff is notable but not unique. Recommended movement passive stack for any mount: **Swift (+30%) + Legend (+20% SPD) + Runner (+20%)** (see [breeding.md](breeding.md)).
 - **Nitewing** (early flying): most players' first flyer; simple craft. Opens up aerial traversal.
 - **Fenglope** (mid ground): "Wind and Clouds" boosts speed + double-jump. Field Alpha Lv25 at Falls Mineshaft (~-249,-434).
+- **Tarantriss** (early-mid traversal, saddle ~Lv20): built-in grapple/web Partner Skill for traversal; honorable-mention pick, not a top-speed mount.
 - **Ragnahawk** (mid flying, top pick): best stamina economy of any flyer (drains slow, recovers fast) plus Fire infuse. Beakon (Electric) is the alternative.
 - **Azurobe** (mid aquatic): Water infuse, smaller/faster than Jormuntide, best mid ocean-crosser.
 - **Late-ground plateau:** no new top ground saddle between ~Lv28 (Dazemu) and Lv61 (Paladius/Necromus). You ride Fenglope/Dazemu through the 40–60 bracket.
 - **Shadowbeak** (late flying): Dark infuse, Lv47; wild only in Wildlife Sanctuary No.3 (east edge). **Selyne**: Meteorite Event-only spawn at Sakurajima, Lv53.
 - **Necromus / Paladius** (endgame ground, both Lv61): paired Legendary Alpha (Lv50) in the far north Desiccated Desert (~446,680). Necromus faster + better coverage (weak to Dragon only); Paladius triple-jumps.
+- **Starryon Primo** (endgame-ground min-max, World Tree, saddle ~Lv77): Partner Skill +~5% speed per Neutral pal, scaling with condensation; a 4-star with a full Neutral party is claimed to beat a fully condensed Necromus in a straight line (creator claim, verify). paldb tentatively lists parents Starryon + Celesdir (name/parents unverified).
 - **Frostallion / Noct** (endgame flying entry, Lv62): high stamina, best non-raid legendary flyer before Xenolord/Jetragon.
 - **Xenolord** (endgame flying, saddle Lv66): raid boss, not a wild catch. Build a Summoning Altar (Lv33, 3 Ancient Tech pts; 100 Stone + 20 Paldium), use a Xenolord Slab (4 Slab Fragments from Feybreak dungeons/expeditions), beat it (Lv65, 1.4M HP, 10-min timer) for a Huge Dark Egg.
 - **Jetragon** (top flyer, saddle Lv79 = highest in game): relocated in 1.0 to the Sky Islands off Sunreach (~-553,-1332), Lv60 Legendary Alpha (weak to Ice).
 - **Neptilius** (endgame aquatic, ~Lv63–64): new 1.0 pal, fastest swimmer.
+- **Ghangler** (mid-late aquatic, saddle ~Lv35, Feybreak shores; Dark/Water): Partner Skill scales ride speed with party comp (~+5% per Dark or Water pal at 0 stars, up to ~+25% per pal at 4 stars); fully condensed with a full Dark/Water party is claimed to be the fastest straight-line swimmer (creator claim, verify). paldb notes the Feybreak-shore form is the **Ghangler Ignis** (Fire/Water) variant (spelling/variant unverified).
 
 ## Flying-mount speed meta
 
@@ -67,6 +70,8 @@ Ranked by ride/sprint speed (Game8 + corroborating sources):
 
 Fastest overall: **Jetragon** (~2x the next tier). Best "fast + usable travel stamina": **Xenolord**. No top-speed flyer also mines/attacks; the gathering flyer is **Astegon** (mid speed, mobile ore rig).
 
+**Party-synergy speed (new emphasis in 1.0):** several endgame mounts scale ride speed with party composition, so the fastest mount is build-dependent (generalizes beyond flying): **Ghangler** (Dark/Water party, aquatic), **Starryon Primo** (Neutral party, ground), and the **Eidrolon / Eidrolon Ignis** line (Dragon/Dark party, flying, ~+2-6% per pal at 4 stars). A 4-star Eidrolon line with a full Dragon/Dark party is claimed to edge Jetragon by ~3% top speed (creator claim, verify). In practice Jetragon/Xenolord stay the out-of-the-box picks; the synergy pals only win with a fully condensed, composition-tuned party.
+
 ## Utility mounts
 
 | Pal | Type | Utility while mounted | Saddle Lv |
@@ -76,6 +81,7 @@ Fastest overall: **Jetragon** (~2x the next tier). Best "fast + usable travel st
 | Reptyro / Cryst | Ground | Improves ore-mining. | mid |
 | Rushoar | Ground | Boosts boulder destruction; cheapest saddle (Lv6). | 6 |
 | Galeclaw | Glider | Fastest glide + fire ranged weapons while gliding (fast fall). | 23 |
+| Tarantriss | Ground | Built-in grapple/web Partner Skill for traversal; early-mid honorable mention, not top speed. | ~20 |
 | Vanwyrm / Cryst | Flying | "Aerial Marauder" +30–50% weak-point dmg. Cryst is Ice variant. | 21 |
 | Blazamut Ryu | Ground (raid pal) | "Dragon Kaiser" +25–40% dragon weak-point dmg. | high |
 | Ragnahawk/Beakon/Shadowbeak/Faleris | Flying | Elemental infusion (Fire/Electric/Dark/Fire) = mobile weapon buff. | see above |
@@ -126,6 +132,10 @@ No-brainer path: Direhowl → Nitewing → Ragnahawk → Necromus/Paladius → F
 4. **"Shaolong" = "Astralym"** (EA/datamine name vs 1.0 localized name).
 5. **Aquatic count:** ~4 that matter (Surfent, Azurobe, Jormuntide, Neptilius); paldb lists 14 water-capable but most are minor.
 6. **Jetragon's old EA Lv50 saddle is obsolete;** current 1.0 value is Lv79.
+7. **Surfent saddle level:** creator video says Lv16; table above says Lv10. Verify.
+8. **Direhowl saddle level:** creator video says Lv8; table above says Lv9. Verify.
+9. **"Ion" / "Hydrolon" (creator video)** are almost certainly two mishearings of **Eidrolon** (saddle 68) and its **Eidrolon Ignis** variant (76), already in the speed-meta table, not two separate pals.
+10. **"King Packer"** (creator video, "really fast now") could not be resolved to a real pal; possibly Kingpaca (trait is carry capacity, not speed). Treat as unconfirmed.
 
 ## Sources
 Game8 (fastest flying/ground mount tier lists, best mounts, per-pal pages), paldb.cc (Mounts), The Pal Professor (mount stats), BisectHosting (Xenolord/Fenglope/Paladius guides), NextTier (best mounts, 1.0 patch notes), GamesRadar (1.0 patch notes), Sportskeeda (Jetragon 1.0), Prodigy Gamers (Eidrolon 1.0), GameRant (mount partner skills), Palworld Wiki (Rideable Pals, Pal Gear Workbench).

@@ -1,6 +1,6 @@
 # Palworld 1.0 — Gear, Accessories, Weapons, Spheres & Tech
 
-1.0 launched July 10, 2026 (build 1.100.427). Built from first-days-post-launch guides; EA-era conflicts flagged. Two clearly-fabricated wiki entries ("Meowmere," "V1 Armor (ULTRAKILL)") and cross-game contamination ("Terraprisma," "Overheat Rifle") were excluded.
+1.0 launched July 10, 2026 (build 1.100.427). Built from first-days-post-launch guides; EA-era conflicts flagged. Two clearly-fabricated wiki entries ("Meowmere," "V1 Armor (ULTRAKILL)") and cross-game contamination ("Terraprisma," "Overheat Rifle") were excluded. A creator video repeats the "V1 Armor" claim (a ~780 Dog-Coin legendary armor from a medal merchant, "better than 95% of craftable armors"); do not treat it as real without in-game confirmation.
 
 ## Level cap & accessory-slot change
 
@@ -35,13 +35,31 @@ Notable accessories:
 | Triple Jump Boots | 3rd mid-air jump | Craft (Ancient Tech, Lv70, 6 AT) | Exploration |
 | Air Dash Boots (/ Double / Triple) | Mid-air dash(es) | Craft (Ancient Tech) | Exploration |
 | Islander's Tool Belt | +carry + work speed | Drop | Base utility |
+| Growth Acceleration Belt | +3 Pal EXP | Tower schematic (central-map summit) | Early leveling |
+| Super Multiclimate | Heat + Cold resist Lv3 + HP+4 | Tower schematic (SE island) | Dual-biome (Epic upgrade) |
+
+Note: a creator video lists **"Palamer's Glasses"** (reveals a target's potential on sight AND caps damage so target HP can't drop below 1); the two effects match **Ability Glasses** (shows IVs) + **Ring of Mercy** (can't drop below 1 HP) above, so it is likely a renamed/combined item or a distinct capture-utility item. Unverified.
 
 Recommended 4-slot loadouts:
 1. **Bossing:** Dogen Emblem + Attack Pendant + element-matched Emperor's Baton/Ring + Phantom Ring.
 2. **Survivability:** Warsect Terra's Belt + Silvegis Emblem + Defense Pendant + Life Pendant (or Vanguard Charm if biome-hopping).
 3. **Exploration:** Ring of Freight (or Islander's Tool Belt) + Triple Jump Boots + Air Dash Boots + a biome undershirt.
 
+Priority (creator guide): environmental Heat/Cold damage is a bigger early killer than combat, so craft/buy a climate Undershirt before spending Dog Coins on the 3rd/4th accessory slot.
+
 Best pieces come from Alpha boss drops, dungeon chests, and Sakurajima/Feybreak region drops.
+
+### Where the schematics are (creator guide)
+
+Each is a walled tower with an unlock minigame (break ceiling stones / power a grid / connect a line), schematic inside, then craft. Epic-tier pieces (Phantom Ring, Islander's Tool Belt, Super Multiclimate) craft at a **Production Assembly Line**, one tier above the HQ Workbench used for the rest.
+
+- **Multiclimate Undershirt** (Heat3 + Cold3): tower in the NE desert (area ~Lv40). Craft (HQ Workbench): 40 HQ Cloth, 20 Flame Organ, 20 Ice Organ, 20 Polymer. CONFLICT: the table lists a ~30k Gold merchant / Bellanoir drop instead; both a schematic-tower and a merchant source may exist, verify.
+- **Attack Pendant** (Atk +3): near the same desert cluster (area ~Lv55). Craft: 25 Ingots, 20 Horns, 25 Palium Fragments, 2 Ancient Civilization Parts.
+- **Defense Pendant** (Def +3): volcanic-island beach tower. Craft: 30 Ingots, 20 Ore, 25 Palium Fragments, 2 Ancient Civilization Parts.
+- **Phantom Ring** (Epic): NE desert / icy island tower. Craft (Production Assembly Line): 30 Refined Ingots, ~10 Plastic, 15 Power Metal Ingots, 30 Ancient Bones.
+- **Islander's Tool Belt** (Epic; carry +4, work speed +4): hidden mineshaft cave near an icy NW island (reach via the non-obvious NW path); guarded by a ~Lv35 pal. Craft (Production Assembly Line): 20 Refined Ingots, 40 Leather, 35 Palium Fragments, 30 Ancient Bark.
+- **Growth Acceleration Belt** (Pal EXP +3): tower at the summit of a central-map mountain, easy minigame. Craft (HQ Workbench): 25 Ingots, 30 Palium Fragments, 10 Mysterious Mushrooms, 3 Ancient Civilization Parts. Cheap; get early to speed leveling of the wearer's active pals.
+- **Super Multiclimate accessory** (Epic; Heat3 + Cold3 + HP+4): SE-island tower (near a "Scorched Ashland" waypoint). Craft (Production Assembly Line): 30 Polymer, 30 Bone, 20 Flame Organ, 20 Ice Organ, 30 Ancient Bones. Late-game slot-efficient replacement for the base Undershirt.
 
 ## Armor
 
