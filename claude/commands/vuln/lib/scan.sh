@@ -109,18 +109,24 @@ for repo in "${target_repos[@]}"; do
     echo "  [warn] install failed — proceeding to scan anyway"
   fi
 
-  # Discard install side effects (lockfile churn)
-  git reset --hard --quiet
-  git clean -fd --quiet
-
   out_dir="$REPORTS/$repo"
   mkdir -p "$out_dir"
   out_file="$out_dir/$TS.json"
 
   echo "  [scan] osv-scanner → $out_file"
-  # osv-scanner exits 1 when findings exist; capture stdout regardless
-  osv-scanner scan source -r . --format json > "$out_file" 2>/dev/null
+  # osv-scanner exits 1 when findings exist; capture stdout regardless.
+  # --no-ignore: osv-scanner honors .gitignore by default, so a repo that
+  #   gitignores its own lockfile scans as if it had no dependencies at all.
+  # --allow-no-lockfiles: a repo with no manifests is clean, not an error.
+  osv-scanner scan source -r . --no-ignore --allow-no-lockfiles --format json \
+    > "$out_file" 2>/dev/null
   scan_status=$?
+
+  # Discard install side effects (lockfile churn) only AFTER scanning. Cleaning
+  # first deletes lockfiles the install just generated, leaving nothing to scan
+  # in any repo that does not commit its lockfile.
+  git reset --hard --quiet
+  git clean -fd --quiet
 
   # Status 0 = no findings, 1 = findings present, anything else = scanner error
   if [ "$scan_status" -gt 1 ]; then

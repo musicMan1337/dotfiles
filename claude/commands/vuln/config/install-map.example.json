@@ -5,7 +5,7 @@
     "some-npm-app": "npm ci",
     "some-yarn-app": "yarn install --frozen-lockfile",
     "some-go-service": "go mod download",
-    "some-dotnet-svc": "dotnet restore",
+    "some-dotnet-svc": "dotnet restore --use-lock-file",
     "some-monorepo": "pnpm -r install --frozen-lockfile"
   }
 }
