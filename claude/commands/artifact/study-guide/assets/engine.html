@@ -1,0 +1,998 @@
+<meta charset="utf-8">
+<title>SUBJECT, Indexed</title>
+<style>
+/* ==========================================================================
+   STEP 1. Paste the ENTIRE contents of
+     ~/.claude/commands/augment/artifact-design/mammoth.css
+   directly below this comment. That file is the source of truth for the
+   palette, type, spacing, and motion tokens; do not retype or "improve" the
+   values here, and do not delete its three theme blocks (:root,
+   [data-theme='dark'], and the prefers-color-scheme fallback).
+
+   STEP 2. Add these four tokens to EACH of those three theme blocks, since
+   mammoth ships no hard-shadow-per-theme and the shadow must stay visible on
+   a dark ground. Light values:
+     --fg-hard: 4px 4px 0 0 var(--color-ink-900);
+     --fg-hard-sm: 3px 3px 0 0 var(--color-ink-900);
+   Dark and prefers-dark values (ink-700 so the offset reads against ink-950):
+     --fg-hard: 4px 4px 0 0 var(--color-ink-700);
+     --fg-hard-sm: 3px 3px 0 0 var(--color-ink-700);
+   Also confirm the success/warning/error/info semantic tokens exist in all
+   three blocks; the results screen uses success and error.
+   ========================================================================== */
+
+/* === page furniture === */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--mm-space-sm); }
+
+.masthead { padding: var(--mm-space-md) 0 var(--mm-space-sm); border-bottom: 1px solid var(--mm-border-default); }
+.mast-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--mm-space-xs); }
+.eyebrow {
+  font-family: var(--mm-font-mono);
+  font-size: var(--mm-text-caption);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mm-text-muted);
+  display: flex; align-items: center; gap: var(--mm-space-2xs);
+  margin-bottom: var(--mm-space-2xs);
+}
+.eyebrow::before {
+  content: ""; width: 7px; height: 7px; flex: none;
+  background: var(--mm-accent-default);
+  border-radius: var(--mm-radius-full);
+}
+.lede { font-size: var(--mm-text-lead); color: var(--mm-text-body); margin-top: var(--mm-space-xs); max-width: 62ch; }
+.meta {
+  display: flex; flex-wrap: wrap; gap: var(--mm-space-2xs) var(--mm-space-xs);
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  color: var(--mm-text-muted); letter-spacing: 0.04em;
+  margin-top: var(--mm-space-sm);
+}
+.meta span { white-space: nowrap; }
+
+.themebtn {
+  flex: none; font-family: var(--mm-font-mono); font-size: .7rem; letter-spacing: .08em;
+  text-transform: uppercase; background: transparent; color: var(--mm-text-muted);
+  border: 1px solid var(--mm-border-default); border-radius: 9999px; padding: 6px 14px; cursor: pointer;
+  transition: color .15s var(--motion-easing-standard), border-color .15s var(--motion-easing-standard);
+}
+.themebtn:hover { color: var(--mm-text-default); border-color: var(--mm-border-emphasis); }
+
+/* toolbar */
+.bar {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--mm-surface-default);
+  border-bottom: 1px solid var(--mm-border-default);
+  padding: var(--mm-space-2xs) 0;
+}
+.bar-in { display: flex; align-items: center; gap: var(--mm-space-xs); flex-wrap: wrap; }
+.search { position: relative; flex: 1 1 260px; min-width: 220px; }
+.search input {
+  width: 100%; font-family: var(--mm-font-body); font-size: var(--mm-text-small);
+  color: var(--mm-text-default); background: var(--mm-surface-raised);
+  border: 1px solid var(--mm-border-default); border-radius: var(--mm-radius-md);
+  padding: 9px 14px 9px 34px;
+  transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.search input::placeholder { color: var(--mm-text-muted); }
+.search input:focus { border-color: var(--mm-border-focus); outline: none; }
+.search::before {
+  content: "\2315"; position: absolute; left: 12px; top: 50%; transform: translateY(-52%);
+  color: var(--mm-text-muted); font-size: 1.05rem; pointer-events: none;
+}
+.count {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  color: var(--mm-accent-text); letter-spacing: 0.04em; white-space: nowrap;
+}
+.count[hidden] { display: none; }
+.jump { display: flex; gap: var(--mm-space-2xs); overflow-x: auto; padding-bottom: 2px; }
+.jump a {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  color: var(--mm-text-muted); border: 1px solid var(--mm-border-muted);
+  border-radius: var(--mm-radius-full); padding: 5px 11px; white-space: nowrap;
+  transition: color var(--motion-duration-fast) var(--motion-easing-standard),
+              border-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.jump a:hover { color: var(--mm-text-default); border-color: var(--mm-border-emphasis); }
+
+/* number tiles: the one signature texture lives here (hard offset shadow) */
+.tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: var(--mm-space-xs); margin: var(--mm-space-sm) 0 var(--mm-space-md);
+}
+.tile {
+  background: var(--mm-surface-raised);
+  border: 1px solid var(--mm-border-default);
+  border-radius: var(--mm-radius-md);
+  box-shadow: var(--fg-hard-sm);
+  padding: var(--mm-space-xs) var(--mm-space-xs) var(--mm-space-2xs);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tile b {
+  font-family: var(--mm-font-mono); font-variant-numeric: tabular-nums;
+  font-size: 1.32rem; line-height: 1.1; color: var(--mm-accent-text); font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.tile span { font-size: var(--mm-text-small); color: var(--mm-text-body); line-height: 1.35; }
+.tile em {
+  font-family: var(--mm-font-mono); font-style: normal; font-size: var(--mm-text-caption);
+  color: var(--mm-text-muted); margin-top: 3px;
+}
+
+/* chapter sections */
+.chap { padding: var(--mm-space-lg) 0 var(--mm-space-sm); border-top: 1px solid var(--mm-border-muted); }
+.chap:first-of-type { border-top: none; }
+.chap-head { display: flex; align-items: baseline; gap: var(--mm-space-xs); flex-wrap: wrap; margin-bottom: var(--mm-space-2xs); }
+.chap-head .tag {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--mm-text-muted);
+}
+.chap-note { font-size: var(--mm-text-small); color: var(--mm-text-muted); margin: var(--mm-space-3xs) 0 var(--mm-space-sm); max-width: 60ch; }
+
+/* page blocks: the ledger spine */
+.pages { display: flex; flex-direction: column; }
+.pg {
+  display: grid; grid-template-columns: 62px 1fr; gap: var(--mm-space-xs);
+  padding: var(--mm-space-sm) 0;
+  border-top: 1px solid var(--mm-border-muted);
+}
+.pg[hidden] { display: none; }
+.pgnum {
+  font-family: var(--mm-font-mono); font-variant-numeric: tabular-nums;
+  font-size: var(--mm-text-small); color: var(--mm-text-muted);
+  letter-spacing: 0.02em; padding-top: 4px;
+}
+.pgbody h3 { margin-bottom: var(--mm-space-2xs); }
+.facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--mm-space-2xs); }
+.facts > li { max-width: 78ch; padding-left: var(--mm-space-xs); position: relative; }
+.facts > li::before {
+  content: ""; position: absolute; left: 0; top: 0.62em; width: 6px; height: 1px;
+  background: var(--mm-border-emphasis);
+}
+.facts b { color: var(--mm-text-default); font-weight: 600; }
+.facts .cite { font-family: var(--mm-font-mono); font-size: 0.82em; color: var(--mm-text-muted); white-space: nowrap; }
+ol.steps { margin: var(--mm-space-2xs) 0 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: var(--mm-space-3xs); max-width: 78ch; }
+ol.steps li::marker { font-family: var(--mm-font-mono); font-size: 0.85em; color: var(--mm-text-muted); }
+ol.steps b { color: var(--mm-text-default); }
+.split { border-top: 1px dashed var(--mm-border-default); margin: var(--mm-space-2xs) 0; }
+
+/* tables */
+.tbl { overflow-x: auto; border: 1px solid var(--mm-border-default); border-radius: var(--mm-radius-md); margin-top: var(--mm-space-xs); }
+table { border-collapse: collapse; width: 100%; font-size: var(--mm-text-small); }
+thead th {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mm-text-muted); text-align: left; font-weight: 500;
+  background: var(--mm-surface-raised); padding: var(--mm-space-2xs) var(--mm-space-xs);
+  border-bottom: 1px solid var(--mm-border-default); white-space: nowrap;
+}
+tbody td { padding: var(--mm-space-2xs) var(--mm-space-xs); border-top: 1px solid var(--mm-border-muted); vertical-align: top; }
+tbody tr[hidden] { display: none; }
+td.pgcell, td.numcell {
+  font-family: var(--mm-font-mono); font-variant-numeric: tabular-nums;
+  white-space: nowrap; color: var(--mm-text-default);
+}
+tbody tr:hover td { background: var(--mm-surface-raised); }
+
+/* callouts */
+.callout {
+  border: 1px solid var(--mm-warning-border); background: var(--mm-warning-subtle);
+  border-radius: var(--mm-radius-md); padding: var(--mm-space-xs) var(--mm-space-sm);
+  margin-top: var(--mm-space-xs);
+}
+.callout h3 { color: var(--mm-warning-text); }
+.callout ol { margin: var(--mm-space-2xs) 0 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: var(--mm-space-3xs); }
+.callout li { max-width: 76ch; }
+.pill {
+  display: inline-block; font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  letter-spacing: 0.04em; padding: 1px 7px; border-radius: var(--mm-radius-full);
+  border: 1px solid var(--mm-info-border); background: var(--mm-info-subtle); color: var(--mm-info-text);
+  white-space: nowrap;
+}
+.pill.hot { border-color: var(--mm-error-border); background: var(--mm-error-subtle); color: var(--mm-error-text); }
+
+/* empty state */
+.empty { display: none; padding: var(--mm-space-lg) 0; text-align: left; }
+.empty.on { display: block; }
+.empty h3 { margin-bottom: var(--mm-space-2xs); }
+.empty p { color: var(--mm-text-muted); }
+.empty .ex { font-family: var(--mm-font-mono); font-size: var(--mm-text-small); color: var(--mm-text-body); margin-top: var(--mm-space-xs); }
+
+footer.foot {
+  border-top: 1px solid var(--mm-border-default); margin-top: var(--mm-space-lg);
+  padding: var(--mm-space-sm) 0 var(--mm-space-lg);
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  color: var(--mm-text-muted); letter-spacing: 0.03em;
+}
+
+/* === practice test === */
+.btn {
+  font-family: var(--mm-font-mono); font-size: .72rem; letter-spacing: .09em; text-transform: uppercase;
+  border-radius: var(--mm-radius-full); padding: 8px 16px; cursor: pointer; border: 1px solid transparent;
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard),
+              color var(--motion-duration-fast) var(--motion-easing-standard),
+              border-color var(--motion-duration-fast) var(--motion-easing-standard),
+              opacity var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.btn-solid { background: var(--mm-accent-default); color: var(--mm-text-inverse); }
+.btn-solid:hover { background: var(--mm-accent-hover); }
+.btn-ghost { background: transparent; color: var(--mm-text-muted); border-color: var(--mm-border-default); }
+.btn-ghost:hover { color: var(--mm-text-default); border-color: var(--mm-border-emphasis); }
+.btn:disabled { opacity: .42; cursor: not-allowed; }
+.mast-actions { display: flex; align-items: center; gap: var(--mm-space-2xs); flex: none; flex-wrap: wrap; justify-content: flex-end; }
+
+.bottomcta {
+  border-top: 1px solid var(--mm-border-default); margin-top: var(--mm-space-md);
+  padding: var(--mm-space-md) 0 0;
+  display: flex; align-items: center; gap: var(--mm-space-xs); flex-wrap: wrap;
+}
+.bottomcta p { font-size: var(--mm-text-small); color: var(--mm-text-muted); margin: 0; }
+
+.test { padding: var(--mm-space-md) 0 var(--mm-space-lg); }
+.testbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--mm-space-xs);
+  flex-wrap: wrap; margin-bottom: var(--mm-space-xs);
+}
+.testmeta {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption); letter-spacing: .08em;
+  text-transform: uppercase; color: var(--mm-text-muted); font-variant-numeric: tabular-nums;
+  display: flex; gap: var(--mm-space-xs); flex-wrap: wrap;
+}
+.prog { height: 3px; background: var(--mm-surface-sunken); border-radius: var(--mm-radius-full); overflow: hidden; }
+.prog i {
+  display: block; height: 100%; width: 0; background: var(--mm-accent-default);
+  transition: width var(--motion-duration-base) var(--motion-easing-standard);
+}
+.qcard { padding: var(--mm-space-md) 0 var(--mm-space-sm); }
+.qcard .qtext {
+  font-family: var(--mm-font-display); font-size: var(--mm-text-h3); color: var(--mm-text-default);
+  line-height: var(--mm-leading-heading); letter-spacing: var(--mm-tracking-heading);
+  text-wrap: balance; max-width: 60ch; margin-bottom: var(--mm-space-sm);
+}
+.opts { display: flex; flex-direction: column; gap: var(--mm-space-2xs); max-width: 68ch; }
+.opt {
+  display: flex; gap: var(--mm-space-xs); align-items: flex-start; text-align: left; width: 100%;
+  font-family: var(--mm-font-body); font-size: var(--mm-text-body-size); line-height: 1.45;
+  color: var(--mm-text-body); background: var(--mm-surface-raised);
+  border: 1px solid var(--mm-border-default); border-radius: var(--mm-radius-md);
+  padding: var(--mm-space-xs) var(--mm-space-sm); cursor: pointer;
+  transition: border-color var(--motion-duration-fast) var(--motion-easing-standard),
+              background-color var(--motion-duration-fast) var(--motion-easing-standard),
+              color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.opt:hover { border-color: var(--mm-border-emphasis); }
+.opt .key {
+  flex: none; font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+  color: var(--mm-text-muted); padding-top: 3px; letter-spacing: .06em;
+}
+.opt[aria-pressed="true"] {
+  border-color: var(--mm-accent-default); background: var(--mm-accent-subtle); color: var(--mm-text-default);
+}
+.opt[aria-pressed="true"] .key { color: var(--mm-accent-text); }
+.navrow { display: flex; align-items: center; gap: var(--mm-space-xs); margin-top: var(--mm-space-md); flex-wrap: wrap; }
+.navrow .spacer { flex: 1 1 auto; }
+.hint { font-size: var(--mm-text-small); color: var(--mm-text-muted); }
+
+.startcard { max-width: 62ch; }
+.startcard .lens { display: flex; gap: var(--mm-space-2xs); flex-wrap: wrap; margin-top: var(--mm-space-sm); }
+
+.score { display: flex; align-items: flex-end; gap: var(--mm-space-md); flex-wrap: wrap; margin-bottom: var(--mm-space-sm); }
+.scorebig {
+  font-family: var(--mm-font-mono); font-variant-numeric: tabular-nums; font-weight: 600;
+  font-size: clamp(2.6rem, 1.8rem + 3vw, 4rem); line-height: 1; letter-spacing: -0.04em;
+  color: var(--mm-text-default);
+}
+.verdict {
+  font-family: var(--mm-font-mono); font-size: var(--mm-text-caption); letter-spacing: .1em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: var(--mm-radius-full);
+  border: 1px solid var(--mm-border-default); color: var(--mm-text-muted);
+}
+.verdict.pass { border-color: var(--mm-success-border); background: var(--mm-success-subtle); color: var(--mm-success-text); }
+.verdict.fail { border-color: var(--mm-error-border); background: var(--mm-error-subtle); color: var(--mm-error-text); }
+
+.rlist { display: flex; flex-direction: column; margin-top: var(--mm-space-sm); border-top: 1px solid var(--mm-border-muted); }
+.ritem { border-bottom: 1px solid var(--mm-border-muted); }
+.rhead {
+  display: flex; gap: var(--mm-space-xs); align-items: flex-start; width: 100%; text-align: left;
+  background: transparent; border: none; cursor: pointer; padding: var(--mm-space-xs) 0;
+  font-family: var(--mm-font-body); font-size: var(--mm-text-small); color: var(--mm-text-body);
+  transition: color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.rhead:hover { color: var(--mm-text-default); }
+.rhead .n {
+  flex: none; font-family: var(--mm-font-mono); font-variant-numeric: tabular-nums;
+  color: var(--mm-text-muted); font-size: var(--mm-text-caption); padding-top: 3px; width: 2.2em;
+}
+.rhead .qs { flex: 1 1 auto; }
+.rhead .caret { flex: none; font-family: var(--mm-font-mono); color: var(--mm-text-muted); }
+.chip {
+  flex: none; font-family: var(--mm-font-mono); font-size: var(--mm-text-caption); letter-spacing: .04em;
+  padding: 1px 8px; border-radius: var(--mm-radius-full); border: 1px solid var(--mm-border-default);
+  color: var(--mm-text-muted); white-space: nowrap;
+}
+.chip.ok { border-color: var(--mm-success-border); background: var(--mm-success-subtle); color: var(--mm-success-text); }
+.chip.no { border-color: var(--mm-error-border); background: var(--mm-error-subtle); color: var(--mm-error-text); }
+.rdetail { display: none; padding: 0 0 var(--mm-space-sm) calc(2.2em + var(--mm-space-xs)); }
+.rdetail.on { display: block; }
+.rdetail .full { color: var(--mm-text-default); margin-bottom: var(--mm-space-2xs); max-width: 68ch; }
+.rdetail ul { list-style: none; margin: 0 0 var(--mm-space-2xs); padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.rdetail li { font-size: var(--mm-text-small); padding-left: var(--mm-space-sm); position: relative; max-width: 72ch; }
+.rdetail li .mark {
+  position: absolute; left: 0; font-family: var(--mm-font-mono); font-size: var(--mm-text-caption);
+}
+.rdetail li.correct { color: var(--mm-success-text); }
+.rdetail li.chosen-wrong { color: var(--mm-error-text); }
+.rdetail .why {
+  font-size: var(--mm-text-small); color: var(--mm-text-muted); border-left: 2px solid var(--mm-border-default);
+  padding-left: var(--mm-space-xs); max-width: 72ch;
+}
+.rdetail .why b { color: var(--mm-text-body); font-family: var(--mm-font-mono); font-size: .95em; }
+
+@media (max-width: 620px) {
+  .pg { grid-template-columns: 1fr; gap: var(--mm-space-3xs); }
+  .pgnum { padding-top: 0; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tiles { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+}
+@media print {
+  .bar, .themebtn, .jump { display: none; }
+  .tile { box-shadow: none; }
+  .pg { break-inside: avoid; }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="mast-top">
+      <div>
+        <div class="eyebrow">SOURCE AUTHORITY &middot; EDITION OR DATE</div>
+        <h1>SUBJECT, indexed</h1>
+      </div>
+      <div class="mast-actions">
+        <button class="btn btn-solid" id="openTest" type="button">Practice test</button>
+        <button class="themebtn" id="themeToggle" type="button" aria-label="Toggle light/dark theme">Theme</button>
+      </div>
+    </div>
+    <p class="lede">One sentence on what this covers and how the page numbers map to the reader's copy. State the mapping explicitly, for example "printed page numbers match PDF page numbers 1:1" or "printed page = PDF page minus 4".</p>
+    <div class="meta">
+      <span>Prepared YYYY-MM-DD</span>
+      <span>Source: FILENAME</span>
+      <span>N pages</span>
+      <span>KEY TEST FACT</span>
+    </div>
+  </header>
+
+  <div id="refview">
+  <div class="bar">
+    <div class="bar-in">
+      <div class="search">
+        <input type="search" id="q" placeholder="Search a topic, page, or citation" aria-label="Search the index" autocomplete="off">
+      </div>
+      <span class="count" id="count" hidden></span>
+      <nav class="jump" aria-label="Jump to section">
+        <a href="#numbers">Numbers</a>
+        <a href="#s1">1 First part</a>
+        <a href="#lookup">Lookup</a>
+        <a href="#gotchas">Gotchas</a>
+      </nav>
+    </div>
+  </div>
+
+  <div id="results">
+
+    <!-- Cram sheet. One tile per hard number, deadline, limit, or dollar
+         amount. Tiles carry the signature hard shadow; nothing else does. -->
+    <section class="chap" id="numbers">
+      <div class="chap-head">
+        <span class="tag">Cram sheet</span>
+        <h2>The numbers that get asked</h2>
+      </div>
+      <p class="chap-note">Why these carry more weight than the prose.</p>
+      <div class="tiles">
+        <div class="tile" data-unit><b>VALUE</b><span>What it is</span><em>p.N</em></div>
+        <div class="tile" data-unit><b>VALUE</b><span>What it is</span><em>pp.N, N</em></div>
+      </div>
+    </section>
+
+    <!-- One section per chapter or part, in source order. Inside it, one
+         .pg block per page worth flipping to. data-unit makes a block
+         searchable; the search hides non-matching blocks, table rows, and
+         tiles, then hides any section left empty. -->
+    <section class="chap" id="s1">
+      <div class="chap-head"><span class="tag">Part 1 &middot; pp.N&ndash;N</span><h2>Section title</h2></div>
+      <p class="chap-note">Optional one-line orientation.</p>
+      <div class="pages">
+
+        <article class="pg" data-unit data-page="N">
+          <div class="pgnum">p.N</div>
+          <div class="pgbody">
+            <h3>What is on this page <span class="pill hot">high yield</span></h3>
+            <ul class="facts">
+              <li><b>Lead with the testable claim</b>, then the qualifier. <span class="cite">citation</span></li>
+              <li>Bold the operative number, deadline, or "may" versus "shall".</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="pg" data-unit data-page="N">
+          <div class="pgnum">p.N</div>
+          <div class="pgbody">
+            <h3>A page that is a real sequence</h3>
+            <ol class="steps">
+              <li>Numbered only when the source is genuinely ordered.</li>
+              <li>Otherwise use .facts, so numbering never implies order that is not there.</li>
+            </ol>
+            <div class="split"></div>
+            <ul class="facts">
+              <li>Use .split to separate a sidebar or definition set from the main list.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Wide reference tables live in .tbl so they scroll inside their own
+         box and the page body never scrolls sideways. One data-unit per row. -->
+    <section class="chap" id="lookup">
+      <div class="chap-head"><span class="tag">During the exam</span><h2>Question to page</h2></div>
+      <p class="chap-note">Read the question, find the row, flip once.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>If the question is about</th><th>Go to</th></tr></thead>
+          <tbody>
+            <tr data-unit><td>Topic as a reader would phrase it</td><td class="pgcell">p.N</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Contradictions, stale cross-references, and near-identical pairs the
+         source itself confuses. This is the section a reader cannot get from
+         the source, so it is worth the most. Drop it only if there are none. -->
+    <section class="chap" id="gotchas">
+      <div class="chap-head"><span class="tag">Traps</span><h2>Conflicts inside the source</h2></div>
+      <div class="callout">
+        <h3>Where it argues with itself</h3>
+        <ol>
+          <li data-unit><b>The conflict in a phrase.</b> What page A says, what page B says, and which one governs.</li>
+        </ol>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="empty" id="empty">
+    <h3>Nothing matches that</h3>
+    <p>No page, table row, or number tile contains that text.</p>
+    <div class="ex">Try: <b>EXAMPLE</b> &middot; <b>EXAMPLE</b> &middot; <b>p.N</b></div>
+  </div>
+
+  <div class="bottomcta">
+    <button class="btn btn-solid" id="openTest2" type="button">Practice test</button>
+    <p>Randomized multiple choice drawn from these pages, scored against the PASS% cut.</p>
+  </div>
+  </div><!-- /refview -->
+
+  <!-- ============ PRACTICE TEST. Structure is load bearing: the engine
+       script queries these ids. Edit copy, not ids. ============ -->
+  <section class="test" id="testview" hidden aria-label="Practice test">
+
+    <div class="testbar">
+      <div class="testmeta" id="testMeta"><span>Practice test</span></div>
+      <div class="mast-actions">
+        <button class="btn btn-ghost" id="restartTest" type="button">Restart test</button>
+        <button class="btn btn-ghost" id="exitTest" type="button">Back to reference</button>
+      </div>
+    </div>
+    <div class="prog" id="progWrap" hidden><i id="progFill"></i></div>
+
+    <div id="startPane" class="startcard">
+      <h2>Practice test</h2>
+      <p style="margin-top:var(--mm-space-2xs)">Questions and answer choices are shuffled every run, so the position of an answer never becomes the answer. One question per screen, and you can move back before you submit.</p>
+      <p style="margin-top:var(--mm-space-2xs);color:var(--mm-text-muted);font-size:var(--mm-text-small)">State the real exam shape here. This bank holds <b id="bankSize">0</b> questions written from the source, each tagged with the page it came from.</p>
+      <p style="margin-top:var(--mm-space-2xs);color:var(--mm-text-muted);font-size:var(--mm-text-small)" id="persistNote">Progress is saved in this browser, so you can duck back to the reference or close the tab mid-test and pick up where you left off. Restart test wipes it and returns here.</p>
+      <div class="lens">
+        <button class="btn btn-solid" type="button" data-len="10">10 questions</button>
+        <button class="btn btn-ghost" type="button" data-len="20">20 questions</button>
+        <button class="btn btn-ghost" type="button" data-len="45">45, exam length</button>
+      </div>
+    </div>
+
+    <div id="qPane" hidden>
+      <div class="qcard">
+        <div class="qtext" id="qText"></div>
+        <div class="opts" id="qOpts"></div>
+      </div>
+      <div class="navrow">
+        <button class="btn btn-ghost" id="prevBtn" type="button">Back</button>
+        <button class="btn btn-solid" id="nextBtn" type="button">Next</button>
+        <span class="spacer"></span>
+        <span class="hint" id="qHint">Pick an answer, or skip ahead with Next.</span>
+      </div>
+    </div>
+
+    <div id="rPane" hidden>
+      <div class="score">
+        <div>
+          <div class="scorebig" id="scorePct">0%</div>
+          <div class="testmeta" style="margin-top:var(--mm-space-3xs)"><span id="scoreRaw">0 of 0 correct</span></div>
+        </div>
+        <div class="verdict" id="verdict">Scored</div>
+      </div>
+      <p class="hint" id="scoreNote"></p>
+      <div class="navrow" style="margin-top:var(--mm-space-sm)">
+        <button class="btn btn-solid" id="retakeBtn" type="button">New randomized run</button>
+        <button class="btn btn-ghost" id="reviewMissed" type="button">Expand every miss</button>
+        <button class="btn btn-ghost" id="exitTest2" type="button">Back to reference</button>
+      </div>
+      <div class="rlist" id="rList"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    Summarized from SOURCE, EDITION. Study aid only; the source controls.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var b = document.getElementById('themeToggle'), r = document.documentElement;
+  b.addEventListener('click', function () {
+    var c = r.getAttribute('data-theme');
+    if (!c) c = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    r.setAttribute('data-theme', c === 'dark' ? 'light' : 'dark');
+  });
+})();
+
+(function () {
+  var q = document.getElementById('q');
+  var countEl = document.getElementById('count');
+  var emptyEl = document.getElementById('empty');
+  var units = [].slice.call(document.querySelectorAll('[data-unit]'));
+  var sections = [].slice.call(document.querySelectorAll('.chap'));
+  var tables = [].slice.call(document.querySelectorAll('.tbl'));
+
+  units.forEach(function (u) { u.dataset.hay = u.textContent.toLowerCase().replace(/\s+/g, ' '); });
+
+  function reset() {
+    units.forEach(function (u) { u.hidden = false; });
+    sections.forEach(function (s) { s.hidden = false; });
+    tables.forEach(function (t) { t.hidden = false; });
+    countEl.hidden = true;
+    emptyEl.classList.remove('on');
+  }
+
+  function run(term) {
+    if (!term) { reset(); return; }
+    var hits = 0;
+    units.forEach(function (u) {
+      var match = u.dataset.hay.indexOf(term) !== -1;
+      u.hidden = !match;
+      if (match) hits++;
+    });
+    tables.forEach(function (t) {
+      var rows = [].slice.call(t.querySelectorAll('tbody tr'));
+      t.hidden = rows.length > 0 && rows.every(function (row) { return row.hidden; });
+    });
+    sections.forEach(function (s) {
+      var own = [].slice.call(s.querySelectorAll('[data-unit]'));
+      s.hidden = own.length > 0 && own.every(function (u) { return u.hidden; });
+    });
+    countEl.hidden = false;
+    countEl.textContent = hits + (hits === 1 ? ' match' : ' matches');
+    emptyEl.classList.toggle('on', hits === 0);
+  }
+
+  var t;
+  q.addEventListener('input', function () {
+    clearTimeout(t);
+    t = setTimeout(function () { run(q.value.trim().toLowerCase()); }, 90);
+  });
+  q.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { q.value = ''; reset(); }
+  });
+})();
+</script>
+
+<script>
+/* === practice test === */
+(function () {
+  /* ============================================================
+     QUESTION BANK. Replace with items built from the source.
+       q : the stem, answerable without seeing the options
+       o : 4 options, correct one FIRST (runtime shuffles both
+           question order and option order)
+       a : index of the correct option in `o` (0 when authored first)
+       p : page citation shown on the result row, e.g. "p.9" / "pp.17, 39"
+       w : one or two sentences of why, safe to read after a miss
+     Aim for at least 2x your longest run length so runs differ.
+     ============================================================ */
+  var BANK = [
+    { q: "SAMPLE. What is the maximum fee an Arizona notary may charge?", o: ["$10 per notary public signature", "$10 per document", "$25 per notarial act", "$2 per signature"], a: 0, p: "pp.24, 53", w: "Up to $10 per notary public signature, per page certified for a copy certification, or per notarial act for an oath." },
+    { q: "SAMPLE. A notary's journal is stolen. How long is there to notify the Secretary of State?", o: ["10 days", "30 days", "3 days", "60 days"], a: 0, p: "pp.9, 48", w: "Ten days for loss, theft, or compromise, and theft is also reported to law enforcement." }
+  ];
+
+  var refview = document.getElementById('refview');
+  var testview = document.getElementById('testview');
+  var startPane = document.getElementById('startPane');
+  var qPane = document.getElementById('qPane');
+  var rPane = document.getElementById('rPane');
+  var qText = document.getElementById('qText');
+  var qOpts = document.getElementById('qOpts');
+  var qHint = document.getElementById('qHint');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var progWrap = document.getElementById('progWrap');
+  var progFill = document.getElementById('progFill');
+  var testMeta = document.getElementById('testMeta');
+  var rList = document.getElementById('rList');
+  var LETTERS = ['A', 'B', 'C', 'D', 'E'];
+
+  document.getElementById('bankSize').textContent = BANK.length;
+
+  var restartBtn = document.getElementById('restartTest');
+  var persistNote = document.getElementById('persistNote');
+
+  var run = null, idx = 0, tick = null, startedAt = 0, elapsedBase = 0, phase = 'start', resumed = false;
+
+  /* -- state, kept in this browser so a mid-test detour survives -- */
+  var KEY = 'az-notary-practice-v1';
+  var canStore = (function () {
+    try {
+      localStorage.setItem(KEY + '-probe', '1');
+      localStorage.removeItem(KEY + '-probe');
+      return true;
+    } catch (e) { return false; }
+  })();
+
+  function save() {
+    if (!canStore) return;
+    try {
+      if (!run) { localStorage.removeItem(KEY); return; }
+      localStorage.setItem(KEY, JSON.stringify({ phase: phase, idx: idx, elapsed: elapsed(), run: run }));
+    } catch (e) { /* quota or blocked, fall back to session-only */ }
+  }
+  function clearSaved() {
+    if (!canStore) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+  }
+  function loadSaved() {
+    if (!canStore) return null;
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (!s || !s.run || !s.run.length || !s.run[0].opts) return null;
+      return s;
+    } catch (e) { return null; }
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice(), i, j, t;
+    for (i = a.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function build(len) {
+    var picked = shuffle(BANK).slice(0, Math.min(len, BANK.length));
+    return picked.map(function (item) {
+      var order = shuffle(item.o.map(function (text, i) { return { text: text, right: i === item.a }; }));
+      return {
+        q: item.q, p: item.p, w: item.w,
+        opts: order,
+        answer: order.findIndex(function (o) { return o.right; }),
+        pick: null
+      };
+    });
+  }
+
+  function mmss(ms) {
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }
+
+  function setMeta(text) {
+    testMeta.innerHTML = '';
+    text.forEach(function (t) {
+      var s = document.createElement('span');
+      s.textContent = t;
+      testMeta.appendChild(s);
+    });
+  }
+
+  function elapsed() { return elapsedBase + (startedAt ? Date.now() - startedAt : 0); }
+
+  function startClock() {
+    stopClock();
+    startedAt = Date.now();
+    tick = setInterval(paintMeta, 1000);
+  }
+  function stopClock() {
+    if (tick) { clearInterval(tick); tick = null; }
+    if (startedAt) { elapsedBase += Date.now() - startedAt; startedAt = 0; }
+  }
+
+  function paintMeta() {
+    if (!run) return;
+    var answered = run.filter(function (r) { return r.pick !== null; }).length;
+    setMeta([
+      'Question ' + (idx + 1) + ' of ' + run.length,
+      answered + ' answered',
+      mmss(elapsed()) + ' elapsed'
+    ]);
+  }
+
+  function paintQuestion() {
+    var item = run[idx];
+    qText.textContent = item.q;
+    qOpts.innerHTML = '';
+    item.opts.forEach(function (opt, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('aria-pressed', item.pick === i ? 'true' : 'false');
+      var k = document.createElement('span');
+      k.className = 'key';
+      k.textContent = LETTERS[i];
+      var s = document.createElement('span');
+      s.textContent = opt.text;
+      b.appendChild(k);
+      b.appendChild(s);
+      b.addEventListener('click', function () {
+        item.pick = i;
+        paintQuestion();
+        paintMeta();
+        save();
+      });
+      qOpts.appendChild(b);
+    });
+    prevBtn.disabled = idx === 0;
+    nextBtn.textContent = idx === run.length - 1 ? 'Score it' : 'Next';
+    if (resumed) {
+      qHint.textContent = 'Resumed where you left off.';
+      resumed = false;
+    } else {
+      qHint.textContent = item.pick === null
+        ? 'Pick an answer, or skip ahead with Next.'
+        : 'Answer recorded. You can change it until you score.';
+    }
+    progFill.style.width = Math.round(((idx + 1) / run.length) * 100) + '%';
+    paintMeta();
+  }
+
+  function showStart() {
+    phase = 'start';
+    startPane.hidden = false;
+    qPane.hidden = true;
+    rPane.hidden = true;
+    progWrap.hidden = true;
+    restartBtn.disabled = true;
+    setMeta(['Practice test', BANK.length + ' in the bank']);
+  }
+
+  function showQuiz() {
+    phase = 'quiz';
+    startPane.hidden = true;
+    rPane.hidden = true;
+    qPane.hidden = false;
+    progWrap.hidden = false;
+    restartBtn.disabled = false;
+    startClock();
+    paintQuestion();
+  }
+
+  function begin(len) {
+    run = build(len);
+    idx = 0;
+    elapsedBase = 0;
+    startedAt = 0;
+    resumed = false;
+    showQuiz();
+    save();
+    window.scrollTo(0, 0);
+  }
+
+  function finish() {
+    stopClock();
+    phase = 'result';
+    renderResults();
+    save();
+  }
+
+  function renderResults() {
+    stopClock();
+    var right = run.filter(function (r) { return r.pick === r.answer; }).length;
+    var pct = Math.round((right / run.length) * 100);
+    var skipped = run.filter(function (r) { return r.pick === null; }).length;
+
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.getElementById('scoreRaw').textContent = right + ' of ' + run.length + ' correct';
+    var v = document.getElementById('verdict');
+    v.className = 'verdict ' + (pct >= 80 ? 'pass' : 'fail');
+    v.textContent = pct >= 80 ? 'Pass, 80% cut' : 'Below the 80% cut';
+    document.getElementById('scoreNote').textContent =
+      'Finished in ' + mmss(elapsed()) + '.' +
+      (skipped ? ' ' + skipped + ' left blank, counted as missed.' : '') +
+      ' Tap any row to see the full question, the answers, and the page to review.';
+
+    rList.innerHTML = '';
+    run.forEach(function (item, i) {
+      var ok = item.pick === item.answer;
+      var wrap = document.createElement('div');
+      wrap.className = 'ritem';
+
+      var head = document.createElement('button');
+      head.type = 'button';
+      head.className = 'rhead';
+      head.setAttribute('aria-expanded', 'false');
+
+      var n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = (i + 1) + '.';
+
+      var qs = document.createElement('span');
+      qs.className = 'qs';
+      qs.textContent = item.q;
+
+      var chip = document.createElement('span');
+      chip.className = 'chip ' + (ok ? 'ok' : 'no');
+      chip.textContent = ok ? 'Correct' : (item.pick === null ? 'Skipped' : 'Missed');
+
+      var pgchip = document.createElement('span');
+      pgchip.className = 'chip';
+      pgchip.textContent = item.p;
+
+      var caret = document.createElement('span');
+      caret.className = 'caret';
+      caret.textContent = '+';
+
+      head.appendChild(n);
+      head.appendChild(qs);
+      head.appendChild(chip);
+      head.appendChild(pgchip);
+      head.appendChild(caret);
+
+      var detail = document.createElement('div');
+      detail.className = 'rdetail';
+
+      var full = document.createElement('div');
+      full.className = 'full';
+      full.textContent = item.q;
+      detail.appendChild(full);
+
+      var ul = document.createElement('ul');
+      item.opts.forEach(function (opt, oi) {
+        var li = document.createElement('li');
+        var mark = document.createElement('span');
+        mark.className = 'mark';
+        var label = '';
+        if (opt.right) { li.className = 'correct'; mark.textContent = '\u2713'; label = ', correct answer'; }
+        if (oi === item.pick && !opt.right) { li.className = 'chosen-wrong'; mark.textContent = '\u2715'; label = ', you chose this'; }
+        if (oi === item.pick && opt.right) { label = ', you chose this'; }
+        if (!mark.textContent) mark.textContent = LETTERS[oi];
+        li.appendChild(mark);
+        li.appendChild(document.createTextNode(opt.text + label));
+        ul.appendChild(li);
+      });
+      detail.appendChild(ul);
+
+      var why = document.createElement('div');
+      why.className = 'why';
+      var b = document.createElement('b');
+      b.textContent = item.p + '  ';
+      why.appendChild(b);
+      why.appendChild(document.createTextNode(item.w));
+      detail.appendChild(why);
+
+      head.addEventListener('click', function () {
+        var on = detail.classList.toggle('on');
+        head.setAttribute('aria-expanded', on ? 'true' : 'false');
+        caret.textContent = on ? '-' : '+';
+      });
+
+      wrap.appendChild(head);
+      wrap.appendChild(detail);
+      rList.appendChild(wrap);
+    });
+
+    qPane.hidden = true;
+    progWrap.hidden = true;
+    rPane.hidden = false;
+    restartBtn.disabled = false;
+    setMeta(['Result', right + ' of ' + run.length, pct + '%', mmss(elapsed())]);
+    window.scrollTo(0, 0);
+  }
+
+  function openTest() {
+    refview.hidden = true;
+    testview.hidden = false;
+    if (run && phase === 'quiz') showQuiz();
+    else if (run && phase === 'result') renderResults();
+    else showStart();
+    window.scrollTo(0, 0);
+  }
+  function closeTest() {
+    if (phase === 'quiz') { stopClock(); save(); }
+    testview.hidden = true;
+    refview.hidden = false;
+    window.scrollTo(0, 0);
+  }
+  function toStart() {
+    stopClock();
+    run = null;
+    idx = 0;
+    elapsedBase = 0;
+    startedAt = 0;
+    resumed = false;
+    clearSaved();
+    showStart();
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('openTest').addEventListener('click', openTest);
+  document.getElementById('openTest2').addEventListener('click', openTest);
+  document.getElementById('exitTest').addEventListener('click', closeTest);
+  document.getElementById('exitTest2').addEventListener('click', closeTest);
+  document.getElementById('retakeBtn').addEventListener('click', toStart);
+  restartBtn.addEventListener('click', toStart);
+  document.getElementById('reviewMissed').addEventListener('click', function () {
+    [].slice.call(rList.querySelectorAll('.ritem')).forEach(function (row) {
+      var missed = row.querySelector('.chip.no');
+      if (!missed) return;
+      var d = row.querySelector('.rdetail');
+      var h = row.querySelector('.rhead');
+      if (!d.classList.contains('on')) {
+        d.classList.add('on');
+        h.setAttribute('aria-expanded', 'true');
+        h.querySelector('.caret').textContent = '-';
+      }
+    });
+  });
+
+  [].slice.call(startPane.querySelectorAll('[data-len]')).forEach(function (b) {
+    b.addEventListener('click', function () { begin(parseInt(b.dataset.len, 10)); });
+  });
+
+  prevBtn.addEventListener('click', function () {
+    if (idx > 0) { idx--; paintQuestion(); save(); }
+  });
+  nextBtn.addEventListener('click', function () {
+    if (idx === run.length - 1) { finish(); return; }
+    idx++;
+    paintQuestion();
+    save();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (testview.hidden || qPane.hidden || !run) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= run[idx].opts.length) {
+      run[idx].pick = n - 1;
+      paintQuestion();
+      save();
+    } else if (e.key === 'ArrowRight') { nextBtn.click(); }
+    else if (e.key === 'ArrowLeft' && idx > 0) { prevBtn.click(); }
+  });
+
+  window.addEventListener('beforeunload', function () { if (phase === 'quiz') { stopClock(); save(); } });
+
+  /* restore any run left behind in this browser */
+  (function () {
+    showStart();
+    if (!canStore) {
+      persistNote.textContent = 'This browser is blocking local storage, so a run lives only until you reload the page. Restart test returns here.';
+    }
+    var s = loadSaved();
+    if (!s) return;
+    run = s.run;
+    idx = Math.min(Math.max(s.idx || 0, 0), run.length - 1);
+    elapsedBase = s.elapsed || 0;
+    phase = s.phase === 'result' ? 'result' : 'quiz';
+    resumed = true;
+    restartBtn.disabled = false;
+    setMeta([phase === 'result' ? 'Saved result' : 'Test in progress', (idx + 1) + ' of ' + run.length, mmss(elapsedBase)]);
+  })();
+})();
+</script>
