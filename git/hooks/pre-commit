@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Global pre-commit: block newly-introduced em-dash (U+2014) in guarded source
+# and prose files. Scans ADDED diff lines only, so pre-existing / vendored
+# em-dash in a file you merely touch does not block the commit. Chains to any
+# repo-local pre-commit afterward. Escape hatch: ALLOW_EMDASH=1 git commit ...
+# Written for bash 3.2 (macOS default): no mapfile, no ${var,,}, no \u.
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$DIR/_lib.sh" 2>/dev/null || exit 0   # fail-open on our own breakage
+
+if [ "${ALLOW_EMDASH:-0}" != "1" ]; then
+  hits="$(LC_ALL=C git diff --cached -U0 --diff-filter=ACM 2>/dev/null \
+    | LC_ALL=C awk -v EM="$EMDASH" '
+        /^\+\+\+ /{ f=$2; sub(/^b\//,"",f); lf=tolower(f);
+          ok=(lf ~ /\.(md|markdown|txt|js|jsx|ts|tsx|mjs|cjs|json|jsonc|css|scss|less|html|htm|py|rb|go|rs|java|cs|php|sh|bash|zsh|sql|yaml|yml|toml|ini|xml|vue|svelte|c|h|cpp|hpp)$/);
+          next }
+        /^(--- |@@)/{ next }
+        ok && /^\+/{ s=substr($0,2); if (index(s,EM)>0) print f ":  " s }
+      ')"
+  if [ -n "$hits" ]; then
+    guard_die "em-dash (U+2014) introduced" \
+      "Replace with , ; : ( ) or .   (en-dash allowed only for numeric ranges)" \
+      "Override once: ALLOW_EMDASH=1 git commit ..."
+    printf '%s\n' "$hits" >&2
+    exit 1
+  fi
+fi
+
+# Passed our check: run the repo's own pre-commit if it has one.
+chain_local_hook pre-commit "$@"

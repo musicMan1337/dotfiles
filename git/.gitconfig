@@ -7,6 +7,10 @@ required = true
 	name = Derek Nellis
 	email = 39734095+musicMan1337@users.noreply.github.com
 [core]
+# Global git hooks (git/hooks/): block em-dash + AI self-attribution in every
+# repo's commits. Tilde-expanded; cross-platform (git-bash on Windows).
+# Disable: git config --global --unset core.hooksPath
+hooksPath = ~/dotfiles/git/hooks
 longpaths = true
 autocrlf = input
 ignorecase = false

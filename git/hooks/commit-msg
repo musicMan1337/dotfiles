@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Global commit-msg: block self-attribution / AI-authorship markers and em-dash
+# in the commit message (the channel Write/Edit hooks never see, since messages
+# go through `git commit`). Targets attribution PATTERNS, not the bare word
+# "claude" (which legitimately names the claude/ dir in some repos). Chains to a
+# repo-local commit-msg afterward. Escape hatches: ALLOW_ATTRIBUTION=1,
+# ALLOW_EMDASH=1. bash 3.2 safe.
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$DIR/_lib.sh" 2>/dev/null || exit 0
+
+msgfile="${1:-}"
+if [ -z "$msgfile" ] || [ ! -f "$msgfile" ]; then
+  chain_local_hook commit-msg "$@"; exit $?
+fi
+
+# Ignore git comment lines (leading '#') so template help text is not scanned.
+body="$(grep -v '^#' "$msgfile" 2>/dev/null)"
+
+emdash=0; attrib=0
+LC_ALL=C printf '%s' "$body" | LC_ALL=C grep -qF "$EMDASH" 2>/dev/null && emdash=1
+printf '%s' "$body" | grep -qiE \
+  'co-authored-by:[[:space:]]*claude|co-authored-by:[[:space:]]*.*anthropic|generated with[[:space:]]+claude|generated with \[?claude code|🤖|ai-generated|ai-assisted|authored by claude|via claude code' \
+  2>/dev/null && attrib=1
+
+problems=""
+[ "$emdash" = 1 ] && [ "${ALLOW_EMDASH:-0}" != "1" ] && problems="${problems}  - em-dash (U+2014) present\n"
+[ "$attrib" = 1 ] && [ "${ALLOW_ATTRIBUTION:-0}" != "1" ] && problems="${problems}  - self-attribution / AI-authorship marker\n"
+
+if [ -n "$problems" ]; then
+  printf '\n\033[1;31m[commit blocked: message]\033[0m\n' >&2
+  printf "$problems" >&2
+  printf '  The message must read as first-person, authored by you: no AI\n' >&2
+  printf '  attribution trailer, no em-dash.\n' >&2
+  printf '  Override once: ALLOW_ATTRIBUTION=1 and/or ALLOW_EMDASH=1 git commit ...\n\n' >&2
+  exit 1
+fi
+
+chain_local_hook commit-msg "$@"
