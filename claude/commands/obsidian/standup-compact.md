@@ -2,7 +2,7 @@
 name: obsidian:standup-compact
 model: haiku
 description: Compact a finalized standup into a concise top-section for posting, preserving the verbose original for reference. Triggers on: compact standup, summarize standup, shrink standup, condense standup, slack version
-allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Read
+allowed-tools: Bash(node ~/.claude/commands/obsidian/_lib/vault-cli.mjs *), Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Read
 ---
 
 # Standup Compact
@@ -86,9 +86,14 @@ Variations:
 - The compacted version should be ~25–35% the size of the original. Smaller is fine if the day was a single thing; bigger means you didn't cut enough.
 
 **Linking conventions (compacted block only).** The verbatim original below the `---` is never touched. In the NEW compacted block, wrap load-bearing references in markdown links so the posted line is click-through. Only ever link a real target; never fabricate a URL.
-- **Case system numbers** (Viper `caseid`): link the number as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)`; in a header, `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it (even when the original wrote a bare number).
+- **Case system numbers** (Viper `caseid`): link the number as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)`. Every case ID resolves to this URL by construction, so always link it (even when the original wrote a bare number).
 - **PR numbers**: `[Repo #NUMBER](html_url)`, never a bare `#9914`. Reuse the link already in the original when present; the compact examples above assume this form.
 - **Artifacts, dashboards, other URLs**: wrap in a markdown link whenever the URL is known (in the original, or from the published artifact); never a bare URL.
+- **Never wrap a link in bold.** Viper's Daily Standup renderer (`renderMarkdown` in `dailyStandups/utils/markdown.tsx`) matches `**...**` as one token and emits its contents as a plain string, so any link, inline code or tag inside bold renders as literal markdown text in the posted standup. Close the bold before every link and reopen it after:
+  - Right: `- **Case** [353105](url) **/** [353094](url) **- description** ([Viper #9920](url))`
+  - Wrong: `- **Case [353105](url) / [353094](url) - description** ([Viper #9920](url))`
+  - Same rule for inline code: `**guard** \`exec()\` **calls**`, not `**guard \`exec()\` calls**`. Sub-bullets are unaffected, they are not bold.
+  - (Renderer limitation as of 2026-07-29; only the `~~strike~~` branch recurses. Retest if that renderer learns to parse inside bold, then this splitting can go away.)
 
 ## Step 5 — Show preview and get approval
 
@@ -125,7 +130,9 @@ The `---` separator visually delimits compacted from original.
 Write via:
 
 ```bash
-source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" overwrite content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "standup/YYYY-MM-DD.md" <<'EOF'
+...
+EOF
 ```
 
 End with "Done." — no recap.

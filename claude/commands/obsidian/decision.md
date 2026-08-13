@@ -27,7 +27,9 @@ Parse the user's input for: **what** was decided, **why**, and any **alternative
 Generate a slug from the topic.
 
 ```bash
-source ~/.zprofile && obsidian create path="decisions/YYYY-MM-DD-<slug>.md" content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "decisions/YYYY-MM-DD-<slug>.md" <<'EOF'
+...
+EOF
 ```
 
 **Format:**
@@ -68,7 +70,7 @@ Keep it tight. A decision log entry should be scannable in 10 seconds.
 If the user mentions the decision came from research or an investigation, search for the related investigation note:
 
 ```bash
-source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path investigations
 ```
 
 If a matching investigation is found, add a `## Research` section with a wiki-link to it:
@@ -84,13 +86,13 @@ Based on [[investigations/YYYY-MM-DD-<slug>]]
 ## Reviewing decisions
 
 ```bash
-source ~/.zprofile && obsidian search query="<keywords>" path="decisions"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path decisions
 ```
 
 Then read matching files and summarize.
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Don't inflate.** If the user gives a one-liner, the log entry should be short too. Don't pad with speculation about alternatives they didn't mention.
 - **Capture the why, not just the what.** "We chose X" is useless without "because Y". If the user didn't say why, ask.

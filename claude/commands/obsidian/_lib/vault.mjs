@@ -8,8 +8,11 @@
  * model used to do by hand: resolving the vault path, computing dates, and
  * issuing `obsidian read` / `obsidian files` calls it could typo or fumble.
  *
- * Reads only. Writes still go through the `obsidian` CLI in the skills so the
- * Obsidian app indexes/syncs the change.
+ * Writes go through _lib/write.mjs, also straight to the filesystem. There is
+ * no `obsidian` CLI to route them through: the `obsidian` on PATH is the app
+ * binary, and calling it with `create path=... content=...` just opens the app
+ * and drops a stray `Untitled N.md` in the vault root. Obsidian indexes
+ * filesystem changes on its own, so a direct write is all that is needed.
  */
 
 import fs from "node:fs";

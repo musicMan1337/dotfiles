@@ -24,7 +24,7 @@ All follow-ups live in a single file: `followups.md`
 
 Read the file and show all open items:
 ```bash
-source ~/.zprofile && obsidian read path="followups.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "followups.md"
 ```
 
 Show only unchecked items (`- [ ]`). If any are past their date, flag them as **OVERDUE**. If there are none, say so.
@@ -35,7 +35,9 @@ Parse the user's input for: **what** needs to happen, **who** is involved (if an
 
 Append to the file:
 ```bash
-source ~/.zprofile && obsidian append path="followups.md" content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs append "followups.md" <<'EOF'
+...
+EOF
 ```
 
 **Entry format:**
@@ -45,14 +47,18 @@ source ~/.zprofile && obsidian append path="followups.md" content="..."
 
 **Linking context:** If the follow-up came from a specific investigation, decision, or standup, add a wikilink at the end. Search for relevant notes:
 ```bash
-source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
-source ~/.zprofile && obsidian search query="<keywords>" path="decisions"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path investigations
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path decisions
 ```
 Only add a link if a real match is found. Omit the `— [[...]]` suffix if there's nothing to link to.
 
 If the file doesn't exist yet, create it:
 ```bash
-source ~/.zprofile && obsidian create path="followups.md" content="# Follow-ups\n\n- [ ] ..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "followups.md" <<'EOF'
+# Follow-ups
+
+- [ ] ...
+EOF
 ```
 
 ### After adding — check for completed items
@@ -67,7 +73,9 @@ When the user says "done: ..." without adding anything new:
 
 Read the file, find the matching item via fuzzy match, toggle `- [ ]` to `- [x]`, then rewrite:
 ```bash
-source ~/.zprofile && obsidian create path="followups.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "followups.md" <<'EOF'
+...
+EOF
 ```
 
 ## Completing a follow-up with notes
@@ -85,14 +93,16 @@ When the user says something like "I followed up on X, here's what happened: ...
 
 4. Rewrite the file:
 ```bash
-source ~/.zprofile && obsidian create path="followups.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "followups.md" <<'EOF'
+...
+EOF
 ```
 
 The completion sub-bullet format is: `  - **Completed YYYY-MM-DD:** <notes>` (two-space indent, today's date, then the user's follow-up notes in their own words).
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Dates are critical.** Always include one — even if the user didn't specify, use today's date as "added on".
 - **Don't over-organize.** One flat file is intentional. If it gets long, the user can clean it up. Don't create subfolders or split by category.
 - **Fuzzy matching for completion.** When the user says "done: Chris PR", match it to the right item even if the wording doesn't match exactly.

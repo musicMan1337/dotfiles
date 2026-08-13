@@ -27,7 +27,7 @@ Generate concise standup bullet points by scanning Claude Code session history, 
 
 ## Step 1 — Gather everything (one deterministic call)
 
-Run the gather script. It resolves the date, reads the vault files directly from the filesystem (no fragile `obsidian read` calls), extracts session activity, and returns one JSON bundle:
+Run the gather script. It resolves the date, reads the vault files directly from the filesystem, extracts session activity, and returns one JSON bundle:
 
 ```bash
 node ~/.claude/commands/obsidian/_lib/gather.mjs --for standup [DATE] [--start HH] [--end HH]
@@ -115,7 +115,7 @@ Wikilinks (Step 3b) are for internal Obsidian notes. Everything that lives outsi
 
 ## Step 4 — Write to Obsidian
 
-Use the Obsidian CLI to write a per-day file. The CLI requires `source ~/.zprofile &&` before each `obsidian` command.
+Write the per-day file with `_lib/vault-cli.mjs write`. Content goes on stdin, never as a shell argument.
 
 **File path:** `standup/YYYY-MM-DD.md` (e.g., `standup/2026-03-18.md`)
 
@@ -124,7 +124,9 @@ The gather bundle's `standup.exists`/`content` already tells you whether a file 
 **CRITICAL: You MUST show the user the draft and wait for their approval before writing to Obsidian.** Do not write the file until the user confirms or requests changes. This is a hard gate — never skip it.
 
 ```bash
-source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "standup/YYYY-MM-DD.md" <<'EOF'
+...
+EOF
 ```
 
 **Output format — flat list only.** A completed standup is a numbered list of what was done. No section headings (`## Yesterday`, `## Today`, `## Completed`), no subsections. The briefing skill may have created the file with those sections earlier in the day — when completing the standup, replace the entire file with just the flat numbered list. The filename is the date; no heading needed.
@@ -138,14 +140,16 @@ After successfully writing the standup file, remove the completed follow-up entr
 1. Remove the entire entry — both the `- [x]` line and its `  - **Completed ...**` sub-bullet — from `followups.md`.
 2. Rewrite the file:
 ```bash
-source ~/.zprofile && obsidian create path="followups.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "followups.md" <<'EOF'
+...
+EOF
 ```
 
 This prevents completed follow-ups from accumulating in the file once they've been captured in standup notes. Only remove entries that were actually included in the standup — leave other completed or pending items untouched.
 
 ## Gotchas
 
-- **Source zprofile:** The Obsidian CLI is not on PATH by default. Always prefix commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Prompts can be noisy:** User prompts often contain tool results, command outputs, and system messages. Look past the noise to find the actual intent.
 - **Don't list tool usage as work:** "Used Read 47 times" is not a standup bullet. Synthesize what the reading accomplished.
 - **Work hours default to 6am-5pm.** If the user overrides the window, respect their override. Otherwise don't second-guess the defaults — anything outside is personal time.

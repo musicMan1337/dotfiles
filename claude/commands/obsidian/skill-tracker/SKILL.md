@@ -2,7 +2,7 @@
 name: obsidian:skill-tracker
 model: haiku
 description: Track skill usage stats and prune unused skills via Obsidian note. Triggers on: track skills, skill usage, prune skills
-allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node *), Bash(ls *), Bash(readlink *), Bash(rm *), Bash(unlink *), Read, Edit, Glob
+allowed-tools: Bash(node ~/.claude/commands/obsidian/_lib/vault-cli.mjs *), Bash(node *), Bash(ls *), Bash(readlink *), Bash(rm *), Bash(unlink *), Read, Edit, Glob
 ---
 
 # Skill Tracker
@@ -21,7 +21,7 @@ Track which Claude Code skills are actually used so unused ones can be pruned. U
 
 Read the existing tracker note:
 ```bash
-source ~/.zprofile && obsidian read path="skill-tracker.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "skill-tracker.md"
 ```
 
 If the file exists, parse the first line for the last-updated date. Format: `> Last updated: YYYY-MM-DD`
@@ -95,7 +95,9 @@ Sort by **Total Uses descending** — most-used skills at top.
 ## Step 4 — Write updated table to Obsidian
 
 ```bash
-source ~/.zprofile && obsidian create path="skill-tracker.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "skill-tracker.md" <<'EOF'
+...
+EOF
 ```
 
 Update the `Last updated` line to today's date.
@@ -167,7 +169,7 @@ After deletion, show what was removed and remind the user to commit the dotfiles
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Renamed skills inflate counts if not merged.** The rename map in Step 3 is critical — without it, `git-commit` (89 uses) and `git:commit` (22 uses) look like two different skills. Update the map when skills are renamed.
 - **Plugin skills vs file skills.** Some skills come from plugins (e.g., `code-review`) — they show in the installed list via `settings.json` plugins, not as files in `commands/`. These can't be "deleted" the same way — they need to be disabled in settings instead. Flag these differently in the prune list.
 - **dev/ is sacred.** Never offer to delete anything in `~/.claude/commands/dev/` — it's a real directory with local-only skills, not symlinked from dotfiles.

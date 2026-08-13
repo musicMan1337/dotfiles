@@ -28,10 +28,12 @@ Parse from the calling context:
 If the note doesn't exist yet, create it with a header:
 
 ```bash
-source ~/.zprofile && obsidian create path="factory/YYYY-MM-DD.md" content="# Factory Log — YYYY-MM-DD
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "factory/YYYY-MM-DD.md" <<'EOF'
+# Factory Log — YYYY-MM-DD
 
 ---
-"
+
+EOF
 ```
 
 ## Append a Notification Entry
@@ -39,7 +41,9 @@ source ~/.zprofile && obsidian create path="factory/YYYY-MM-DD.md" content="# Fa
 Format the entry as enriched markdown, then append:
 
 ```bash
-source ~/.zprofile && obsidian append path="factory/YYYY-MM-DD.md" content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs append "factory/YYYY-MM-DD.md" <<'EOF'
+...
+EOF
 ```
 
 ### Entry Format
@@ -88,15 +92,15 @@ Other factory skills (patrol, pipeline) may read the notifications folder for co
 
 ```bash
 # Read today's notifications
-source ~/.zprofile && obsidian read path="factory/YYYY-MM-DD.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "factory/YYYY-MM-DD.md"
 
 # Search recent notifications
-source ~/.zprofile && obsidian search query="keyword" path="factory"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "keyword" --path factory
 ```
 
 ## Gotchas
 
-- **Source zprofile.** Always `source ~/.zprofile &&` before any obsidian command.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Don't overwrite.** Always `append`, never `create` with `overwrite` on an existing daily note. Other entries from earlier in the day must be preserved.
 - **Check before first create.** Before creating today's note, try to read it first. If it exists, just append. If it doesn't, create with header then append.
 - **One note per day, not per notification.** Multiple notifications in a day all go into the same file, separated by `---` rules.

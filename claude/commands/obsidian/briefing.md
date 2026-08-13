@@ -18,7 +18,7 @@ No args needed — defaults to "brief me for today". The user might also say:
 
 ## Step 0 — Gather (MANDATORY, first action)
 
-Do not guess dates or issue per-file `obsidian read` calls. Run the gather script first, it returns authoritative dates plus all the local-vault context in one call (reads the vault directly):
+Do not guess dates or read vault files one at a time. Run the gather script first, it returns authoritative dates plus all the local-vault context in one call (reads the vault directly):
 
 ```bash
 node ~/.claude/commands/obsidian/_lib/gather.mjs --for briefing
@@ -157,7 +157,9 @@ Write today's standup file with today's plan plus the briefing context sections 
 These sections stay in the file through the day for reference. End-of-day `/obsidian:standup` synthesis strips everything except the finalized Completed bullets.
 
 ```bash
-source ~/.zprofile && obsidian create path="standup/$today.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "standup/$today.md" <<'EOF'
+...
+EOF
 ```
 
 **Format:**
@@ -206,7 +208,7 @@ Use `standupFiles` from the gather bundle (the slugs directly under `standup/`, 
 
 For each file to archive:
 ```bash
-source ~/.zprofile && obsidian move path="standup/YYYY-MM-DD.md" to="standup/archive/YYYY-MM-DD.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs move "standup/YYYY-MM-DD.md" "standup/archive/YYYY-MM-DD.md"
 ```
 
 If the archive move fails with `ENOENT: no such file or directory` on the destination, the `standup/archive/` folder doesn't exist yet — create it once with a plain `mkdir -p <vault>/standup/archive` (the vault path is visible in the ENOENT error). Then retry the moves.
@@ -215,7 +217,7 @@ Skip archiving if there are 10 or fewer files in `standup/` root.
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Dates come from Step 0, not memory.** Never infer today's weekday from context — always run the Step 0 date script first. The script already handles the Monday→Friday rollback.
 - **Don't fabricate plans.** Only draft today items from real signals (follow-ups, PRs, investigations, carry-over). If there's nothing, say so — the user will add their own.
 - **No Yesterday section.** Don't display or write a Yesterday section — yesterday's standup lives in its own file; the user opens it directly. Step 1 reads it only for the completeness gate.

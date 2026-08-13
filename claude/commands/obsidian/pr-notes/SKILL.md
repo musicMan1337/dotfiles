@@ -75,13 +75,13 @@ One file per day: `reviews/YYYY-MM-DD.md`
 ### Check if the day's file already exists
 
 ```bash
-source ~/.zprofile && obsidian read path="reviews/YYYY-MM-DD.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "reviews/YYYY-MM-DD.md"
 ```
 
 **If the file exists:**
 - Read it and check which PR numbers are already logged
 - Only append new PRs that aren't already in the file
-- Use `obsidian create ... overwrite` with the merged content
+- Write the merged content with `_lib/vault-cli.mjs write` (content on stdin), or `Edit` the note in place if you are only inserting a section
 
 **If no file exists:**
 - Create it with all reviews for that day
@@ -164,7 +164,7 @@ Revert the package lock to master's version.
 
 After writing the PR notes file, check if a standup file exists for the same date:
 ```bash
-source ~/.zprofile && obsidian read path="standup/YYYY-MM-DD.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "standup/YYYY-MM-DD.md"
 ```
 
 If it exists, add a wikilink reference at the bottom:
@@ -181,7 +181,7 @@ Show the user a summary of how many PRs were logged and any notable reviews (cha
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Don't duplicate PRs.** When appending to an existing day file, check PR numbers already present.
 - **gh CLI auth required.** If `gh` fails with auth errors, tell the user to run `gh auth login`.
 - **Large PRs:** Show file count, not individual file names.

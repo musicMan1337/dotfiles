@@ -22,7 +22,9 @@ The user provides context about what they're investigating. This could be:
 Generate a slug from the topic (e.g., "dd-update-bug", "procore-cost-code-mapping").
 
 ```bash
-source ~/.zprofile && obsidian create path="investigations/YYYY-MM-DD-<slug>.md" content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "investigations/YYYY-MM-DD-<slug>.md" <<'EOF'
+...
+EOF
 ```
 
 **Format:**
@@ -49,8 +51,8 @@ tags: [project-tag]
 - `project`: infer from context (branch name, ticket prefix, or explicit mention)
 - `related`: wikilink to related decision/standup/investigation if one exists — e.g. `"[[decisions/2026-03-19-vault-dev-token-delivery]]"`. Search for it:
   ```bash
-  source ~/.zprofile && obsidian search query="<keywords>" path="decisions"
-  source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
+  node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path decisions
+  node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path investigations
   ```
   Leave empty string if nothing relevant found. Don't fabricate links.
 - `tags`: one or more lowercase tags matching the project/domain (e.g. `[viper, architecture]`)
@@ -59,12 +61,14 @@ tags: [project-tag]
 
 Search for the investigation first:
 ```bash
-source ~/.zprofile && obsidian search query="<keywords>" path="investigations"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<keywords>" --path investigations
 ```
 
 Read the file, then append new findings or dead ends to the appropriate section:
 ```bash
-source ~/.zprofile && obsidian append path="investigations/<filename>" content="..."
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs append "investigations/<filename>" <<'EOF'
+...
+EOF
 ```
 
 When appending findings, prefix with a timestamp: `- [HH:MM] Found that...`
@@ -76,7 +80,7 @@ When the user says they're done, update the frontmatter `status` to `resolved` a
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Slugs should be short and grep-friendly.** Use lowercase, hyphens, no special chars.
 - **Don't over-document.** These are breadcrumbs, not reports. One sentence per finding is ideal.
 - **Dead ends are the most valuable part.** Always record why something didn't work, not just that it didn't.

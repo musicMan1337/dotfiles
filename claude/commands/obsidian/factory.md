@@ -43,7 +43,9 @@ factory/20260321-143022-fix-login/status.md
 ### write — Create or overwrite a session file
 
 ```bash
-source ~/.zprofile && obsidian create path="factory/<session>/<file>.md" content="<content>" overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "factory/<session>/<file>.md" <<'EOF'
+<content>
+EOF
 ```
 
 Use for: initial findings, spec output, synthesis results. Overwrites if the file already exists.
@@ -51,7 +53,9 @@ Use for: initial findings, spec output, synthesis results. Overwrites if the fil
 ### append — Add to an existing session file
 
 ```bash
-source ~/.zprofile && obsidian append path="factory/<session>/<file>.md" content="<content>"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs append "factory/<session>/<file>.md" <<'EOF'
+<content>
+EOF
 ```
 
 Use for: incremental findings, progressive updates during long-running agents.
@@ -59,7 +63,7 @@ Use for: incremental findings, progressive updates during long-running agents.
 ### read — Read a session file
 
 ```bash
-source ~/.zprofile && obsidian read path="factory/<session>/<file>.md"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs read "factory/<session>/<file>.md"
 ```
 
 Use for: next-phase agents loading prior-phase output. The orchestrator tells agents which files to read — agents read directly rather than receiving content from the orchestrator.
@@ -67,14 +71,14 @@ Use for: next-phase agents loading prior-phase output. The orchestrator tells ag
 ### list — List all files in a session
 
 ```bash
-source ~/.zprofile && obsidian search query="" path="factory/<session>"
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs list "factory/<session>"
 ```
 
 Use for: discovering what's been written so far, resuming from a checkpoint, debugging.
 
 ## Gotchas
 
-- **Source zprofile.** Always `source ~/.zprofile &&` before any obsidian command.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Vault access goes through `_lib/vault-cli.mjs` (or `_lib/gather.mjs` for the bundled reads).
 - **Session ID is the pipeline run-id.** Don't invent a new ID scheme. The pipeline generates `YYYYMMDD-HHMMSS-<slug>` and every agent in that run uses the same session ID.
 - **Agents write, orchestrator coordinates.** The orchestrator tells sub-agents the session ID and what filename to use. Sub-agents write their output. The orchestrator tells the next phase's agents which files to read. The orchestrator itself never reads the full content — that's the whole point.
 - **Don't nest deeper.** Files go directly in `factory/<session>/`, not in sub-subdirectories. The phase prefix in the filename provides enough organization.
