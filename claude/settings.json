@@ -177,6 +177,11 @@
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/bash-egress-guard.sh\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/scan-guard.sh\"",
+            "timeout": 5
           }
         ]
       },
@@ -287,6 +292,7 @@
   "theme": "light",
   "autoCompactEnabled": false,
   "switchModelsOnFlag": false,
+  "autoScrollEnabled": true,
   "terminalOutputLimit": 150000,
   "disableTelemetry": true,
   "disableErrorReporting": true,
