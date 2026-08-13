@@ -73,14 +73,28 @@ m "\b(npm|pnpm|yarn)\b[^|;&]*\bpublish\b" && deny "Publishing a package is block
 # 5. Recursive+forced rm whose target escapes {cwd-subtree, /tmp, scratchpad}.
 #    Relative targets (build, dist, ./x) are allowed; home-absolute / tilde / root
 #    targets and the `cd ~ && rm -rf .` pattern are denied.
-if m "\brm\b" && m "(\-[A-Za-z]*[rR]|--recursive)" && m "(\-[A-Za-z]*f|--force)"; then
-  if m "\brm\b[^|;&]*[[:space:]](~|\\\$HOME|/Users/derek|/)([[:space:]/]|$)"; then
+#    Flags are matched as whole tokens WITHIN the rm segment: an unanchored
+#    -[A-Za-z]*[rR] also matches a hyphen inside an argument (fnm's
+#    node-versions/, pre-render/) or a flag on an unrelated command later in the
+#    compound, which denied plain single-file `rm -f <path>` (2026-08).
+RM_FLAG_R='(^|[[:space:]])(-[A-Za-z]*[rR][A-Za-z]*|--recursive)([[:space:]]|$)'
+RM_FLAG_F='(^|[[:space:]])(-[A-Za-z]*f[A-Za-z]*|--force)([[:space:]]|$)'
+HOME_ABS=$'[[:space:]]["\']?(~|\\$HOME|/Users/derek|/)([[:space:]/\'"]|$)'
+seg_m() { printf '%s' "$seg" | grep -Eq "$1"; }
+
+while IFS= read -r seg; do
+  [ -n "$seg" ] || continue
+  seg_m "$RM_FLAG_R" || continue
+  seg_m "$RM_FLAG_F" || continue
+  if seg_m "$HOME_ABS"; then
     deny "Recursive delete targeting your home directory, an absolute home path, or root is blocked. Scope the rm to a relative path under the working directory, or use scratchpad/tmp."
   fi
-  if m "\bcd[[:space:]]+(~|\\\$HOME|/Users/derek|/)([[:space:]]|;|&|$)" && m "\brm\b[^|;&]*[[:space:]](\.|\*)([[:space:]]|$)"; then
+  if m "\bcd[[:space:]]+(~|\\\$HOME|/Users/derek|/)([[:space:]]|;|&|$)" && seg_m "[[:space:]](\.|\*)([[:space:]]|$)"; then
     deny "A cd to home or root followed by a recursive delete of the current directory or a bare glob is blocked (home-wipe pattern)."
   fi
-fi
+done <<EOF
+$(printf '%s' "$cmd" | grep -oE '\brm\b[^|;&]*')
+EOF
 # find-based mass delete rooted at home/root.
 m "\bfind\b[[:space:]]+(~|\\\$HOME|/Users/derek|/)[^|;&]*-delete" && deny "find -delete rooted at home or root is blocked."
 
