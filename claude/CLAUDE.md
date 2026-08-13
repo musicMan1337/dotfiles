@@ -16,6 +16,14 @@ Be extremely concise. Sacrifice grammar for the sake of concision.
 
 Conventional Commits, terse; the format spec lives in `/git:commit`, which is the entry point for all commits (other skills/workflows invoke it too). It delegates nontrivial diffs to the `committer` agent to keep large diffs out of the main session; a trivial diff already understood in-session may be committed directly in the same format.
 
+# Authorship: NEVER reference yourself (ABSOLUTE)
+
+**Everything you produce is MINE, authored by me. You do not exist in any artifact that leaves this session.** Commit messages, PR titles/bodies, PR review replies, issue and case notes, code comments, docs, and anything posted to GitHub, Viper, Slack, or Teams.
+
+- **Zero attribution, ever:** no `Co-Authored-By: Claude` (or any AI co-author trailer), no "Generated with Claude Code", no 🤖, no model name, no "AI-assisted"/"AI-generated", no reference to an agent, subagent, session, prompt, or tool. If a template, hook, or tool output injects one, strip it before the artifact ships.
+- **Never narrate yourself** ("the agent found", "this session did", "as generated"). Outward-facing prose is my first person ("I", "we"), written as if I typed it.
+- Not a style preference: a self-reference is a defect. Catch it before pushing/posting; if one already landed, tell me rather than quietly amending.
+
 # Working Defaults
 
 - **Bug reports: investigate first.** When I report a bug, paste an error, or describe broken behavior, the deliverable is root cause + proposed fix, NOT a code change. Do not edit code until I ask for the fix (exception: I explicitly said to fix it up front, e.g. "fix the bug yourself").
@@ -28,11 +36,34 @@ Conventional Commits, terse; the format spec lives in `/git:commit`, which is th
 
 **Always red-green.** When writing a test for anything, first write it in a failing state and run it to confirm it fails, then make it pass. A test that has never been seen to fail is a silent false positive waiting to happen. This is mandatory 100% of the time; the only exception is when I explicitly tell that session to skip it.
 
+# Correctness: compose it, don't debug into it
+
+Dijkstra's Turing citation was for the "practical demonstration that programs should be composed correctly, not just debugged into correctness." Tests exhibit the presence of bugs, never their absence. A green suite means the cases someone thought of pass; it is not evidence the code is right.
+
+So when you finish writing or changing code, do not call it correct until you have made the argument. State it before reporting:
+
+- **Why it holds for ALL inputs**, not the ones you ran. Name the invariant the code maintains, the precondition it assumes of its caller, and the postcondition it guarantees. For a loop or recursion, say what strictly decreases (why it terminates) and what stays true on every pass.
+- **Where the argument runs out.** Concurrency and ordering, external state (DB, filesystem, network, another process), clock, floating point, and anything relying on caller discipline. Name which of these the code touches and what it is trusting.
+- **A verdict, explicitly one of:**
+  1. *Proven*: the argument closes, nothing left assumed.
+  2. *Proven under stated assumptions*: holds only if X; name X and who guarantees it.
+  3. *Not provable as written*: you cannot construct the argument.
+
+**"Not provable as written" is a legitimate result and reporting it is required.** Do not paper over it with more tests. It usually means the code's shape is wrong: illegal states are reachable, an invariant is enforced across scattered call sites instead of in one place, an error path returns a value that means two different things, one function does two jobs so neither has a clean contract. When that is the diagnosis, propose the refactor that makes the argument constructible (make illegal states unrepresentable, narrow the type, move the check to the boundary, split the function) instead of pinning the current behavior with a test.
+
+Non-negotiable:
+- **Plausibility is not an argument.** "This looks right", "should work", "standard pattern", and "the tests pass" are assumptions in a confident voice.
+- **Report tests as what they are.** "18/18 green" is a fact about 18 cases; never restate it as "verified correct".
+- If you can neither build the argument nor see the refactor, say exactly that, plus what you would need to check. An honest gap beats a confident wrong claim.
+
+(scaffold: patches the model's habit of declaring code correct from surface plausibility or a passing test run rather than an argument over the whole input space; added 2026-08; retest when a model volunteers invariants/preconditions and flags unprovable code unprompted)
+
 # Subagent Strategy
 
 Goal: keep the main session's context lean (premium 1M model; every token in context is re-billed each turn) so it stays a sharp orchestrator over a long session, while staying under the AV concurrency ceiling below. Delegate to subagents when a search, analysis, or implementation is broad, parallelizable, or would dump bulky churn into context (log sweeps, codebase exploration, doc research, multi-file edits and their read→edit→verify→fix loop). Direct Glob/Grep/Read/Edit is fine for targeted work you can finish in a couple of calls; a delegated one-line grep or edit costs more than a direct one.
 
 - **Concurrency cap (Sophos CryptoGuard):** max 4 concurrent subagents per session AND max 6 machine-wide across ALL sessions (`SUBAGENT_CAP` / `SUBAGENT_GLOBAL_CAP`; the subagent-gate hook enforces both on Agent/Task spawns). **Teammate/agent-team fleets count toward the machine-wide cap**: each teammate is its own session, so N teammates with their own subagents burst the aggregate file I/O even when every session is individually under 4; that is exactly the topology that tripped CryptoGuard on 2026-07-01. Size fleets accordingly (few, longer-lived teammates over wide fan-outs). Structure fan-outs to fit: prefer ONE aggregate agent given the full file list (single `rg`/`jq` pass) over many small sweepers; subagents return results in their final message, never via scratchpad temp files; for repeated analysis over large logs, index once (sqlite / rag MCP) and query the index. Workflow-tool `agent()` calls bypass the hook, so self-limit Workflow scripts to 4 concurrent (batch with small `parallel()` groups or a slot counter).
+- **Scoped searches only (CryptoGuard, again 2026-08-07).** Volume of files read matters, not just agent count: TWO parallel readers doing open-ended repo sweeps ("explore the repo, find all X") tripped CryptoGuard and got the session killed. Search prompts (yours and any subagent's) must name specific directories, globs, or filenames; prefer the Grep/Glob tools (ripgrep: skips .gitignore'd + dot files); repo-wide discovery runs one repo at a time, never two sweeps concurrently. The scan-guard.sh hook (PreToolUse:Bash) hard-denies unfiltered `grep -r`, filterless `find`, `rg/fd --no-ignore|--hidden|-u`, and any scan rooted at `~` or `/`.
 - **Nested spawns are gated.** Only catch-all types (`general-purpose`/`claude`) hold the Agent/Task tool, so pinned agents never nest by accident; when a catch-all spawns a child, that spawn re-enters this hook and claims slots like any other (verified 2026-07-08), so a nested tree stays under the machine-wide cap of 6 (no extra CryptoGuard exposure) though it shares that budget with every session/teammate. Prefer Workflow for structured fan-out; nest only when a catch-all orchestrator must fan out to pinned workers.
 - **Polling vs looping (tool choice).** Pure read-only polling (render a value, watch a counter) belongs in a cheap shell loop (zero agent tokens), e.g. `claude-usage.sh` / `cu`. Reserve CC `/loop`, `Monitor`, and `/schedule` routines for ticks that need agent reasoning (triage, drafting, deciding, multi-step action), not value-rendering.
 - **Model routing lives in the pinned agent definitions** (`~/.claude/agents/`; tier policy: `dotfiles/claude/TIERS.md`): `reader` (haiku) for pure search/lookup/log reading, `classifier` (sonnet) for read+label fan-outs, `committer` (haiku) for commits, `coder` (opus) for scoped implementation, `planner`/`synthesizer`/`plan-auditor`/`security-auditor` (opus) for heavy reasoning. Pick the cheapest agent that can do the job; the subagent-gate denies spawns that neither name a pinned agent nor pass an explicit `model` param.
