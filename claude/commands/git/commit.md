@@ -19,6 +19,14 @@ One commit for the current changes, message in the house format below.
 - Body only when the why isn't obvious; always for breaking changes, migrations, security fixes. Bullets use `-`. Reference issues: `Closes #42`, `Refs #17`.
 - No filler ("This commit", "I", "we", "now"), no emoji, never the em-dash character.
 
+## Authorship (ABSOLUTE, no exceptions)
+
+The commit is MINE. **NEVER** reference yourself, a model, an agent, or a tool anywhere in the message, subject or body.
+
+- Forbidden outright: `Co-Authored-By: Claude` or any AI co-author trailer, "Generated with Claude Code", 🤖, "AI-assisted"/"AI-generated", any model name, any mention of an agent, subagent, session, or prompt.
+- No trailers or footers of any kind beyond issue refs (`Closes #42`, `Refs #17`).
+- If a commit template, hook, or tool output injects attribution, delete it before committing. If such a commit already landed, tell me; do not `--amend`.
+
 ## Ground rules (incident-derived)
 
 - Stage specific files; avoid blanket `git add -A`; never stage `.env`, credentials, or secrets.

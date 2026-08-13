@@ -20,6 +20,10 @@ Open a PR for the current branch against the repo's default branch and report it
 - Multi-line body via heredoc (`gh pr create --body "$(cat <<'EOF' ... EOF)"`); other quoting is fragile on MSYS Git Bash.
 - If `gh pr create` fails because a PR exists, report the existing PR's URL (`gh pr view --json url`).
 
+## Authorship (ABSOLUTE, no exceptions)
+
+The PR is MINE; title and body must read as if I typed them, first person ("I", "we"). **NEVER** mention yourself, a model, an agent, a subagent, a session, a prompt, or a tool anywhere in the PR, and **NEVER** append an attribution footer ("Generated with Claude Code", 🤖, "AI-assisted", any model name). Summary and test-plan bullets describe the change, never who or what produced it. Pass this rule to any subagent you spawn for the PR, and re-read the body before `gh pr create`.
+
 ## Report
 
 The PR URL, nothing else.

@@ -8,6 +8,10 @@ allowed-tools: Bash(gh *), Bash(git *), Bash(dotnet *), Bash(npm run lint*), Bas
 
 Review and address all unresolved review comments on the current branch's PR — from bots, humans, or any other source.
 
+## Authorship (ABSOLUTE, no exceptions)
+
+Every reply you post is MINE, in my voice, first person ("I", "we"). Teammates read these. **NEVER** disclose or hint that a model, agent, or tool wrote it: no "Claude", no model name, no 🤖, no "AI"/"AI-assisted"/"generated", no "the agent", "the subagent", "this session", or "the prompt". Same for every commit made through `/git:commit` here: no attribution trailers. Re-read each reply before posting and strip any self-reference; one slip is a defect, not a style nit.
+
 ## Step 1 — Find the PR and fetch comments
 
 1. `git branch --show-current` to get the branch
