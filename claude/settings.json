@@ -112,8 +112,6 @@
     "obsidian:investigate": "user-invocable-only",
     "dev:viper-case-note": "user-invocable-only",
     "dev:wrapup": "user-invocable-only",
-    "git:pr": "user-invocable-only",
-    "git:pr-suggestions": "user-invocable-only",
     "test:gh-actions": "user-invocable-only",
     "harness:model-upgrade": "user-invocable-only",
     "init": "off",
@@ -181,6 +179,11 @@
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/scan-guard.sh\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/pr-guard.sh\"",
             "timeout": 5
           }
         ]

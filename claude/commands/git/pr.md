@@ -18,6 +18,7 @@ Open a PR for the current branch against the repo's default branch and report it
 - Body: `## Summary` (1–3 bullets) + `## Test plan` (bulleted checklist). Ground the summary in the actual changes; commit messages are usually sufficient since house commits are diff-derived. On a huge diff, skim `--stat` plus key files rather than reading everything; never invent details.
 - Base branch = the repo default. Push with `-u` first if the branch has no upstream.
 - Multi-line body via heredoc (`gh pr create --body "$(cat <<'EOF' ... EOF)"`); other quoting is fragile on MSYS Git Bash.
+- **Prefix the command with `PR_VIA_SKILL=1`**, i.e. `PR_VIA_SKILL=1 gh pr create ...`. The `pr-guard.sh` PreToolUse hook denies raw `gh pr create`, and denies `gh pr edit` when it carries `--title`/`--body`/`--body-file`, so PR prose cannot bypass this file's format and authorship rules. That marker is what identifies the call as coming from here; without it your own command is blocked. Metadata-only edits (`--add-label`, `--add-reviewer`, `--base`, `--milestone`) need no marker.
 - If `gh pr create` fails because a PR exists, report the existing PR's URL (`gh pr view --json url`).
 
 ## Authorship (ABSOLUTE, no exceptions)
