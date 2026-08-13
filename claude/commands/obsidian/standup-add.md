@@ -2,12 +2,14 @@
 name: obsidian:standup-add
 model: haiku
 description: Add completed work to today's standup and clear matching briefing TODOs. Triggers on: add to standup, mark done, log work
-allowed-tools: Bash(source ~/.zprofile && obsidian *), Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Read
+allowed-tools: Bash(node ~/.claude/commands/obsidian/_lib/gather.mjs *), Bash(node ~/.claude/commands/obsidian/_lib/vault-cli.mjs *), Read, Edit
 ---
 
 # Standup Add
 
-Append completed work to a standup note. If the note still has briefing structure (`## Today`, `## Completed`), work within that structure. If the note is already a flat numbered list (completed standup), append new items to the end of the list.
+Append completed work to a standup note. If the note still has briefing structure (`## Today`, `## Completed`), work within that structure. If the note is already a flat list (completed standup), append new items to the end of the list.
+
+**Always use unordered bullets (`- `), never numbered items (`1. `).** Multiple sessions run `/obsidian:standup-add` in parallel against the same note; each one only sees the items present at its own read, so numbered items collide and restart (two `1.` blocks in one file). Unordered bullets are position-independent and merge cleanly.
 
 ## Input
 
@@ -20,7 +22,7 @@ Append completed work to a standup note. If the note still has briefing structur
 
 ## Step 1 — Gather + determine content
 
-Run the gather script to resolve the date and pull the existing standup + wikilink targets in one call (reads the vault directly, no `obsidian read`/`obsidian files`):
+Run the gather script to resolve the date and pull the existing standup + wikilink targets in one call (reads the vault directly off the filesystem):
 
 ```bash
 node ~/.claude/commands/obsidian/_lib/gather.mjs --for add [DATE]
@@ -45,7 +47,7 @@ Use their description as-is, lightly formatted into bullets if needed.
 
 ## Step 2 — Inspect the existing standup
 
-Use `standup` from the gather bundle (Step 1). If `standup.exists` is `false`, create one as a flat numbered list (no section headings).
+Use `standup` from the gather bundle (Step 1). If `standup.exists` is `false`, create one as a flat unordered list (no section headings).
 
 ## Step 3 — Match and strike through TODOs
 
@@ -76,10 +78,12 @@ For each match: strike through the TODO → `~~original text~~`
 ---
 ## Completed
 
-1. **Project/Feature** (branch-or-context)
-   - Outcome-focused bullet
-   - Another bullet if needed
+- **Project/Feature** (branch-or-context)
+  - Outcome-focused bullet
+  - Another bullet if needed
 ```
+
+Top-level items are `- `, sub-bullets indented two spaces. Never `1. `.
 
 ### Wikilinks
 
@@ -115,15 +119,33 @@ Other sessions write to the same standup note; the Step 1 snapshot may be stale 
 2. **Content changed since Step 1:** rebase your additions onto the CURRENT content: re-apply the strike-throughs and append the Completed items to the fresh version. Never write from the stale snapshot; that silently deletes another session's work.
 3. **Idempotency check:** if the fresh content already contains your items (same PR number, branch, or feature: an earlier invocation this session, or another session, already logged it), skip the write entirely and tell the user it's already there. Do not create a second entry and do not rewrite the file just to change wording.
 
-Then write:
+Then write. The vault is a plain directory and Obsidian indexes filesystem
+changes on its own, so writes go straight to disk.
+
+**Appending to an existing standup, prefer `Edit`.** You are inserting one item
+into a file whose other sections must survive untouched. `Read` the note, then
+`Edit` it with an anchor that spans the end of the last Completed item and the
+`---` before `## Open Follow-ups`. That is surgical and cannot drop a section
+you never looked at.
+
+**Creating a standup from scratch, or a rewrite large enough that `Edit` is
+unwieldy**, pipe the full content on stdin:
 
 ```bash
-source ~/.zprofile && obsidian create path="standup/YYYY-MM-DD.md" content="..." overwrite
+node ~/.claude/commands/obsidian/_lib/vault-cli.mjs write "standup/YYYY-MM-DD.md" <<'EOF'
+...full note content...
+EOF
 ```
+
+Content goes on **stdin**, never as an argument: these notes are multi-KB
+markdown full of backticks and quotes, which is precisely what a shell argument
+mangles. The script refuses empty stdin, non-`.md` paths, and any path escaping
+the vault, and creates parent directories as needed. Add `--append` to append
+rather than replace.
 
 ## Gotchas
 
-- **Source zprofile:** Always prefix obsidian commands with `source ~/.zprofile &&`.
+- **There is no `obsidian` CLI. Never call it.** The `obsidian` on PATH is the app binary (`/Applications/Obsidian.app/Contents/MacOS/obsidian`). It has no `create`/`read`/`append`/`search` subcommands: passing it `create path=... content=...` silently launches the app and leaves a stray `Untitled N.md` in the vault root, writing nothing. Reads go through `_lib/gather.mjs`, writes through `Edit` or `_lib/vault-cli.mjs write`.
 - **Concurrent sessions are the norm, not the edge case.** Multiple Claude sessions add to the same day's standup; the Step 6 re-gather + merge is mandatory. Blind overwrite from a stale read has caused real data loss.
 - **Double invocation happens.** The skill gets invoked twice for the same work (retry, habit, chained ritual). The second run must detect the existing entry via the Step 6 idempotency check and no-op with a note, never duplicate.
 - **Don't duplicate completed items.** If the same work already appears in Completed, enrich it with new sub-bullets — don't create a second entry.
