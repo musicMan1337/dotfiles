@@ -1,6 +1,6 @@
 ---
 name: dev:sql
-description: Full workflow for the eBacon SQL repo. ALL SQL work (editing sprocs/views/migrations, committing, pushing, building) happens in an isolated git worktree of the SQL repo, NEVER in the shared main checkout. The skill sets up/locates the worktree, commits via /git:commit, pushes the branch, then runs the MassScriptBuilder from the main repo root (PR-style diff vs origin/master) to emit numbered SQL scripts for SSMS. Triggers on: sql work, edit sproc, change a view, sql migration, build mass scripts, mass script builder, sql mass build, run sql build, generate sql scripts, commit sql, push sql, post-commit sql, /dev:sql.
+description: Full workflow for the eBacon SQL repo. ALL SQL work (editing sprocs/views/migrations, committing, pushing, building) happens in an isolated git worktree of the SQL repo, NEVER in the shared main checkout. The skill sets up/locates the worktree, commits via /git:commit, pushes the branch, runs the MassScriptBuilder from the main repo root (PR-style diff vs origin/master) to emit numbered SQL scripts for SSMS, then emits pre/post verification test scripts (single UNION ALL result tab, pasteable RESULTS block) under queries/cc/tests/ and later parses the pasted results into a completion verdict. On request, appends a plain-text case-note INSERT (dbo.notes + log_case) to the post test script. Triggers on: sql work, edit sproc, change a view, sql migration, build mass scripts, mass script builder, sql mass build, run sql build, generate sql scripts, commit sql, push sql, post-commit sql, sql test script, verify sql change, parse test results, /dev:sql.
 model: opus
 ---
 
@@ -10,7 +10,7 @@ Personal helper that owns the **entire** lifecycle of a change to the eBacon SQL
 
 ## Base behavior: build on every ready-for-review batch
 
-**Whenever a batch of SQL changes is done and ready for the user to review, running the MassScriptBuilder is mandatory, not optional.** It's the close-out of every batch: commit + push + build so the numbered scripts the user pastes into SSMS always reflect the latest committed state. Don't hand a SQL batch back for review without a fresh build.
+**Whenever a batch of SQL changes is done and ready for the user to review, running the MassScriptBuilder is mandatory, not optional.** It's the close-out of every batch: commit + push + build so the numbered scripts the user pastes into SSMS always reflect the latest committed state. Don't hand a SQL batch back for review without a fresh build. The same close-out also emits the pre/post verification test scripts (Step 5).
 
 ### The two builder modes (same builder, two run contexts)
 
@@ -41,6 +41,7 @@ A dedicated worktree gives the branch its own isolated tree. The main checkout i
 - **Output:** numbered SQL files (`1 - <name>.sql`, ...) plus a manifest, written into `MassScriptBuilder/<Branch>/`. Manifest is `_template.js` for the checked-out branch (tracked; committed on the branch in Step 1b), `__template.js` (gitignored) when building a different branch via the branch arg.
 - **Template-replay build:** `node builder.js --template <path>` (npm script `build:template`) ignores the git diff and rebuilds just the files listed in `<path>/(_|__)template.js`, pulling each body from the current `origin/master` tree. Committing `_template.js` in Step 1b is what makes this replay possible later.
 - **Schema update file naming.** Schema-modifying SQL (DDL: `CREATE/ALTER TABLE`, indexes, new columns, one-time backfills) goes in `SchemaUpdates/DN/` as `DN_<caseid>_<ShortDescription>.sql` (e.g. `SchemaUpdates/DN/DN_344451_FileDateGating.sql`). The builder orders these first. Non-schema changes (SP/view edits, data updates) go in the per-user folder (`Derek/<descriptive-name>.sql`), not `SchemaUpdates/`.
+- **Test scripts dir (gitignored scratch, in the MAIN checkout, not the worktree):** `/Users/derek/eBacon/SQL/queries/cc/tests/`, named `<caseid>_<snake_cased_description>_pre.sql` / `_post.sql` (see Step 5).
 
 ---
 
@@ -157,20 +158,66 @@ cd /Users/derek/eBacon/SQL/MassScriptBuilder && node builder.js "$branch"
 
 Surface stdout/stderr verbatim. It prints the base ref, target, what it included, and where it wrote. On error (missing template entry, bad ref, etc.), surface verbatim, do not retry, let the user decide.
 
-## Step 5: Locate the output and print a copy-pasteable path
+## Step 5: Emit pre/post verification test scripts
 
-```bash
-echo "/Users/derek/eBacon/SQL/MassScriptBuilder/$branch"
+Every batch that changes DB behavior ships with test scripts the user runs in SSMS/DataGrip around the numbered change scripts. Write them to the gitignored scratch dir `/Users/derek/eBacon/SQL/queries/cc/tests/`:
+
+- **Naming:** `<caseid>_<snake_cased_description>_pre.sql` and `<caseid>_<snake_cased_description>_post.sql` (case id + description from the branch, e.g. `353920_approval_pending_indexes_post.sql`; NoCase branches drop the case id and use the snake_cased description alone).
+- **`_pre` only when applicable:** emit it when the change alters existing behavior worth baselining (perf fix, output-preserving refactor, index change) so pre-vs-post can be compared. New-object-only changes get just `_post`. Skip both for manifest-only or comment-only batches.
+- **Run order (state it in each file header):** `_pre` BEFORE the numbered change scripts, `_post` after.
+
+**Single result tab is the contract.** Structure each file so the user copies ONE grid:
+
+- Each check is a SELECT emitting the same column shape, e.g. `check_name, expected, actual, detail`, with every value column CAST to NVARCHAR (or SQL_VARIANT) so heterogeneous checks UNION ALL cleanly; compute pass/fail in SQL where possible.
+- Setup (DECLAREs, temp tables, captured counts) goes above; the file ends in a single UNION ALL query, `ORDER BY check_name`.
+- If genuinely irreducible to one query (mid-script state, INSERT-EXEC capture, incompatible shapes), group into the FEWEST possible UNION ALL blocks and state the expected result-tab count in the file header.
+
+Header comment per file: case id, branch, when to run, "copy the grid WITH HEADERS and paste it into the RESULTS block". Footer:
+
+```sql
+/* ==== RESULTS: paste grid output WITH HEADERS below this line ====
+
+==== END RESULTS ==== */
 ```
+
+### Case note insert (ON USER REQUEST ONLY)
+
+When the user asks (e.g. "make a case note stating the problem and solution"), append a `CASE NOTE` section to the bottom of the `_post` file (above the RESULTS block), inside its own comment block so whole-file execution never runs it; the user selects the statements inside and executes the selection:
+
+```sql
+/* ==== CASE NOTE: select the statements below and run them manually ====
+INSERT INTO dbo.notes (Client, Itemtype, Item, Creator, Note)
+VALUES ('<client>', 'Case', '<caseid>', '<user entity>', '<note text>');
+
+INSERT INTO dbo.log_case (CaseID, Client, RecordUser, Attribute, oldValue, newValue)
+VALUES ('<caseid>', '<client>', '<user entity>', 'Note Added', '', '<note text>');
+==== END CASE NOTE ==== */
+```
+
+- **Note text is PLAIN TEXT, never HTML.** Concise problem + solution, outcome-focused; double any embedded single quotes (`''`).
+- The pair mirrors `noteActionPaywiz` (`NoteID` is identity, `CreatedDate` defaults; the `log_case` row is what puts "Note Added" in case history). Skip the email-workflow part of the sproc; a manual insert intentionally doesn't notify.
+- `Client` comes from the case row (`SELECT Client FROM cases WHERE caseid = <caseid>`); `Creator`/`RecordUser` is the user's entity. If either is unknown, ask, never guess.
+
+## Step 6: Locate the output and print copy-pasteable paths
 
 End the turn with:
 
-1. One short line: how many numbered SQL files were emitted (count `[0-9]*.sql` in the output dir).
-2. A fenced code block with the absolute output path (slashes included), nothing after it:
+1. One short line: how many numbered SQL files were emitted (count `[0-9]*.sql` in the output dir) and which test scripts exist, with run order.
+2. A fenced code block with the absolute paths (builder output dir, then each test script), nothing after it:
 
 ```
 /Users/derek/eBacon/SQL/MassScriptBuilder/Derek/344451-FileDateGating
+/Users/derek/eBacon/SQL/queries/cc/tests/344451_file_date_gating_pre.sql
+/Users/derek/eBacon/SQL/queries/cc/tests/344451_file_date_gating_post.sql
 ```
+
+## Step 7: Ingest pasted RESULTS, format, verdict
+
+When the user says results are pasted (or pastes them in chat):
+
+1. Read each test file's RESULTS block and parse the raw grid (tab-separated or aligned text, headers in the first row).
+2. Replace the raw paste inside the comment block with an aggregated, aligned table (pre-vs-post deltas where a `_pre` exists) so the file becomes the readable record; touch nothing above the RESULTS block.
+3. Report the verdict: per-check pass/fail against the case's success criteria, and whether the batch satisfies case completion. Surface any check that can't be mapped to a criterion instead of guessing; a missing or partial paste means "cannot verdict yet", not a fail.
 
 ---
 
@@ -185,5 +232,7 @@ End the turn with:
 - **Manifest naming.** Checked-out branch → tracked `_template.js`; branch arg → gitignored `__template.js`. Mention only if asked.
 - **Commit the manifest, in the worktree (Step 1b).** The tracked `_template.js` is generated by running the builder from inside the worktree (HEAD), not the branch-arg run in main (which yields the gitignored `__template.js`). Reuse main's `node_modules` via a symlink so each worktree doesn't carry its own copy. Commit only `MassScriptBuilder/<branch>/_template.js`.
 - **Do not commit the `.sql` output.** `MassScriptBuilder/<branch>/*.sql` is run against the DB, not source; `.gitignore` covers `**/*.sql`.
+- **Test scripts are scratch, not source.** `queries/cc/` is gitignored; write them in the MAIN checkout's `queries/cc/tests/`, never in the worktree, never committed.
+- **UNION ALL type alignment.** CAST every value column to NVARCHAR in every branch of the union; mismatched types across branches is the #1 way the single-tab contract breaks.
 - **Cleanup.** Remove a finished SQL worktree with `git -C "$MAIN" worktree remove "$wt"` once the branch is merged; the branch on origin is preserved.
 - **Customize this file freely.** Personal wrapper; you own it.
