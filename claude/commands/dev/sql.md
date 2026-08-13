@@ -1,6 +1,6 @@
 ---
 name: dev:sql
-description: Full workflow for the eBacon SQL repo. ALL SQL work (editing sprocs/views/migrations, committing, pushing, building) happens in an isolated git worktree of the SQL repo, NEVER in the shared main checkout. The skill sets up/locates the worktree, commits via /git:commit, pushes the branch, runs the MassScriptBuilder from the main repo root (PR-style diff vs origin/master) to emit numbered SQL scripts for SSMS, then emits pre/post verification test scripts (single UNION ALL result tab, pasteable RESULTS block) under queries/cc/tests/ and later parses the pasted results into a completion verdict. On request, appends a plain-text case-note INSERT (dbo.notes + log_case) to the post test script. Triggers on: sql work, edit sproc, change a view, sql migration, build mass scripts, mass script builder, sql mass build, run sql build, generate sql scripts, commit sql, push sql, post-commit sql, sql test script, verify sql change, parse test results, /dev:sql.
+description: Full workflow for the eBacon SQL repo. ALL SQL work (editing sprocs/views/migrations, committing, pushing, building) happens in an isolated git worktree of the SQL repo, NEVER in the shared main checkout. The skill sets up/locates the worktree, commits via /git:commit, pushes the branch, runs the MassScriptBuilder from the main repo root (PR-style diff vs origin/master) to emit numbered SQL scripts for SSMS, then emits pre/post verification test scripts (single UNION ALL result tab, pasteable RESULTS block) under queries/cc/tests/ and later parses the pasted results into a completion verdict. For behavior-preserving sproc refactors it also builds a parity differential (git-extracted baseline proc + branch-complete corpus + dual rolled-back runs + EXCEPT diff w/ vacuousness guard) as the executable half of the global correctness rules. On request, appends a plain-text case-note INSERT (dbo.notes + log_case) to the post test script. Triggers on: sql work, edit sproc, change a view, sql migration, build mass scripts, mass script builder, sql mass build, run sql build, generate sql scripts, commit sql, push sql, post-commit sql, sql test script, verify sql change, parse test results, parity test, differential test, prove sproc equivalence, /dev:sql.
 model: opus
 ---
 
@@ -198,6 +198,29 @@ VALUES ('<caseid>', '<client>', '<user entity>', 'Note Added', '', '<note text>'
 - The pair mirrors `noteActionPaywiz` (`NoteID` is identity, `CreatedDate` defaults; the `log_case` row is what puts "Note Added" in case history). Skip the email-workflow part of the sproc; a manual insert intentionally doesn't notify.
 - `Client` comes from the case row (`SELECT Client FROM cases WHERE caseid = <caseid>`); `Creator`/`RecordUser` is the user's entity. If either is unknown, ask, never guess.
 
+## Step 5b: Parity (differential) testing for behavior-preserving changes
+
+When a batch refactors a sproc that existing clients depend on staying identical (config-table extraction, hardcode removal, port, perf rewrite), the pre/post scripts are not enough: they check the new state, not equivalence. Per the global "Correctness: compose it, don't debug into it" rules, build BOTH halves and report the verdict in their language:
+
+1. **Construction argument** (all inputs): decompose the change into moves whose equivalence is either readable in the diff (a gate added on a mode the legacy rows satisfy; a new block unreachable for the legacy config) or machine-checkable data premises (seed tuples equal to the old literals, asserted by a `_post` check). This is the half that covers inputs the corpus never runs.
+2. **Differential harness** (real engine): one self-contained script in `queries/cc/tests/`, named `<caseid>_<slug>_parity_differential.sql`. Reference implementation: `355075_nesco_parity_differential.sql`.
+
+Harness shape:
+
+- **Baseline**: extract the pre-change body via `git show origin/master:<path>` (or the branch-point ref), rename the proc to `<Name>_<caseid>Baseline`, deploy it at script top, `DROP` it at script end. Self-contained; zero residue.
+- **Corpus**: branch-complete synthetic payload; enumerate every reachable branch of the changed logic and comment the mapping (entry N -> branch X). Splice REAL anchor ids (employee/project/etc.) at runtime via `SELECT TOP 1` so joins resolve, and verify anchors exist (abort row if not).
+- **Dual run**: baseline then current against the IDENTICAL input, each inside `BEGIN TRAN ... ROLLBACK`. Capture observables into table variables (they survive ROLLBACK): landed rows, plus error-log rows read pre-rollback filtered by a unique `@User` marker. Compare ERROR SETS as rigorously as landed rows; identical failure is part of parity.
+- **Verdict**: `EXCEPT` diff both directions + count equality + error-set diff, one final grid per the single-tab contract. Proc runs emit their own grids, so the header must say "verdict is the LAST grid" and state the expected grid count.
+- **Vacuousness guard (mandatory)**: FAIL the verdict when fewer than N corpus entries actually landed. A corpus that under-lands produces trivially-equal-but-meaningless output; the guard is what turns "both did nothing, identically" from a false PARITY into a red result you must diagnose.
+
+Corpus gotchas (each cost a round in 355075):
+
+- **Corpus values must satisfy real FKs.** Query `sys.check_constraints` + `sys.foreign_keys` on the target tables FIRST; one FK-violating row aborts an entire set-based INSERT, silently killing every sibling row in both runs.
+- **Pick the date window empirically, not by vibes.** It must be free of real rows for the client (so void/sweep logic cannot touch production data even transiently, verify with a COUNT) and must not trip period/trigger logic (read the table's triggers, don't assume).
+- **TRY/CATCH can swallow divergence.** Set-based statements inside swallowing CATCH blocks (the `@FailedSources` NULL-concat class) turn a thrown error into silent absence; if the diff shows rows missing with no matching error rows, suspect a swallowed throw and reproduce the statement OUTSIDE the proc to surface `ERROR_MESSAGE()`.
+
+Report the result as the global rules require: differential PARITY proves the corpus, not the universe; the closing claim is "proven under stated assumptions", naming the construction premises (seed equality, config-mode discipline) as the assumptions.
+
 ## Step 6: Locate the output and print copy-pasteable paths
 
 End the turn with:
@@ -233,6 +256,7 @@ When the user says results are pasted (or pastes them in chat):
 - **Commit the manifest, in the worktree (Step 1b).** The tracked `_template.js` is generated by running the builder from inside the worktree (HEAD), not the branch-arg run in main (which yields the gitignored `__template.js`). Reuse main's `node_modules` via a symlink so each worktree doesn't carry its own copy. Commit only `MassScriptBuilder/<branch>/_template.js`.
 - **Do not commit the `.sql` output.** `MassScriptBuilder/<branch>/*.sql` is run against the DB, not source; `.gitignore` covers `**/*.sql`.
 - **Test scripts are scratch, not source.** `queries/cc/` is gitignored; write them in the MAIN checkout's `queries/cc/tests/`, never in the worktree, never committed.
+- **Behavior-preserving sproc refactors get a parity differential, not just pre/post.** See Step 5b: git-extracted baseline proc + branch-complete corpus + dual rolled-back runs + EXCEPT diff, with the vacuousness guard. Pre/post scripts assert the new state; only the differential (plus the construction argument) speaks to equivalence.
 - **UNION ALL type alignment.** CAST every value column to NVARCHAR in every branch of the union; mismatched types across branches is the #1 way the single-tab contract breaks.
 - **Cleanup.** Remove a finished SQL worktree with `git -C "$MAIN" worktree remove "$wt"` once the branch is merged; the branch on origin is preserved.
 - **Customize this file freely.** Personal wrapper; you own it.
