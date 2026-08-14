@@ -32,12 +32,56 @@ guard_die() {
 chain_local_hook() {
   local name="$1"; shift
   local root; root="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
-  local local_hook="$root/.git/hooks/$name"
+
+  # Resolve the repo's OWN hooks dir. Deliberately not `git rev-parse --git-path
+  # hooks`: that honors core.hooksPath and resolves right back to this directory.
+  # In a worktree $root/.git is a FILE, so $root/.git/hooks does not exist and
+  # the real hooks live in the common dir. (2026-08-14: this is why lefthook was
+  # silently dead in every Viper worktree, not just on fresh clones.)
+  local common; common="$(git -C "$root" rev-parse --git-common-dir 2>/dev/null)" || return 0
+  case "$common" in /*) ;; *) common="$root/$common" ;; esac
+
   # If this repo sets its own core.hooksPath (husky/lefthook), we are not even
-  # running; when we ARE running, .git/hooks is the only thing we could shadow.
+  # running; when we ARE running, that hooks dir is the only thing we shadow.
+  local local_hook="$common/hooks/$name"
   if [ -x "$local_hook" ] && [ "$local_hook" != "$0" ]; then
     "$local_hook" "$@"
     return $?
   fi
-  return 0
+
+  chain_lefthook "$root" "$name" "$@"
+}
+
+# Run lefthook directly when it has no installed hook file to chain to.
+# `lefthook install` REFUSES to write hooks while a global core.hooksPath is set
+# (it will not create files git would ignore), and a repo's `prepare` script
+# typically swallows that with `|| true`. On a fresh clone that leaves nothing
+# for chain_local_hook to find, so the repo's entire lint gate silently
+# disappears with only a hint buried in npm output. Calling lefthook ourselves
+# makes `lefthook install` unnecessary. Fails OPEN throughout: a missing binary
+# or config must never brick a commit.
+chain_lefthook() {
+  local root="$1" name="$2"; shift 2
+
+  local cfg="" f
+  for f in lefthook.yml lefthook.yaml .lefthook.yml .lefthook.yaml; do
+    if [ -f "$root/$f" ]; then cfg="$root/$f"; break; fi
+  done
+  [ -n "$cfg" ] || return 0
+
+  # Only run hooks the config actually declares, so an undeclared name is a
+  # no-op here instead of a bet on lefthook's exit code for unknown hooks.
+  grep -Eq "^[[:space:]]*[\"']?${name}[\"']?[[:space:]]*:" "$cfg" || return 0
+
+  local bin=""
+  if command -v lefthook >/dev/null 2>&1; then
+    bin="lefthook"
+  elif [ -x "$root/node_modules/.bin/lefthook" ]; then
+    bin="$root/node_modules/.bin/lefthook"
+  else
+    return 0
+  fi
+
+  ( cd "$root" && "$bin" run "$name" "$@" )
+  return $?
 }
