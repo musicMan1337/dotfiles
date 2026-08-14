@@ -58,6 +58,27 @@ Non-negotiable:
 
 (scaffold: patches the model's habit of declaring code correct from surface plausibility or a passing test run rather than an argument over the whole input space; added 2026-08; retest when a model volunteers invariants/preconditions and flags unprovable code unprompted)
 
+# Code Comments: default to NONE
+
+A comment is a last resort, never a deliverable. The code states what it does; a comment exists only for what the code CANNOT state. Assume the comment you are about to write should be deleted before I ever see it, because it usually should: I delete most of them outright and the code is fine.
+
+Hard limits when one does survive:
+
+- **1 to 2 lines, total.** Not 1 to 2 lines per section: 1 to 2 lines for the whole comment, and only if deleting it would lose something real.
+- **Never the block pattern**: a "what this does" paragraph followed by a "why it was written this way" justification. Both halves are noise. The first restates the code; the second is a message to a reviewer, and it belongs in the commit message, not the source.
+- **Never narrate the change, the diff, the old behavior, or the task** ("added to fix X", "previously this returned Y", "per the plan", "kept for backwards compat during migration"). That is report and commit-message material; see Authorship.
+- No new docstring / JSDoc / XML-doc blocks on internal functions unless the file already does that consistently, and never restate a signature in prose.
+
+What clears the bar: a non-obvious invariant or precondition, a load-bearing gotcha (upstream bug, ordering/timing requirement, spec or regulatory rule, a deliberate deviation that reads like a mistake), the case/issue/spec link that explains a magic value, a `TODO`/`FIXME` I asked for.
+
+**When you want a longer comment, you do not get to just write it.** Write the 1 to 2 line version in the code, keep an internal note of the spot, and at the end of the turn surface every such spot (`file:line`, what you wanted to say, why the short version is lossy) and ask me, numbered, what should actually go there. Never silently expand. Never skip the ask because the short version "reads fine": the ask is how I decide, and library / public-API / algorithm-dense code is exactly where I sometimes say yes to a real block. Subagents cannot ask, so they put the flagged spots in their report and the main session asks me.
+
+**My explicit direction overrides everything above, for that request only.** If I say "explain in the code exactly what this does, with examples", write as much as the job needs. What I asked to be verbose stays verbose; do not tidy it away on a later pass.
+
+Applies to app code, skills, hooks, scripts, and SQL alike. Removing existing verbose comments is fine when the change already touches those lines; no drive-by comment purges.
+
+(scaffold: patches the model's strong prior toward multi-paragraph explain-then-justify comment blocks on every nontrivial hunk, and toward reviewer-facing narration of the diff inside the source; added 2026-08; retest when a model's default diff ships comment-free unless the code cannot express the constraint)
+
 # Subagent Strategy
 
 Goal: keep the main session's context lean (premium 1M model; every token in context is re-billed each turn) so it stays a sharp orchestrator over a long session, while staying under the AV concurrency ceiling below. Delegate to subagents when a search, analysis, or implementation is broad, parallelizable, or would dump bulky churn into context (log sweeps, codebase exploration, doc research, multi-file edits and their read→edit→verify→fix loop). Direct Glob/Grep/Read/Edit is fine for targeted work you can finish in a couple of calls; a delegated one-line grep or edit costs more than a direct one.
@@ -96,9 +117,9 @@ Write:
 
 Before any browser automation, call `list_connected_browsers` and `select_browser` the dedicated Chrome profile that has the Claude extension (the Chrome window whose profile chip reads **"Claude"**, separate from my "Derek" / "derek@ebacon.com" browsing profiles). Never drive my main browsing profiles.
 
-**Gotcha: the Claude-profile browser does NOT report its name as "Claude".** It connects under the default display name **"Browser 1"** (deviceId `d01f0c30-898f-4a5d-b90b-b0e8f3b003ec` on this machine, as of 2026-07). Do not reject it for not being literally named "Claude" — that mistake cost a round-trip. How to connect:
+**Gotcha: the Claude-profile browser does NOT report its name as "Claude".** It connects under the default display name **"Browser 1"** (deviceId `d01f0c30-898f-4a5d-b90b-b0e8f3b003ec` on this machine, as of 2026-07). Do not reject it for not being literally named "Claude"; that mistake cost a round-trip. How to connect:
 
 - `list_connected_browsers` → if the known Claude-profile deviceId (`d01f0c30-...`) is present, `select_browser` it directly. If exactly one browser is connected and it's that deviceId, it's the Claude profile; just select it.
-- `switch_browser` (the "prompt every extension" path) returns **"No other browsers available"** when the Claude profile is the only one connected, so it does NOT help distinguish/confirm — don't rely on it here.
+- `switch_browser` (the "prompt every extension" path) returns **"No other browsers available"** when the Claude profile is the only one connected, so it does NOT help distinguish/confirm; don't rely on it here.
 - Confirm identity by the Chrome **profile chip reading "Claude"** (visible in a screenshot), not by the MCP display name.
 - If no browser is connected at all, stop and tell me to open/activate the extension in the "Claude"-profile window; do NOT fall back to a non-Claude profile. If the connected deviceId differs from the one above (extension reinstalled), confirm with me before driving it.
