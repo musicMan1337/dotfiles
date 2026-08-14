@@ -5,9 +5,13 @@
 # "claude" (which legitimately names the claude/ dir in some repos). Chains to a
 # repo-local commit-msg afterward. Escape hatches: ALLOW_ATTRIBUTION=1,
 # ALLOW_EMDASH=1. bash 3.2 safe.
+# dotfiles-managed-hook  (identity marker; _integrity.sh greps for this string)
 set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_lib.sh" 2>/dev/null || exit 0
+
+# Backstop for a clobbered pre-commit: that shim cannot report its own removal.
+[ -x "$DIR/_integrity.sh" ] && { "$DIR/_integrity.sh" check || exit 1; }
 
 msgfile="${1:-}"
 if [ -z "$msgfile" ] || [ ! -f "$msgfile" ]; then

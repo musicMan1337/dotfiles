@@ -4,9 +4,13 @@
 # em-dash in a file you merely touch does not block the commit. Chains to any
 # repo-local pre-commit afterward. Escape hatch: ALLOW_EMDASH=1 git commit ...
 # Written for bash 3.2 (macOS default): no mapfile, no ${var,,}, no \u.
+# dotfiles-managed-hook  (identity marker; _integrity.sh greps for this string)
 set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_lib.sh" 2>/dev/null || exit 0   # fail-open on our own breakage
+
+# Fail closed if any managed hook in this dir was replaced by a foreign install.
+[ -x "$DIR/_integrity.sh" ] && { "$DIR/_integrity.sh" check || exit 1; }
 
 if [ "${ALLOW_EMDASH:-0}" != "1" ]; then
   hits="$(LC_ALL=C git diff --cached -U0 --diff-filter=ACM 2>/dev/null \
