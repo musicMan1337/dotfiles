@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-# Guards the guards: `lefthook install` writes its own shim into core.hooksPath
-# and renames ours to <name>.old, silently disarming them (seen 2026-08-14).
-# Usage: _integrity.sh check   -> exit 1 if a managed hook is not ours
-#        _integrity.sh repair  -> put ours back (from .old, else from git)
-# bash 3.2 safe. Fails OPEN on its own breakage; fails CLOSED only on real drift.
+# `lefthook install` shims core.hooksPath and renames ours to <name>.old (seen
+# 2026-08-14). Fails open on its own breakage, closed only on real drift.
 set -u
 
 MODE="${1:-check}"
@@ -49,7 +46,9 @@ fi
 printf '\n\033[1;31m[commit blocked: global git hooks were overwritten]\033[0m\n' >&2
 [ -n "$drift" ] && printf '  no longer ours:%s\n' "$drift" >&2
 [ -n "$strays" ] && printf '  foreign backup left behind:%s\n' "$strays" >&2
-printf '  Repair: %s repair\n' "$DIR/_integrity.sh" >&2
+printf '  Repair: %s repair   (restores from %s.old, else from git)\n' \
+  "$DIR/_integrity.sh" "$DIR/pre-commit" >&2
+printf '  Re-check: %s check\n' "$DIR/_integrity.sh" >&2
 printf '  Cause: a `lefthook install` (repo prepare/postinstall) clobbered core.hooksPath.\n' >&2
 printf '  Override once: SKIP_HOOK_INTEGRITY=1 git commit ...\n\n' >&2
 exit 1
