@@ -57,3 +57,7 @@ send a trivial gate through the heavy harness.
   with nothing behind it is a BLOCK.
 - **An agent capability grant is a change.** New tool access, new egress, new creds for an
   automation or AI agent all go through this gate; the spine's agent section applies.
+- **Supply-chain changes have a dedicated gate.** For a change that adds/bumps third-party
+  deps or CI actions, the supply-chain half of the verdict is `/setup:package-lockdown`
+  (EXISTING AUDIT green: scan clean, pins dated, cooldown gates on, actions SHA-pinned);
+  cite its result rather than re-deriving those checks here.

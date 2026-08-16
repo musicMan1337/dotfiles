@@ -7,6 +7,10 @@ description: Maintain the running eBacon attack-surface inventory (~/eBacon/atta
 
 Maintains the single running inventory of eBacon's deployed attack surface. This skill **curates the file**; the deep, scored, per-system assessment is a separate step (`/security:assess-attack-surface`).
 
+`/setup:package-lockdown` runs change exactly what the Defenses line records (pins, age
+gates, scanners, update-bot cooldowns); its Phase 5 sends an update here. Accept those
+write-backs as routine `update` operations.
+
 ## The file
 
 - **Path:** `/Users/derek/eBacon/attacksurface.md` (this is `THE_FILE` below). It lives **outside every git repo on purpose.**
