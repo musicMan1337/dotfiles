@@ -172,6 +172,15 @@ Every batch that changes DB behavior ships with test scripts the user runs in SS
 - Setup (DECLAREs, temp tables, captured counts) goes above; the file ends in a single UNION ALL query, `ORDER BY check_name`.
 - If genuinely irreducible to one query (mid-script state, INSERT-EXEC capture, incompatible shapes), group into the FEWEST possible UNION ALL blocks and state the expected result-tab count in the file header.
 
+**Label every output statement.** Put a SHORT single-line comment immediately above every statement that produces a result set. The SQL client renders that comment as the result-tab label, which is the only way to tell several anonymous grids apart:
+
+```sql
+/* Plan count + exec totals */
+SELECT COUNT(*), SUM(execution_count) FROM ...;
+```
+
+Banner comments do NOT work for this: a boxed `/*==== ... ====*/` block renders as the literal box characters and is unreadable as a tab name. Banners are still fine for structure; the one-line label just has to sit directly above the statement as well. Describe the grid's content ("Recompiles per statement"), not its position ("Step 3").
+
 Header comment per file: case id, branch, when to run, "copy the grid WITH HEADERS and paste it into the RESULTS block". Footer:
 
 ```sql
