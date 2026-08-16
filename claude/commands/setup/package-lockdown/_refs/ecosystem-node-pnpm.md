@@ -161,6 +161,20 @@ pnpm dlx npm@latest audit signatures
 pnpm audit --audit-level=high
 ```
 
+## `.npmrc` env-var auth references (`${NPM_TOKEN}`)
+
+Measured 2026-08-14 (npm 10.9/11.12, pnpm 9.15/10.x) for the committed-`.npmrc` +
+runtime-exported-token pattern (e.g. tokens served by Snout):
+
+| State of the var | npm 10/11 | pnpm 9/10 |
+|---|---|---|
+| Unset | Literal `${NPM_TOKEN}` passes through; no config error; registry ops 403 | **Entire project `.npmrc` discarded** (WARN only), including the scope→registry pin: scoped installs silently fall through to npmjs.org, reopening dependency confusion |
+| Set but empty | Parses; registry ops fail `ENEEDAUTH` | Parses; registry pin intact; private fetches 401 |
+| `${VAR:-}` default syntax | Unsupported (literal) | Unsupported (whole-file discard) |
+
+Rule: whatever exports the token must ALWAYS export it, empty string on failure, never
+unset. Never satisfy the reference by writing a real token into any `.npmrc`.
+
 ## What pnpm avoids by default vs npm
 
 | Risky behavior | npm | pnpm 11+ |

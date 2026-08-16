@@ -179,6 +179,10 @@ just audit
 
 Only then commit `pnpm-lock.yaml`, `uv.lock`, `package.json`, `pyproject.toml`, `pnpm-workspace.yaml` together.
 
+Then close the loop: add/update the repo's `~/eBacon/attacksurface.md` entry (via
+`security:attack-surface`), run `security:env-lockdown` REPO mode for the secrets side,
+and gate a security-relevant repo with `/security:harden-gate`.
+
 ## Verification-failure handling
 
 If a previous pin in the repo cannot be reproduced in the registry now (yanked / typosquat / hallucination), surface as a finding. Do NOT silently overwrite.

@@ -13,8 +13,8 @@ Source: playbook §5. Defense in depth via **layered, non-overlapping** tools. M
 | 5 | Per-PR | pnpm audit + signatures | PR (Node) | Known CVEs + provenance |
 | 6 | Per-PR | Trivy | PR (Docker) | Container CVEs + secrets |
 | 7 | Per-PR | zizmor | PR (Actions) | Workflow misconfigs |
-| 8 | Continuous | Renovate | Daily | Outdated deps with cooldown |
-| 9 | Continuous | Dependabot (security) | Daily | Security-only PRs (backup) |
+| 8 | Continuous | Dependabot (cooldown) | Weekly | Outdated deps + Action SHAs, cooldown-gated (**estate default**) |
+| 9 | Continuous | Renovate | Daily | Alternative to 8 for repos needing dashboard/automerge/packageRules |
 | 10 | Post-deploy | SBOM (Syft) | Push to main | Inventory for IR (L8) |
 
 ## Do not add (overlap = noise, not coverage)
@@ -24,7 +24,48 @@ Source: playbook §5. Defense in depth via **layered, non-overlapping** tools. M
 - Grype + Trivy (overlap)
 - Safety + pip-audit (pip-audit is the PyPA-official superset)
 
-## Renovate config template
+## Dependabot config template (estate default)
+
+Native `cooldown` support landed in Dependabot; this mirrors the age-gate discipline
+without a Renovate install. Proven in production on Snout. `.github/dependabot.yml`:
+
+```yaml
+# (L1/L9 continuous) Dependabot keeps deps + pinned Action SHAs current, with a cooldown
+# so freshly-published versions age before a PR is opened (defense against compromised
+# releases that get caught and yanked within days). The "npm" ecosystem covers pnpm-lock.yaml.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+    groups:
+      dev-minor-patch:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+```
+
+Tradeoff vs Renovate: no `vulnerabilityAlerts.minimumReleaseAge: null` equivalent, so a
+security fix inside its cooldown window needs a manual override-floor bump (pnpm
+`overrides` / uv constraints) instead of an expedited bot PR. Acceptable when OSV runs
+per-PR and floors are the incident lever anyway.
+
+## Renovate config template (alternative)
+
+Prefer when a repo needs the dependency dashboard, automerge, per-package rules, or
+cooldown-bypass for security-flagged bumps.
 
 ```json
 {
@@ -80,6 +121,10 @@ Source: playbook §5. Defense in depth via **layered, non-overlapping** tools. M
 Key: `vulnerabilityAlerts.minimumReleaseAge: null` bypasses cooldown only for security-flagged bumps. This resolves the cooldown-vs-fresh-fix tension.
 
 ## Branch protection (required)
+
+Adapt `contexts` to the checks the repo actually runs (a Node-only repo has no
+pip-audit; Snout requires only `osv-scan` + a review). A required context that never
+reports blocks every merge.
 
 ```sh
 gh api repos/$ORG/$REPO/branches/main/protection \

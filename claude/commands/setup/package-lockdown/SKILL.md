@@ -23,6 +23,12 @@ Four rules that separate a hardening skill from a new attack surface. Violate an
 
 4. **Refuse on uncertainty.** If a registry is unreachable (offline, rate-limited, malformed reply), REFUSE to write that pin. Surface as a finding. Never guess from training data, ever.
 
+## Alignment with the security:* family
+
+- **Execution policy (spine).** Mechanical scopes (NEW BOOTSTRAP, EXISTING AUDIT config-writing, registry lookups) run inline. A REAL security VERDICT (the ADD-ONE-PACKAGE "is X safe" call on a package actually about to be installed, or any INCIDENT-scope compromise walk) follows the spine's execution policy (`/Users/derek/dotfiles/claude/commands/security/harden/references/spine.md`): when the main session model is not Fable, route it through `fable:hunt` (`assess <package or incident + your structured observations>`) and relay the verdict; when the session is Fable, render inline unless it self-stops.
+- **Grading bridge (for security:harden / harden-gate).** The L-layers are not one kind of control. L2 hash pinning, L3 postinstall blocking, and L9 SHA pinning are structural BOUNDARIES (do not degrade against a smarter attacker); L1 age gate and L5 CVE scanning are RACES (they bet the ecosystem flags malware inside the window); L6 provenance / `trustPolicy` moves the root of trust outside the registry account (Tier 2). A lockdown'd repo is boundaries plus races, layered; never report it as "supply chain solved."
+- **Close the loop.** After a bootstrap or a material audit: update the repo's entry in `~/eBacon/attacksurface.md` (via `security:attack-surface`) so the inventory's Defenses line matches reality; for a security-relevant repo, finish with `/security:harden-gate` on the shipped config. The full new-repo ritual is three skills: this one (deps), `security:env-lockdown` REPO mode (secrets/CC config), `security:attack-surface` (inventory entry).
+
 ## Operational constraints
 
 - **Delegate ALL registry lookups, repo scans, and CVE queries to Haiku subagents.** Do not run npm/curl/jq directly to gather many versions; spawn a Haiku subagent with the package list and have it return a verified map. Registry verification is mechanical lookup work; running Opus on it is waste, and per-package outputs poison main context.
@@ -48,7 +54,7 @@ Pick one path based on detection:
 | Signal | Scope | Path |
 |---|---|---|
 | No lockfile, empty/scant manifest, or user said "new project / init / scaffold" | **NEW BOOTSTRAP** | Full §3.5 day-zero. Load `_refs/bootstrap-day-zero.md`. |
-| Lockfile + deps exist, hardening config missing or weak (`^` ranges everywhere, no allowBuilds, no Renovate cooldown) | **EXISTING AUDIT** | Gap audit. Load relevant `_refs/ecosystem-<X>.md` + `_refs/anti-patterns.md`. |
+| Lockfile + deps exist, hardening config missing or weak (`^` ranges everywhere, no allowBuilds, no update-bot cooldown, Dependabot or Renovate) | **EXISTING AUDIT** | Gap audit. Load relevant `_refs/ecosystem-<X>.md` + `_refs/anti-patterns.md`. |
 | User asked "add package X" / "is X safe to install" / "should I use Y" | **ADD-ONE-PACKAGE** | Load only `_refs/pre-install-checklist.md`. Skip ecosystem configs. |
 | User mentioned a CVE drop, suspected compromise, hijacked Action | **INCIDENT** | Load `_refs/incident-response.md`. Walk the scenario; do not write configs. |
 
@@ -74,7 +80,7 @@ Pinning rule (per playbook §4.1, §4.2):
 
 Date-stamp every pin written with today's date from the harness context (e.g., `react = "19.2.0"  # verified 2026-05-25`). For EXISTING AUDIT, add the comment when adjusting a pin; flag pre-existing undated pins in the report.
 
-For pnpm `allowBuilds`, pre-populate the native-binary baseline from `_refs/bootstrap-day-zero.md` Step 1, with a justification comment per entry. For Renovate, pull the template from `_refs/ci-stack.md`. For GitHub Actions, every action gets its 40-char SHA verified by the same Haiku loop (one subagent call per action, returns SHA + tag-it-matched + commit-date).
+For pnpm `allowBuilds`, pre-populate the native-binary baseline from `_refs/bootstrap-day-zero.md` Step 1, with a justification comment per entry. For the update bot, pull the **Dependabot template (estate default)** or the Renovate alternative from `_refs/ci-stack.md`. For GitHub Actions, every action gets its 40-char SHA verified by the same Haiku loop (one subagent call per action, returns SHA + tag-it-matched + commit-date).
 
 ## Phase 5: Report + next commands
 
@@ -86,6 +92,7 @@ Print:
 4. **Deferred risks.** Any CVE whose patched version doesn't exist yet upstream, or trust downgrades you couldn't fix structurally. Cite the §6.5 / §11 pattern that applies.
 5. **Commands for the user to run, in order.** Numbered. Typical: `pnpm install --frozen-lockfile` or `uv lock && uv sync --frozen`, then `pnpm audit --audit-level=high && pnpm dlx npm@latest audit signatures`, then `osv-scanner scan source --recursive .`, then ecosystem-specific (`uvx pip-audit --requirement <(uv export --format requirements-txt --frozen) --no-deps --disable-pip --strict` for Python). NEVER run them yourself.
 6. **Next-step prompt.** Tell the user: "If any of those error out, paste the error message back to me and I'll match it to the lock-loop playbook (`_refs/pre-install-checklist.md` lock-loop errors table)."
+7. **Close the loop.** Update the repo's `~/eBacon/attacksurface.md` entry (via `security:attack-surface`) with the new Defenses posture; for a security-relevant repo, finish with `/security:harden-gate`. New repos: also run `security:env-lockdown` REPO mode.
 
 ## Phase 6: Lock-loop iteration
 
@@ -114,6 +121,12 @@ If the error doesn't match any row, surface it as a gap and propose adding a row
 - **Don't trust `Today's date is...` in agent context to imply future registry contents.** Registry holds what was published; dates don't unlock future versions. Always cross-check with the registry's own timestamp (`npm view <pkg> time`, PyPI `releases` keys).
 - **Cooldown for the package manager itself is a tradeoff, not a rule.** Pinning pnpm/uv to a version inside cooldown is defensible for product engineering (managers are well-audited, Renovate-managed; cooldown does its real work on the *transitive* dep graph flowing through them). For high-stakes / regulated environments, stay strict. Document the choice inline.
 - **Major-version cascades.** Bumping one framework anchor (Next.js, FastAPI, React Native) cascades to 3-8 satellites. Bump in dependency order: anchor, then typed bindings (`@types/<lib>`), then test framework, then testing addons. Re-lock between layers to catch conflicts early.
+- **`osv-scanner.toml`: one unknown key voids the whole file.** The expiry field is `ignoreUntil` (`validUntil` is rejected), and rejection is per-FILE ("Ignored invalid config file"), so every ignore silently stops applying. After any toml edit, re-run the scanner and confirm exit code plus the per-ID filter messages. (Snout, 2026-08-14.)
+- **Advisory-ID ignores are unconditional and outlive fixes silently.** A no-fix ignore stays green after upstream publishes a fix. Pair every ignore with `ignoreUntil` (hard backstop) AND a CI fix-watch job that queries `api.osv.dev/v1/vulns/<id>` and fails on a `fixed` event or `withdrawn`. Reference implementation: Snout `.github/workflows/security.yml` `ignored-advisory-fix-watch`.
+- **Red-green any fix-watch/detector script against a known-fixed advisory before trusting it.** First Snout attempt failed open: `echo "$body"` expanded escape sequences in the OSV JSON into control chars, jq errored, and the known-fixed test case read "no fix". Use `printf '%s'`, and route unparseable replies to a warning, never to the no-fix branch.
+- **osv-scanner "unused ignores" can be a false warning** (2.2.4 alias-counting quirk: it lists IDs as unused in the same run whose filter messages show them working). Trust the filter messages and exit code.
+- **pnpm's "Packages: +N -M" counts node_modules mutations, not lockfile entries.** To verify a manifest change did what you predicted, diff the lockfile's `packages:` key set against HEAD. Exact-pinning also re-resolves override floors, so expect small cooldown-safe transitive refreshes (e.g. a `>=7.8.0` floor stepping 7.8.1 -> 7.8.5), not a byte-identical lockfile.
+- **Dependabot is three separate switches.** `dependabot.yml` (version updates), vulnerability alerts, and automated security fixes are independent; a repo with a perfect dependabot.yml can still have security updates OFF. Verify/enable: `gh api [-X PUT] repos/<o>/<r>/vulnerability-alerts` and `.../automated-security-fixes`.
 
 ## Growing this skill
 
