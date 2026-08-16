@@ -64,7 +64,7 @@
       "mcp__rag__rag_track"
     ]
   },
-  "model": "opus[1m]",
+  "model": "claude-fable-5[1m]",
   "skillOverrides": {
     "spec:advisor": "user-invocable-only",
     "spec:audit": "user-invocable-only",
