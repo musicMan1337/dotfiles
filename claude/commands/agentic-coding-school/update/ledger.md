@@ -10,8 +10,8 @@ No transcript text here: paid course material, public repo.
 | 2026-08-17 | claude-code | Cross Session Talk | ADOPT | named peer sessions (`claude -n`) + SendMessage for work outliving a subagent |
 | 2026-08-17 | fundamental-techniques | Unconstraining the Exploration Space | ADOPT | `--safe-mode` for ideation outside the harness's own conventions |
 | 2026-08-17 | advanced-techniques | Point Fixes vs Architectural Fixes | ADAPT | same-class sweep + ranked least-to-most-invasive ladder on repeat bugs |
-| 2026-08-17 | loopy-ai | Improving the Loop | ADAPT | mine session transcripts of a skill's own runs to grow its gotchas |
-| 2026-08-17 | loopy-ai | Creating the Skill | ADAPT | GIF evidence for UI flows; rejected blast-radius auto-merge and cross-vendor review |
+| 2026-08-17 | loopy-ai | Improving the Loop | ADAPT | mine session transcripts of a skill's own runs to grow its gotchas; shipped as harness:skill-feedback |
+| 2026-08-17 | loopy-ai | Creating the Skill | ADAPT | GIF evidence for UI flows shipped into the exercised rule; rejected blast-radius auto-merge and cross-vendor review |
 | 2026-08-17 | advanced-techniques | Score Before You Spend | REJECT | impact x opportunity already in security:assess-attack-surface; generic ranker is project work |
 | 2026-08-17 | advanced-techniques | Deep Bug Hunting | REJECT | 98-agent fan-out; economics die under the 4/6 CryptoGuard cap |
 | 2026-08-17 | fundamental-techniques | Evaluating Code Review Tools | REJECT | independent-reviewer principle already in plan-auditor/security-auditor |

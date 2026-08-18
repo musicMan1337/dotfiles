@@ -5,6 +5,7 @@
  *
  * Usage:
  *   node extract-usage.js [--since YYYY-MM-DD]
+ *   node extract-usage.js --skill <name>   # transcript paths for one skill
  *
  * Without --since: scans entire history.
  * With --since: only scans entries after that date.
@@ -27,6 +28,7 @@ import { homedir } from "node:os";
 import readline from "node:readline";
 
 const HISTORY_FILE = path.join(homedir(), ".claude", "history.jsonl");
+const PROJECTS_DIR = path.join(homedir(), ".claude", "projects");
 
 const BUILTIN_COMMANDS = new Set([
   "help", "clear", "model", "cost", "context", "resume", "compact",
@@ -67,11 +69,23 @@ const NAMESPACE_ONLY = new Set([
 // Parse args
 const args = process.argv.slice(2);
 let sinceDate = null;
+let skillFilter = null;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--since" && args[i + 1]) {
     sinceDate = args[++i];
+  } else if (args[i] === "--skill" && args[i + 1]) {
+    skillFilter = args[++i].toLowerCase();
   }
+}
+
+function findTranscript(sessionId) {
+  if (!fs.existsSync(PROJECTS_DIR)) return null;
+  for (const dir of fs.readdirSync(PROJECTS_DIR)) {
+    const candidate = path.join(PROJECTS_DIR, dir, `${sessionId}.jsonl`);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
 }
 
 const sinceTimestamp = sinceDate
@@ -142,6 +156,7 @@ async function main() {
         firstUsed: dateStr,
         projects: new Set(),
         sessions: new Set(),
+        sessionRows: new Map(),
       };
     }
 
@@ -150,7 +165,27 @@ async function main() {
     if (dateStr > u.lastUsed) u.lastUsed = dateStr;
     if (dateStr < u.firstUsed) u.firstUsed = dateStr;
     u.projects.add(projectName);
-    if (sessionId) u.sessions.add(sessionId);
+    if (sessionId) {
+      u.sessions.add(sessionId);
+      u.sessionRows.set(sessionId, { project: project || null, date: dateStr });
+    }
+  }
+
+  if (skillFilter) {
+    const name = RENAMES[skillFilter] || skillFilter;
+    const data = usage[name];
+    const sessions = data
+      ? [...data.sessionRows.entries()]
+          .map(([sessionId, meta]) => ({
+            sessionId,
+            date: meta.date,
+            project: meta.project,
+            transcript: findTranscript(sessionId),
+          }))
+          .sort((a, b) => b.date.localeCompare(a.date))
+      : [];
+    console.log(JSON.stringify({ skill: name, count: data ? data.count : 0, sessions }, null, 2));
+    return;
   }
 
   // Convert Sets to arrays/counts for JSON output
