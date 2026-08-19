@@ -88,6 +88,8 @@ If consolidating, write the merged doc to the most appropriate existing path (us
 
 Draft the new (or merged, or replacement) content. Show it inline before writing. Keep it scoped — a new doc should earn every line.
 
+Read `augment:skill-creator` first for how agent-read prose earns that line: context pointers, the two loads, the information hierarchy, completion criteria, and the no-op test. For a doc a HUMAN reads (README, RFC, spec, ADR), read `~/dotfiles/claude/references/technical-writing.md` instead: pick the Diataxis mode first, then write to its four layers. Run the draft through `writing:unslop` either way.
+
 Present:
 
 ```

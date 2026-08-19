@@ -80,6 +80,9 @@ Reference **semantic tokens** (`--mm-*`) in your rules, never the raw
 10. **Icons (if any): Phosphor-style, light weight.** ~1–1.5px stroke at 24px,
     round caps/joins, `currentColor`, editorial metaphors. Generate decorative
     graphics with Canvas, not hand-authored SVG paths.
+11. **Every word on the page runs through `writing:unslop`.** Invoke that skill
+    and write the copy clean as you draft it. Design tokens defeat the visual
+    tell; unslop defeats the prose tell. Both or neither.
 
 ## Hard exclusion list — NEVER do these
 
@@ -203,4 +206,5 @@ turn:
 - [ ] Prepared date (`YYYY-MM-DD`, from the environment) in the masthead metadata
 - [ ] Empty/error/loading states designed, not default
 - [ ] Nothing from the exclusion list present
+- [ ] Copy run through `writing:unslop` (rules 24, 25, 27 are the ones that bite)
 - [ ] Row appended/updated in the Obsidian artifacts manifest (source of truth for the Excel tracker)

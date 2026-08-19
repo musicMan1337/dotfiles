@@ -1,5 +1,5 @@
 /*
- * mammoth.css — "Warm Editorial" design spec for self-contained HTML artifacts.
+ * mammoth.css: "Warm Editorial" design spec for self-contained HTML artifacts.
  *
  * Ported from the mammoth-ui design system (~/code/mammoth-ui) into standalone,
  * framework-free CSS. The shipped library uses Tailwind v4 `@theme`; this file
@@ -12,9 +12,9 @@
  * primitives. Light + dark are both wired (data-theme or prefers-color-scheme).
  *
  * Three layers below:
- *   1. PRIMITIVES   — 9 warm OKLCH families × 11 steps (raw; do not reference)
- *   2. SEMANTIC     — role tokens (--mm-*), light + dark
- *   3. EDITORIAL    — fonts, fluid type, off-grid spacing, base element styling
+ *   1. PRIMITIVES  : 9 warm OKLCH families × 11 steps (raw; do not reference)
+ *   2. SEMANTIC    : role tokens (--mm-*), light + dark
+ *   3. EDITORIAL   : fonts, fluid type, off-grid spacing, base element styling
  *                     (the repo documents these as principles but ships them as
  *                      Tailwind defaults; baked in here because an artifact is a
  *                      typographic document, not a component library)
@@ -31,12 +31,12 @@
 /* @font-face { font-family:'Newsreader'; src:url(data:font/woff2;base64,...) format('woff2'); font-weight:400 700; font-display:swap; } */
 
 /* ════════════════════════════════════════════════════════════════
-   1. PRIMITIVES — raw OKLCH ramps (never reference directly)
+   1. PRIMITIVES: raw OKLCH ramps (never reference directly)
    Hues: ivory 87° · clay 42° · moss 155° · ink 45° · sand 60°
          sage 130° · amber 75° · ember 25° · slate 250° (the only cool tone)
    ════════════════════════════════════════════════════════════════ */
 :root {
-  /* IVORY — warm off-white (bg/surfaces) */
+  /* IVORY: warm off-white (bg/surfaces) */
   --color-ivory-50: oklch(97% 0.012 87);
   --color-ivory-100: oklch(95.5% 0.015 87);
   --color-ivory-200: oklch(93.5% 0.018 87);
@@ -49,7 +49,7 @@
   --color-ivory-900: oklch(40% 0.012 87);
   --color-ivory-950: oklch(29% 0.008 87);
 
-  /* CLAY — terracotta (primary brand accent) */
+  /* CLAY: terracotta (primary brand accent) */
   --color-clay-50: oklch(96.8% 0.018 42);
   --color-clay-100: oklch(94% 0.038 42);
   --color-clay-200: oklch(89.5% 0.072 42);
@@ -62,7 +62,7 @@
   --color-clay-900: oklch(23.8% 0.055 42);
   --color-clay-950: oklch(16.2% 0.03 42);
 
-  /* MOSS — jade green (secondary brand / logo) */
+  /* MOSS: jade green (secondary brand / logo) */
   --color-moss-50: oklch(96.8% 0.018 155);
   --color-moss-100: oklch(94.2% 0.035 155);
   --color-moss-200: oklch(90% 0.058 155);
@@ -75,7 +75,7 @@
   --color-moss-900: oklch(26% 0.042 155);
   --color-moss-950: oklch(17.5% 0.024 155);
 
-  /* INK — warm near-black (text / dark surfaces) */
+  /* INK: warm near-black (text / dark surfaces) */
   --color-ink-50: oklch(96.8% 0.008 45);
   --color-ink-100: oklch(94% 0.012 45);
   --color-ink-200: oklch(90% 0.016 45);
@@ -88,7 +88,7 @@
   --color-ink-900: oklch(21.5% 0.01 45);
   --color-ink-950: oklch(14.8% 0.007 45);
 
-  /* SAND — warm gray (borders / muted / neutrals) */
+  /* SAND: warm gray (borders / muted / neutrals) */
   --color-sand-50: oklch(97% 0.01 60);
   --color-sand-100: oklch(94.8% 0.016 60);
   --color-sand-200: oklch(91.2% 0.022 60);
@@ -101,7 +101,7 @@
   --color-sand-900: oklch(22% 0.014 60);
   --color-sand-950: oklch(15.2% 0.01 60);
 
-  /* SAGE — yellow-green (success) */
+  /* SAGE: yellow-green (success) */
   --color-sage-50: oklch(96.8% 0.015 130);
   --color-sage-100: oklch(94.2% 0.028 130);
   --color-sage-200: oklch(90.2% 0.046 130);
@@ -114,7 +114,7 @@
   --color-sage-900: oklch(25.8% 0.032 130);
   --color-sage-950: oklch(17.5% 0.018 130);
 
-  /* AMBER — yellow-orange (warning) */
+  /* AMBER: yellow-orange (warning) */
   --color-amber-50: oklch(96.8% 0.022 75);
   --color-amber-100: oklch(94.2% 0.045 75);
   --color-amber-200: oklch(90.2% 0.078 75);
@@ -127,7 +127,7 @@
   --color-amber-900: oklch(26.5% 0.056 75);
   --color-amber-950: oklch(18.2% 0.033 75);
 
-  /* EMBER — warm red (error/danger) */
+  /* EMBER: warm red (error/danger) */
   --color-ember-50: oklch(96.8% 0.022 25);
   --color-ember-100: oklch(94% 0.048 25);
   --color-ember-200: oklch(89.5% 0.085 25);
@@ -140,7 +140,7 @@
   --color-ember-900: oklch(24.8% 0.062 25);
   --color-ember-950: oklch(16.8% 0.037 25);
 
-  /* SLATE — cool blue-gray (info; the only cool tone) */
+  /* SLATE: cool blue-gray (info; the only cool tone) */
   --color-slate-50: oklch(97% 0.01 250);
   --color-slate-100: oklch(94.8% 0.018 250);
   --color-slate-200: oklch(91% 0.028 250);
@@ -155,7 +155,7 @@
 }
 
 /* ════════════════════════════════════════════════════════════════
-   2. SEMANTIC — role tokens. Reference THESE in artifact rules.
+   2. SEMANTIC: role tokens. Reference THESE in artifact rules.
    ════════════════════════════════════════════════════════════════ */
 :root,
 [data-theme='light'] {
@@ -174,7 +174,7 @@
   --mm-text-inverse: var(--color-ivory-50);
   --mm-text-on-emphasis: var(--color-ivory-50);
 
-  /* Brand accent (clay) — the primary interactive color */
+  /* Brand accent (clay): the primary interactive color */
   --mm-accent-default: var(--color-clay-500);
   --mm-accent-hover: var(--color-clay-600);
   --mm-accent-active: var(--color-clay-700);
@@ -182,7 +182,7 @@
   --mm-accent-subtle: var(--color-clay-50);
   --mm-accent-disabled: var(--color-sand-300);
 
-  /* Secondary accent (moss) — brand, NOT success */
+  /* Secondary accent (moss): brand, NOT success */
   --mm-secondary-default: var(--color-moss-500);
   --mm-secondary-hover: var(--color-moss-600);
   --mm-secondary-active: var(--color-moss-700);
@@ -359,7 +359,7 @@
 }
 
 /* ════════════════════════════════════════════════════════════════
-   3. EDITORIAL LAYER — type, motion, shape, base element styling
+   3. EDITORIAL LAYER: type, motion, shape, base element styling
    ════════════════════════════════════════════════════════════════ */
 :root {
   /* Type roles: editorial serif display + humanist sans body, never Inter/system-ui as the sole face.
@@ -397,7 +397,7 @@
   --mm-space-lg: 56px;
   --mm-space-xl: 90px;
 
-  /* Shape — modest radii (matches rounded-md/-lg usage) */
+  /* Shape: modest radii (matches rounded-md/-lg usage) */
   --mm-radius-sm: 4px;
   --mm-radius-md: 6px;
   --mm-radius-lg: 8px;
@@ -408,7 +408,7 @@
   --mm-shadow-hard: 4px 4px 0 0 var(--color-ink-900);
   --mm-shadow-soft: 0 14px 34px -22px oklch(21.5% 0.01 45 / 0.5);
 
-  /* Motion — per-property only; standard is the workhorse (NOT ease-in-out) */
+  /* Motion: per-property only; standard is the workhorse (NOT ease-in-out) */
   --motion-duration-micro: 80ms;
   --motion-duration-fast: 150ms;
   --motion-duration-base: 250ms;
