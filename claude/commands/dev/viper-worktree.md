@@ -124,6 +124,43 @@ So: every time SQL changes land in a worktree batch, the close-out is not "I edi
 
 ---
 
+# Testing uploaded files
+
+Stub corpus: `/Users/derek/eBacon/exampleFiles/`. One `example.<ext>` per file type plus `rejected-example.exe` / `rejected-example.js` for the rejection path. The bytes are throwaway; only the extension (and the MIME derived from it) matters.
+
+Whitelists differ per stack, which changes what a test should expect: CI3 `uploadFile` allows `jpg jpeg png doc docx xls xlsx gif msg pdf zip txt xml csv tif pptx ppt mp3 iif md`; CI4 `Shared/Files/FileType` allows that set plus `rtf` and `sql`. `example.eml` is in the corpus but whitelisted by neither, so it is a third rejection case. Both stacks cap at 35000 KB.
+
+## Recreating the file for an existing `t_document` row
+
+Uploaded bytes never leave prod/stage, so any local screen that downloads, previews, thumbnails, or merges an existing document 404s (or fatals) until a file exists at that row's path. `t_document.filePath` is web-relative, rooted at the worktree's `public/`:
+
+- Host: `<worktree>/public/<filePath>`. Container: `/app/public/<filePath>` (same file via the bind mount). Always create it on the host.
+- New-convention paths are `uploaded/<client>/<entity>/<itemType>_<item>_<YmdHis>_<fileTitle>.<ext>`, but legacy rows carry arbitrary shapes and are read verbatim. Copy `filePath` out of the DB; never derive it.
+
+From the worktree root:
+
+```bash
+P='uploaded/CLIENT/CLIENT-user/Case_351958_20260101120000_Contract.pdf'   # t_document.filePath, verbatim
+mkdir -p "public/$(dirname "$P")" && cp "/Users/derek/eBacon/exampleFiles/example.${P##*.}" "public/$P"
+```
+
+Keep the extension the row's path already has: `FileType` / `sendFile()` derive the download MIME from it, and an unlisted extension throws rather than serving. `public/uploaded/*` is gitignored (only `index.php` + `web.config` tracked), so dummies never reach a diff. Worktree bootstrap mirrors gitignored paths from the main checkout, so anything planted in main's `public/uploaded/` follows into every future worktree; plant in the worktree to keep it local.
+
+CI4's phpunit environment roots uploads at `writable/uploaded-test` instead (`ENVIRONMENT === 'testing'`), so files planted for browser testing are invisible to the test suite and vice versa.
+
+## Feeding upload endpoints
+
+The same corpus is your upload payload. Browser path: hand the file input the absolute `exampleFiles` path (Claude in Chrome's `file_upload`). Direct curl against the worktree, with a session cookie:
+
+```bash
+curl -b "PHPSESSID=<id>" -F "userfile[]=@/Users/derek/eBacon/exampleFiles/example.pdf" \
+  "http://$DC_APP_HOST:$DC_APP_PORT/<controller>/<method>"
+```
+
+CI3 multi-upload reads `$_FILES["userfile"]` (array form) and re-keys each file to `singlefile` internally; CI4 `UploadLibrary::upload()` takes `UploadedFile`s off the request, field name per endpoint. Round-trip a success case by reading back the new `t_document` row and confirming the bytes landed at its `filePath`; for `rejected-example.*` expect a refusal, not a saved row.
+
+---
+
 # Closing out a code-change batch (ready for review)
 
 When you finish a batch of edits in a worktree and are handing back to the user for review, do this close-out so the user has everything they need to verify, the app reflects your changes and any SQL is built and pushed. Run only the parts the batch touched.
@@ -380,4 +417,5 @@ On "Refine the plan first", open the PLAN file in edit mode, ask what to change,
 - **Gitignored local config does not follow into new worktrees.** See Step 4.5; `database.php` missing or the `config.php` local patch absent is the first thing to check when a fresh worktree misbehaves.
 - **CI4 `/api/*` fatals with `require(/app/server/vendor/autoload.php): Failed to open stream`.** A fresh worktree has no `server/vendor/` — `viper-new-worktree.sh` doesn't provision it, and the `ci4` container's on-start `composer install` fails because `composer.lock` needs `ext-gd` (mpdf) + `ext-zip` (openspout), absent from the ci4 image (`docker compose logs ci4` shows the platform-req failure). Fix per Step 4.5 item 2: `cp -R /Users/derek/eBacon/Viper/server/vendor <worktree>/server/vendor`. The app (CI3) works without it; only migrated CI4 endpoints break, so this often surfaces mid-task the first time a migrated `/api` path is hit. Systemic fix is gd/zip in `.docker/local/ci4/Dockerfile`.
 - **Blast-radius gate is advisory + human-merge discipline, never auto-merge.** See "Closing out a code-change batch". The close-out gate classifies the change and gates the wrapup offer; it never merges. LARGE changes (SQL/auth/payroll) always stop for explicit human sign-off before anything proceeds.
+- **Existing `t_document` rows have no bytes locally.** Download/preview/PDF paths against prod-copied rows 404 or fatal until a dummy file is planted at `<worktree>/public/<filePath>`; stub corpus at `/Users/derek/eBacon/exampleFiles/`. See "Testing uploaded files".
 - **Customize this file freely.** It's your personal wrapper; you own it. The upstream Viper skill is the canonical thing and stays untouched.
