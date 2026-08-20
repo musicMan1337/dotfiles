@@ -32,6 +32,8 @@ The bundle contains:
 - `activeInvestigations` — `[{slug, content}]` already filtered to `Status: Active` (Step 2B)
 - `standupFiles` — all standup slugs for the Step 6 archive check
 
+The bundle does not cover the case-queue dashboard; that is Step 2F, a separate command.
+
 ## Step 1 — Check prior day's standup (BLOCKING)
 
 This step gates the entire briefing. Do NOT proceed to Step 2 until resolved. Use `yesterdayStandup` from the gather bundle, no extra read.
@@ -101,6 +103,22 @@ gh pr view <num> --repo tagemployerservices/Viper --json reviews,comments \
 ```
 Non-zero → handled, drop it. Zero → unhandled, keep it. Do NOT run `/dev:viper-dependabot` or audit/build anything here — just list the queue so it becomes a today item.
 
+### F. Case-queue dashboard Today section
+
+The `/dev:dashboard` skill maintains a focus set from the live Viper case queue, ordered by what unblocks the most downstream work. Read it, never re-derive it:
+
+```bash
+node ~/.claude/commands/dev/dashboard/today.mjs
+```
+
+Output is a `stamp:` line plus one bullet per focus item. Compare the stamp to `today` from Step 0:
+
+- Stamp is today: these are the day's real priorities. They lead the plan in Step 4.
+- Stamp is older: the dashboard is stale. Carry the items in anyway, marked with their stamp date, and offer to run `/dev:dashboard` first.
+- `(no dashboard Today section: ...)`: the file or its markers are missing. Note it and continue; do not block the briefing.
+
+Never query the case system directly here. The dashboard owns those queries, and duplicating them produces two sets of numbers that disagree.
+
 ## Step 3 — Present the briefing
 
 Show the user a structured summary. Do NOT include a Yesterday section — the user opens yesterday's notes themselves.
@@ -128,6 +146,14 @@ Show the user a structured summary. Do NOT include a Yesterday section — the u
 (or "None" if clear)
 ```
 
+Put the dashboard focus set first, above Open Follow-ups, since it is the ranked list:
+
+```
+## Dashboard Focus (stamped YYYY-MM-DD)
+- **Item title** why it is today's work
+(or note that the dashboard is stale or missing)
+```
+
 **Every PR MUST be a clickable markdown link.** Format: `[Repo #NUMBER](https://github.com/OWNER/REPO/pull/NUMBER)`. Use the PR's `html_url` from the `gh api` response — never write a bare `#123` or plain repo-number. This applies to both the presented briefing AND the written standup file.
 
 **Case system numbers MUST be clickable too.** Any Viper `caseid` in a Today bullet (or anywhere in the file) links as `[353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105)` (link the number), or in a header `**Case [353105](https://my.ebacon.com/index.php/viper/#caseSystem/353105) - description**`. Every case ID resolves to this URL by construction, so always link it. Same rule for artifacts/dashboards/other URLs: wrap in a markdown link when you have the URL, never paste it bare. Never fabricate a URL.
@@ -137,6 +163,7 @@ The **Open PRs** sections aren't necessarily TODO items — they're visibility b
 ## Step 4 — Draft today's plan
 
 Based on everything above, draft a "Today" section with planned bullets. Use judgment:
+- **Dashboard focus items (Step 2F) lead the plan**, in the order the dashboard set them. They are already ranked by downstream impact, so do not re-sort them against the other signals; those append below.
 - Overdue follow-ups become today items
 - PRs awaiting your review become today items
 - **Outstanding Dependabot PRs (Step 2E) become today items** — e.g. "Review N Viper Dependabot PRs (`/dev:viper-dependabot`)". Roll the queue into one bullet rather than one per PR unless the user wants them itemized.
@@ -194,6 +221,14 @@ EOF
 [unhandled Dependabot PRs from Step 2E — each as `[Viper #NUMBER](html_url) "Title" — opened Nd ago` — or "None". These are action items, also reflected in the Today plan.]
 ```
 
+Add one more reference section after Dependabot PRs:
+
+```
+## Dashboard Focus
+
+[focus items from Step 2F verbatim, with the stamp date. Note "stale, stamped YYYY-MM-DD" when the stamp is not today, or "None" when the dashboard is missing.]
+```
+
 **Every PR entry MUST be a clickable markdown link** using the PR's `html_url` from `gh api`. No bare `#123`.
 
 The empty `## Completed` section is preemptive — `/obsidian:standup-add` appends to it throughout the day instead of creating it.
@@ -225,3 +260,6 @@ Skip archiving if there are 10 or fewer files in `standup/` root.
 - **gh CLI failures:** If GitHub is unreachable, skip the PR sections and note it. Don't block the whole briefing.
 - **Open PRs are visibility, not action items.** Don't auto-promote every open PR to a TODO. Only PRs that need attention (review requested, changes requested, stale) should become Today items.
 - **Dependabot PRs ARE action items.** Unlike your own open PRs, unhandled Viper Dependabot PRs (Step 2E) always become a today bullet. But the briefing only *lists* them — it never runs `/dev:viper-dependabot`; that's Derek's call during the day.
+- **The dashboard is the ranking authority, not this skill.** Step 2F items arrive pre-ordered by downstream impact. Reordering them against follow-ups and PRs throws away the only judgment the dashboard adds.
+- **A stale dashboard still beats no dashboard.** An older stamp means the queue moved, not that the items are wrong. Carry them with the stamp date visible and offer `/dev:dashboard`; dropping them silently loses the day's priorities.
+- **Never re-query `dbo.cases` from the briefing.** Two sources for the same counts drift, and the dashboard's `queries.sql` is the single source of truth for them.
