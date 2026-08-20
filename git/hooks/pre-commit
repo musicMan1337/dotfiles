@@ -9,8 +9,9 @@ set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_lib.sh" 2>/dev/null || exit 0   # fail-open on our own breakage
 
-# Fail closed if any managed hook in this dir was replaced by a foreign install.
-[ -x "$DIR/_integrity.sh" ] && { "$DIR/_integrity.sh" check || exit 1; }
+# Self-heal if any managed hook here was replaced by a foreign install
+# (`lefthook install`). Repairs and continues rather than blocking the commit.
+[ -x "$DIR/_integrity.sh" ] && "$DIR/_integrity.sh" repair
 
 if [ "${ALLOW_EMDASH:-0}" != "1" ]; then
   hits="$(LC_ALL=C git diff --cached -U0 --diff-filter=ACM 2>/dev/null \
