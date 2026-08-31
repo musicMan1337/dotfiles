@@ -106,6 +106,12 @@ Name variants by the decision, not by a letter: "Sailor Moon Monday, 4 Kansai da
 
 Cap it at four. More than that means an earlier stage was left unsolved.
 
+### The challenger
+
+Once the user picks one, the useful next variant is not a fifth sample of the space. It is a **challenger**: hold every settled decision fixed, find the chosen variant's weakest structural point, and build the one variant that removes it.
+
+Weak points are structural, not aesthetic. Look for a split day (travel plus activity) that ends on a hard anchor, a want seated only because the route happened to pass it, a block ordering nobody chose deliberately, an avoidable hotel change. State what the challenger spends to buy the fix, then reduce the comparison to the single question that separates them. A challenger that loses cleanly is worth as much as one that wins: it converts a preference into a checked decision.
+
 ## Ledger
 
 Every variant gets scored against every rule and anchor, as a table, before any prose:
@@ -137,4 +143,5 @@ The ledger renders as a real table, the variants as tabs, and each day carries i
 - **"Once each way" is not "one crossing".** Confirm the count. Pass-through transfers are a separate question from stays; ask whether changing trains in a region counts as being there.
 - **Cutting content is a decision, not a side effect.** When a variant has no room for a cluster, name the cut in the ledger. A cluster that quietly vanishes between variants is the thing the user notices last and minds most.
 - **A whiteboard dump is a want list, not a cluster list.** Items arrive grouped by city, but days are built from things walkable from one station. Regroup by geography before counting days, or a city that looks like one day turns out to be three.
+- **A settled decision is not a solved trip.** Picking a variant fixes the shape and leaves the ordering inside each block wide open, and that ordering is where split days and hotel churn hide. Re-solve inside the block after the shape is chosen.
 - **The trip file drifts.** After the user accepts a change, write it to `## Decided` with the reason. Otherwise the same tradeoff gets re-argued next session from scratch.
