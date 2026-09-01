@@ -7,7 +7,9 @@ description: Plan a multi-day trip as a staged constraint solve, macro first. Fr
 
 The deliverable is a **schedule you can defend**, not a pretty day list. Every day in the output traces back to a stated constraint, and every stated constraint has a visible verdict against every variant.
 
-Sibling skill: `vacation:flights` books the getting-there. This one spends the days.
+Sibling skills: `vacation:flights` books the getting-there, and `vacation:plan-optimizer` verifies a finished plan against real hours and timetables before anything is booked. This one spends the days.
+
+Estimates are fine here. The optimizer is what turns them into facts, so record a leg or an opening time as an estimate and move on rather than stopping to research it mid-solve.
 
 ## Trip file
 
