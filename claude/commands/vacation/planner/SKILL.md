@@ -28,6 +28,8 @@ Read it before doing anything. It is the single source of truth for the frame, t
 
 When the user states something new, write it into the file **before** re-solving. A constraint that only lived in the conversation is gone next session.
 
+`references/output-example.md` is a worked solve: what the finished page contains, and the specific ways one long session got it wrong.
+
 ## The stages
 
 Run them in order, macro to granular. Do not start a stage until the previous one's criterion is met; a day-level plan built on an unsolved region shape is wasted work.
@@ -59,7 +61,9 @@ Anything time-locked. Each anchor needs four fields, and the third and fourth ar
 
 Note weight where the user gave one (a birthday, a booked ticket). Weight breaks ties in stage 4; it does not make a soft anchor hard.
 
-**Criterion:** every anchor has all four fields, and every multi-day span is written as a span.
+Before sizing anything, ask which named wants are the same event. Lists collect names, not identities: a venue and the thing happening in it arrive as two lines, and scheduling both double-counts the demand and makes a day look fuller than it is. The tell is two entries that would each need the same slot.
+
+**Criterion:** every anchor has all four fields, every multi-day span is written as a span, and no two entries name the same event.
 
 ### 3. Rules
 
@@ -88,7 +92,11 @@ Fill blocks with clusters. A **cluster** is content grouped by geography, not by
 
 A crossing day is not a full day. Charge its transit hours to one side and plan the remainder honestly.
 
-**Criterion:** every want in the trip file is either placed on a day or listed as cut, with nothing silently dropped.
+**Look up what a place *is* before giving it a slot.** A name implies a category and the implication is often wrong: something that reads like a daytime museum can be an evening hall with kitchens, which makes it dinner rather than a stop. Category decides which part of a day a want can occupy, and getting it wrong can survive all the way to a finished plan. On this skill's first real trip it reordered the entire second half.
+
+**Closing times order the day, not travel time.** Markets, shrine offices, castle grounds and winter sunset pin a cluster far harder than the twenty minutes between two stations. Collect the closing time for anything that sells or admits, and treat the earliest one as the day's spine.
+
+**Criterion:** every want in the trip file is either placed on a day or listed as cut, with nothing silently dropped, and every want that can close has its closing time recorded.
 
 ### 6. Clock
 
@@ -126,6 +134,8 @@ Three verdicts only: **pass**, **strain**, **break**. A `break` on a hard rule d
 
 Then one recommendation, in two sentences, naming what it trades away.
 
+**Check the prose against the schedule before shipping it.** Every number outside the day cards (longest day, wants seated, hours per day, how many of a thing) is derived, so it goes stale the moment a day moves and no one notices. Compute those claims from the schedule data rather than recalling them, and re-derive after every edit. This is where a plan quietly starts lying about itself.
+
 ## Render
 
 Write a self-contained HTML file to `~/.claude/vacation/trips/<slug>/schedule.html` and print the path. Do not open it.
@@ -144,6 +154,9 @@ The ledger renders as a real table, the variants as tabs, and each day carries i
 - **Cutting content is a decision, not a side effect.** When a variant has no room for a cluster, name the cut in the ledger. A cluster that quietly vanishes between variants is the thing the user notices last and minds most.
 - **The want list arrives in layers, and stage 5 on a partial list is wasted.** A second photo, a draft schedule, a "here's everything we wanted" list will land later and it will carry named hotels, named meals, and sub-attractions the first list compressed into one line. Before assigning days, ask what other lists exist. A variant set built on layer one is not merely incomplete, it is unfalsifiable: it satisfies every constraint it knows about.
 - **Named lodging and named meals are wants, not filler.** A generic "check in" or "lunch" row silently drops a ryokan, a themed hotel, or a dish someone picked the city for. If the source names it, schedule it by name.
+- **The traveller's reordering usually beats yours.** They know which things are worth the walk. When they propose a different order, price it before defending the current one; on this skill's first trip a suggested inversion removed half an hour of backtracking that had been designed in.
+- **An inherited itinerary is a want list of unknown provenance.** A document handed over at the start carries entries that came from nobody's list, including places that are only the district a hotel already sits in. Diff any starting plan against the actual sources and cut what neither one asked for.
+- **Evidence for a reading is not a settled reading.** Two sources can point the same way and still both be the traveller's own shorthand. Say what the evidence supports, then ask; a wrong "this settles it" nearly deleted a real want here.
 - **A whiteboard dump is a want list, not a cluster list.** Items arrive grouped by city, but days are built from things walkable from one station. Regroup by geography before counting days, or a city that looks like one day turns out to be three.
 - **A settled decision is not a solved trip.** Picking a variant fixes the shape and leaves the ordering inside each block wide open, and that ordering is where split days and hotel churn hide. Re-solve inside the block after the shape is chosen.
 - **The trip file drifts.** After the user accepts a change, write it to `## Decided` with the reason. Otherwise the same tradeoff gets re-argued next session from scratch.
