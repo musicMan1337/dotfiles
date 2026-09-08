@@ -31,5 +31,10 @@ if [ "${ALLOW_EMDASH:-0}" != "1" ]; then
   fi
 fi
 
-# Passed our check: run the repo's own pre-commit if it has one.
+# Staged-diff secret-pattern scan (shaped secrets only; escape hatch ALLOW_SECRET=1).
+if [ -x "$DIR/secret-scan.sh" ]; then
+  "$DIR/secret-scan.sh" || exit 1
+fi
+
+# Passed our checks: run the repo's own pre-commit if it has one.
 chain_local_hook pre-commit "$@"
