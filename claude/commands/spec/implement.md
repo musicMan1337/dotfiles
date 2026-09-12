@@ -68,4 +68,5 @@ Continue to the next wave until all sections are implemented.
 - **No partial commits**: commit once per wave, after the wave is fully done, never mid-wave
 - **Stay in lead role**: if you find yourself writing implementation code, stop and delegate to a sub-agent instead
 - **Handle blockers**: if a sub-agent reports an error or ambiguity, resolve it before spawning dependent waves
+- **Log decisions live**: keep a `## Decisions` section in the spec (or plan file) and append one line (what was ambiguous / what was chosen / why) every time an ambiguity is resolved or the plan is deviated from; never resolve silently. (scaffold: patches silent ambiguity resolution in long implementations; added 2026-09; retest when wrapup shows unprompted deviation reporting)
 - **Haiku for gathering**: any time you need to search files, explore code, or gather context, spawn Haiku sub-agents (`model: "haiku"`) — never do exploratory searching yourself

@@ -387,7 +387,7 @@ Ask the user (numbered options, per global rule):
 2. Refine the plan first
 3. Stop
 
-On "Start coding", begin executing the plan tasks directly. Use TaskCreate to track milestones if the work has multiple discrete steps. Otherwise just start. When you finish a batch and hand back, run the "Closing out a code-change batch (ready for review)" checklist (frontend build + URL, SQL via `/dev:sql`, summary).
+On "Start coding", begin executing the plan tasks directly. Append to a `## Decisions` section in `PLAN_<slug>.md` on every ambiguity resolved or deviation, per the live decision log rule in `spec:implement`. Use TaskCreate to track milestones if the work has multiple discrete steps. Otherwise just start. When you finish a batch and hand back, run the "Closing out a code-change batch (ready for review)" checklist (frontend build + URL, SQL via `/dev:sql`, summary).
 
 On "Refine the plan first", open the PLAN file in edit mode, ask what to change, write the changes, then re-confirm.
 

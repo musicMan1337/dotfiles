@@ -80,7 +80,7 @@ If creating new:
   - Skill-level rules → `.claude/rules/<topic>.md` if that pattern is in use.
   - Component README → at the component root, not at repo root.
   - Repo-wide agent rules → `CLAUDE.md` at repo root (but prefer Branch A's "update existing" if one already exists).
-- Match file's voice and density: CLAUDE.md is terse, ADRs are structured (Context / Decision / Consequences), READMEs vary by repo.
+- Match file's voice and density: CLAUDE.md is terse, ADRs are structured (Context / Decision / Consequences / Enforcement / Revisit if), READMEs vary by repo. When the repo's existing ADR scheme allows frontmatter, carry `enforced_by` (the test, lint rule, or hook file that enforces the decision) and `touches` (path globs the decision governs).
 
 If consolidating, write the merged doc to the most appropriate existing path (usually the canonical/root-most one) and plan to delete the others in Step 5.
 
@@ -127,6 +127,7 @@ After approval:
 - **Consolidate over create.** Two short docs on the same topic age worse than one comprehensive doc. Future agents reading both will get conflicting signals when one drifts.
 - **Don't create CLAUDE.md duplicates.** A repo should have at most one CLAUDE.md at root and (rarely) one per major sub-project. If you're about to create a second CLAUDE.md anywhere in the tree, the user almost certainly wanted to add to the existing one.
 - **ADRs are append-only.** When the user wants to record a decision that supersedes an old one, create a new ADR that references and supersedes the old — never edit the old ADR's decision section. The "Status" header is the right knob (Accepted → Superseded by ADR-NNNN).
+- **An ADR with no `enforced_by` is a wish.** If nothing mechanical enforces the decision, say so in Enforcement and name what would. (scaffold: patches ADRs written as prose wishes with no enforcement pointer; added 2026-09; retest when generated ADRs carry enforcement unprompted)
 - **Plans/specs in flight are contracts.** If a phase has a PLAN.md and the user wants to add "more plan content," it's a deviation note, not a rewrite. Prefer adding to an existing section over restructuring.
 - **READMEs at repo root serve humans first.** Don't dump agent-only conventions into the top-level README. That's CLAUDE.md territory.
 - **If creating a skill, redirect to `/skill-creator`.** That's a different beast — it has structure (frontmatter, trigger phrases, gotchas section) this command won't enforce.

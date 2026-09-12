@@ -44,6 +44,7 @@ Rung 4 is usually one small script that imports the same dependency the app ship
 - **Viper monorepo.** A changed package export crosses component boundaries, and CI hard-fails on an undeclared internal workspace dep.
 - **Wire shapes.** A renamed field in a JSON response has consumers that no TypeScript reference finds.
 - **Jobs and schedules.** Cron, queue consumers, and CI workflows call code that no application path calls.
+- **Incident history.** Past postmortems live in the Obsidian vault under `incidents/YYYY-MM-DD_<slug>.md`; search them for the touched paths with `node ~/.claude/commands/obsidian/_lib/vault-cli.mjs search "<path or symbol>" --path incidents` before sizing the radius. An empty result is an answer; say so.
 
 ## Output
 

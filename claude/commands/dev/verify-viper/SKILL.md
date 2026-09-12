@@ -77,6 +77,8 @@ Report the actual verdict per spec. A pass is a fact about the assertions in tha
 
 `tests/integration/rendering/` is the map, and it is the source of truth: reading it costs one `ls` and it cannot go stale. Surfaces currently covered: scheduler, employee screen, quotes, prime, job site, sidewinder, company menu, case system, dashboard, kb, payroll, system menu, report viewer. Domain flows: `tests/integration/domains/` (human resources case system).
 
+First read the diff and list every user-reachable path it adds or alters; map each to a spec or a Chrome drive, and name the undriven ones in the report. (scaffold: patches happy-path-only verification; added 2026-09; retest when reports list undriven paths unprompted)
+
 A change to a surface with a spec gets that spec run. A change to a surface with no spec gets a Chrome drive plus a recording, and the missing spec named in the report as a coverage gap.
 
 ## Cleanup

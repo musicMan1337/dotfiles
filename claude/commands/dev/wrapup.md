@@ -58,6 +58,8 @@ Inside a Viper worktree (`pwd` under `/Users/derek/eBacon/Viper/.worktrees/`): i
 
 One short block: branch, new commit hash(es), PR URL, case-note status (posted to the case via the PR pragma with the run/confirmation link, or the printed sentence for non-Viper), standup status, cleanup status. No prose recap beyond that.
 
+- Surface the plan file's `## Decisions` section verbatim so the human picks small correction vs rebuild; a long list of deviations is the signal a v2 is worth its cost.
+
 ## Gotchas
 
 - **Sequencing is the point.** Do not parallelize the steps; commit must land before push, push before PR.

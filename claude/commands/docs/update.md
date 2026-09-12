@@ -80,6 +80,7 @@ For each target file, produce a minimal patch:
 - Match the file's existing voice and density (CLAUDE.md is terse, plans/specs are more detailed)
 - For CLAUDE.md additions: one line each, lead with the rule, follow with the why only if non-obvious
 - Before adding a line anywhere, apply the no-op test from `augment:skill-creator`: if it does not change behavior versus the model's default, it is sediment, not a rule. Run new prose through `writing:unslop`
+- Before adding a prose rule for a mistake that is mechanically checkable, check whether a lint rule, test, or hook already enforces it or could; propose that instead (`setup:linting` owns the lint side). (scaffold: patches stacking prose rules for mistakes a linter would catch; added 2026-09; retest when docs:update runs volunteer the lint alternative unprompted)
 - For human-facing docs, hold the edit to the file's existing Diataxis mode (`~/dotfiles/claude/references/technical-writing.md`); a reference table dropped into a tutorial is drift even when every line is true
 - Use `Edit` (not `Write`) so the diff is auditable
 - If removing stale content, show it explicitly in the diff preview

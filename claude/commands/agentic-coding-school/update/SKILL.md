@@ -88,4 +88,7 @@ Append one row per mined video to `ledger.md`, rejects included, since rejects a
 - A version-specific claim in a transcript can be stale in either direction. The nested-spawn depth default went 5, then 1 in v2.1.217, then 3 in v2.1.219, so a video recorded inside that window states a live-sounding fact that was wrong two versions later. Check version claims against the docs (`claude-code-guide` agent), not the local binary: it is packed, and even a known-real env var greps zero, so a local miss proves nothing.
 - `get_video` in the main session burns a lot of context per call. Keep transcripts inside miners; the only exception is a single video the user names directly.
 
+- Ledger rows must carry the class slug and the title exactly as `list_videos` prints it, and the drop step matches on both: the course reuses titles across classes (`Feedback Channels` exists in `loopy-ai` and `slack-agents`) and a paraphrased title (`Example: Automated Maintenance` vs `Automated Maintenance`) slips through and gets re-mined.
+- A skill NAME in the miner's inventory does not stop a re-proposal of the technique inside its body (`harness:model-upgrade` step 2 already was the A/B retest a miner proposed as new). For the 2 to 3 skills nearest each shortlisted video, hand miners the one line that encodes the technique, not just the name.
+
 Add whatever misfires on a run as a new gotcha here.
