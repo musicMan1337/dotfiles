@@ -44,4 +44,4 @@ Recorded so `harness:model-upgrade` does not keep re-litigating them.
 - **exhaust-the-design-space.** Covered by the arena and judge-panel patterns in the Workflow tool.
 - **foundational-thinking**, **experience-first**, **outcome-oriented-execution**, **migrate-callers-then-delete-legacy-apis.** Either default behavior at this tier or a per-project call, not a standing rule.
 
-(scaffold: patches the model's tendency to reach for the locally convenient shape, a lock, a nil-check guard, a boolean pair, a hand-run edit, instead of the structure that makes the failure unrepresentable; added 2026-08; retest when a model volunteers the sum type, the eliminated shared write target, and the rerunnable script without being asked)
+(scaffold: patches the model's tendency to reach for a lock instead of eliminating the shared write target; added 2026-08; narrowed 2026-09, when the sum type, the structural fix over a nil-check guard, and the rerunnable verification script all came unprompted and only "Separate before serializing shared state" did not; retest when a model checks whether the actors need the same mutable object at all before reaching for a lock)

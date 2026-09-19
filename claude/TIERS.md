@@ -19,6 +19,12 @@ Where assignments live:
 
 Maintenance rule (re-measure trigger): tier ASSIGNMENTS are a price/capability
 snapshot. On each new model generation, re-check the two dated assumptions:
-(1) price ratios between tiers (~30x haiku-to-opus as of 2026-07); (2) which
-task classes the cheap tier now handles well (each generation moves tasks down
-a tier). Do not encode per-task model rationale prose anywhere else; it rots.
+(1) price ratios between tiers; (2) which task classes the cheap tier now
+handles well (each generation moves tasks down a tier). Do not encode per-task
+model rationale prose anywhere else; it rots.
+
+Measured 2026-09 (per MTok, input/output): opus $5/$25, sonnet $2/$10, haiku
+$1/$5. Haiku-to-opus is 5x, not the ~30x that held in 2026-07, and sonnet-to-opus
+is 2.5x. Tier routing no longer pays for itself on price alone at small volumes;
+the standing reason to delegate is context hygiene (see "Subagent Strategy" in
+CLAUDE.md), and the cheap tiers earn their place on high-volume fan-out.

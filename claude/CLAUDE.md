@@ -26,7 +26,7 @@ Conventional Commits, terse; the format spec lives in `/git:commit`, which is th
 
 # Working Defaults
 
-- **Bug reports: investigate first.** When I report a bug, paste an error, or describe broken behavior, the deliverable is root cause + proposed fix, NOT a code change. Do not edit code until I ask for the fix (exception: I explicitly said to fix it up front, e.g. "fix the bug yourself"). When the bug plausibly repeats (a shape that could exist elsewhere in the codebase), sweep for the same shape before proposing, and hand me options ranked least-to-most invasive with a recommendation, not one fix scoped to the reported symptom. A fix that is a timeout, threshold, retry, or magic-number change with no explained mechanism is not a root cause: state ranked hypotheses plus the instrumentation or repro that discriminates them before proposing it. (scaffold: patches the model's habit of fixing at exactly the altitude of the report and confident parameter-bump patches that hide root cause; added 2026-08; refreshed 2026-09; retest when a model volunteers the same-class sweep and the ladder unprompted or declines to propose a bump unprompted)
+- **Bug reports: investigate first.** When I report a bug, paste an error, or describe broken behavior, the deliverable is root cause + proposed fix, NOT a code change. Do not edit code until I ask for the fix (exception: I explicitly said to fix it up front, e.g. "fix the bug yourself").
 - **Nothing is "done" until it's exercised.** A new config value must be shown to be consumed by the code that reads it; a new script must run once cleanly; a new endpoint must be hit. Run /verify for nontrivial changes before declaring completion. "I wrote it" is not "it works." For a web UI change, drive the flow in the Claude Chrome profile and keep the `gif_creator` recording as the evidence.
 - **Never assert DB behavior from inference.** If a SQL MCP is connected, check the actual schema/sproc/data before claiming how the database behaves or writing queries against guessed column names.
 - **Generated files: print the path, nothing else.** When you generate a scratchpad/output file (HTML, report, export), print its absolute path and stop. Never auto-open a browser or app; I open files myself via URL or file explorer.
@@ -56,7 +56,7 @@ Non-negotiable:
 - **Report tests as what they are.** "18/18 green" is a fact about 18 cases; never restate it as "verified correct".
 - If you can neither build the argument nor see the refactor, say exactly that, plus what you would need to check. An honest gap beats a confident wrong claim.
 
-(scaffold: patches the model's habit of declaring code correct from surface plausibility or a passing test run rather than an argument over the whole input space; added 2026-08; retest when a model volunteers invariants/preconditions and flags unprovable code unprompted)
+(scaffold: patches the model's habit of declaring code correct from surface plausibility or a passing test run rather than an argument over the whole input space; added 2026-08; refreshed 2026-09, when a bypassed run volunteered a randomized differential test and scoped its own claim honestly but still named no invariant, no termination argument, and no verdict; retest when a model volunteers invariants/preconditions and flags unprovable code unprompted)
 
 # Code Comments: default to NONE
 
@@ -77,7 +77,7 @@ What clears the bar: a non-obvious invariant or precondition, a load-bearing got
 
 Applies to app code, skills, hooks, scripts, and SQL alike. Removing existing verbose comments is fine when the change already touches those lines; no drive-by comment purges.
 
-(scaffold: patches the model's strong prior toward multi-paragraph explain-then-justify comment blocks on every nontrivial hunk, and toward reviewer-facing narration of the diff inside the source; added 2026-08; retest when a model's default diff ships comment-free unless the code cannot express the constraint)
+(scaffold: patches the model's strong prior toward multi-paragraph explain-then-justify comment blocks on every nontrivial hunk, and toward reviewer-facing narration of the diff inside the source; added 2026-08; refreshed 2026-09, when a bypassed run shipped 23 comment lines on one function, JSDoc on an internal helper, and the explain-then-justify block; retest when a model's default diff ships comment-free unless the code cannot express the constraint)
 
 # Subagent Strategy
 
