@@ -106,6 +106,10 @@ foreach ($subdir in @("hooks", "commands", "scripts", "agents")) {
     }
 }
 
+# No Sophos CryptoGuard on this Windows box: disable the subagent concurrency gate (claude/hooks/subagent-gate.js).
+# User-scope env var; takes effect in terminals opened afterward.
+[Environment]::SetEnvironmentVariable("SUBAGENT_GATE_OFF", "1", "User")
+
 # Start-Process to keep the window open at the end
 function KeepWindowOpen {
     Write-Host "======================================================================="
