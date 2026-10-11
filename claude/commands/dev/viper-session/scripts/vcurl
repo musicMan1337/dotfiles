@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# vcurl - authenticated request to production Viper using the stored PHPSESSID.
+#
+#   vcurl [--dry-run] [--json] <VERB> <path-after-index.php> [key=value ...]
+#
+#   vcurl GET  rest/caseREST/case CaseID=359706 Client=TAGClient
+#   vcurl POST rest/notes/enhancedNote itemType=Case item=359706 client=TAGClient note='text'
+#
+# Bodies are form-encoded on purpose: CI3's REST_Controller reads $_POST (which PHP
+# fills only for form-encoded bodies) and, for PUT, skips parse_str entirely when the
+# content-type matches a "supported format" like application/json. A JSON body makes
+# every $this->post()/put() return false, so the endpoint silently writes nothing.
+set -euo pipefail
+
+BASE="${VIPER_BASE:-https://my.ebacon.com}"
+COOKIE_FILE="${VIPER_COOKIE_FILE:-$HOME/.cache/viper/session}"
+DRY=0
+FORCE_JSON=0
+
+while [[ $# -gt 0 && "$1" == --* ]]; do
+    case "$1" in
+        --dry-run) DRY=1; shift ;;
+        --json)    FORCE_JSON=1; shift ;;   # escape hatch; breaks $this->post(), see above
+        --help|-h) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) echo "unknown flag: $1" >&2; exit 2 ;;
+    esac
+done
+
+[[ $# -ge 2 ]] || { echo "usage: vcurl [--dry-run] <VERB> <path> [key=value ...]" >&2; exit 2; }
+
+VERB="$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')"; shift
+PATH_PART="${1#/}"; shift
+URL="$BASE/index.php/$PATH_PART"
+
+if [[ $DRY -eq 1 ]]; then
+    printf 'DRY RUN, nothing sent\n  %s %s\n' "$VERB" "$URL"
+    for kv in "$@"; do printf '    %s\n' "$kv"; done
+    [[ $# -eq 0 ]] && printf '    (no fields)\n'
+    [[ -s "$COOKIE_FILE" ]] || printf '  note: no session stored yet at %s\n' "$COOKIE_FILE"
+    exit 0
+fi
+
+[[ -f "$COOKIE_FILE" ]] || {
+    echo "No session at $COOKIE_FILE. Ask Derek for a fresh PHPSESSID, then:" >&2
+    echo "  mkdir -p ~/.cache/viper && chmod 700 ~/.cache/viper" >&2
+    echo "  printf '%s' '<PHPSESSID>' > $COOKIE_FILE && chmod 600 $COOKIE_FILE" >&2
+    exit 3
+}
+PERMS="$(stat -f '%Lp' "$COOKIE_FILE" 2>/dev/null || stat -c '%a' "$COOKIE_FILE")"
+[[ "$PERMS" == "600" ]] || { echo "Refusing to use $COOKIE_FILE: mode $PERMS, expected 600." >&2; exit 3; }
+SESSION="$(cat "$COOKIE_FILE")"
+[[ -n "$SESSION" ]] || { echo "Cookie file is empty." >&2; exit 3; }
+
+ARGS=()
+if [[ $FORCE_JSON -eq 1 ]]; then
+    BODY="{"; SEP=""
+    for kv in "$@"; do
+        BODY+="$SEP\"${kv%%=*}\":\"${kv#*=}\""; SEP=","
+    done
+    BODY+="}"
+    ARGS+=(-H "Content-Type: application/json" --data-raw "$BODY")
+else
+    for kv in "$@"; do
+        if [[ "$VERB" == "GET" || "$VERB" == "DELETE" ]]; then
+            ARGS+=(--get --data-urlencode "$kv")
+        else
+            ARGS+=(--data-urlencode "$kv")
+        fi
+    done
+fi
+
+RESP="$(mktemp)"; trap 'rm -f "$RESP"' EXIT
+CODE="$(curl -sS -o "$RESP" -w '%{http_code}' -X "$VERB" \
+    -H "Cookie: PHPSESSID=$SESSION" -H 'Accept: application/json' \
+    ${ARGS[@]+"${ARGS[@]}"} "$URL")"
+
+printf '%s %s -> HTTP %s\n' "$VERB" "$URL" "$CODE"
+
+BYTES="$(wc -c < "$RESP" | tr -d ' ')"
+HEAD="$(head -c 200 "$RESP")"
+
+if [[ "$BYTES" == "0" ]]; then
+    case "$CODE" in
+        401|403) echo 'Empty 401/403: the PHPSESSID is expired or invalid. Ask for a fresh one.' ;;
+        204)     echo '(204, no content)' ;;
+        *)       echo '(empty body)' ;;
+    esac
+    exit 0
+fi
+
+if printf '%s' "$HEAD" | grep -qiE '<(!doctype|html)\b'; then
+    case "$CODE" in
+        404) echo 'CI3 404 page: no such controller or method. Check the path and that case-system routes need the rest/ prefix.' ;;
+        401|403) echo 'Login page: the PHPSESSID is expired or invalid.' ;;
+        *)   echo 'HTML, not JSON. Usually the login page (expired session) or a CI3 error page.' ;;
+    esac
+    printf '  %s...\n' "$(printf '%s' "$HEAD" | tr -d '\n' | head -c 160)"
+    exit 0
+fi
+
+python3 -m json.tool < "$RESP" 2>/dev/null || cat "$RESP"
