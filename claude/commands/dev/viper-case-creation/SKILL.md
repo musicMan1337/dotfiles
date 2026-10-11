@@ -80,6 +80,7 @@ e.g. `'Q3 2026'` → `1159`. **If the lookup returns NULL, leave `@MilestoneId` 
 
 - `Item` = the parent (project) `CaseID` as a varchar; `ItemType = 'Case'`. **This is the only parent link that exists.**
 - `AssignedTo`, `Priority` ∈ {Low, Medium, High, Urgent}, `Status` (use `'To Do'`), `Category`, `Tags`.
+- Audit columns are `CreatedBy` (varchar) and `CreatedOn` (datetime, defaults to `getdate()`); there is NO `Creator` / `DateCreated` on this table (verified `describe_table` 2026-08-27). Also has a nullable `Client`.
 - `LinkedCaseId` + `LinkedCaseTitle` link the todo to a case. **A raw INSERT bypasses the app's `#<caseid>` text-parser, so set `LinkedCaseId` / `LinkedCaseTitle` columns directly.** Also put `#<caseid>` in the Title for display, but the columns are what actually create the link.
 - **Planning columns live here, not on the case** (all missing from the auto-generated knowledge doc; verified by `describe_table` 2026-08-11): `StartDate` + `DueDate` (`date`), `SortOrder` (`int`, 0-based **within a category**), `Effort` (`varchar(50)`), `Dependencies` (`varchar(max)`, free text), plus `CompletedBy`, `CompleteDate`, `VoidDate`, `FolderId`, `LinkedDocumentId`. A schedule belongs on the todos; `cases.DueDate` is a single date with no start, effort, or ordering.
 - `Effort` is NULL on every todo of the most recent project, so there is no in-use vocabulary. If you write it, say so in the script header so the user can drop it if the app expects an enum.

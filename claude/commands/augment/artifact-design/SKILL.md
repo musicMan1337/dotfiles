@@ -62,25 +62,33 @@ Reference **semantic tokens** (`--mm-*`) in your rules, never the raw
 5. **Off-grid spacing as a human tell.** Prefer the `--mm-space-*` scale
    (5/9/14/22/35…), not a mechanical 8px grid. Asymmetric section padding (e.g.
    more top than bottom) reads as authored.
-6. **Color discipline (OKLCH).** Clay = primary interactive. Moss = brand, **not
+6. **Page width scales with the screen.** The reading measure caps *prose* (68ch),
+   not the page. Build the shell as
+   `width: min(100% - 2 * var(--mm-page-pad), var(--mm-page-max))` (tokens in
+   `mammoth.css`: 1720px max, fluid side padding) and let tables, grids, code
+   cards, diagrams and dashboards fill it. **Never hard-code a 900-1100px
+   `.wrap`**; that was the habitual constraint and it wastes most of a 27-32"
+   monitor. Where a prose-only page wants a narrower column, cap the *text
+   block* with `--mm-measure`, not the shell.
+7. **Color discipline (OKLCH).** Clay = primary interactive. Moss = brand, **not
    success**. Feedback colors (sage/amber/ember/slate) are for feedback only.
    Slate is deliberately the only cool tone, reserved for info.
-7. **Motion is per-property, never `transition-all`.** `--motion-easing-standard`
+8. **Motion is per-property, never `transition-all`.** `--motion-easing-standard`
    `cubic-bezier(0.2,0,0,1)` is the workhorse (not `ease-in-out`). Entrances get
    playful overshoot (`--motion-easing-emphasized`); exits are decisive, no
    bounce (`--motion-easing-exit`). Opacity always tweens. One orchestrated
    moment beats scattered effects. Respect `prefers-reduced-motion` (already in
    `mammoth.css`).
-8. **The single weird texture.** Pick ONE signature detail and apply it
+9. **The single weird texture.** Pick ONE signature detail and apply it
    consistently: the hard-offset shadow (`--mm-shadow-hard`), a dotted hover
    border, or a subtle grain. Use it on one element type. Don't also pile on soft
    shadows. This fingerprint is what makes the page unmistakable.
-9. **Design the dead zones.** Empty / error / loading / zero states get real
+10. **Design the dead zones.** Empty / error / loading / zero states get real
    copy and personality, not a spinner. Personality lives in the structural gaps.
-10. **Icons (if any): Phosphor-style, light weight.** ~1–1.5px stroke at 24px,
+11. **Icons (if any): Phosphor-style, light weight.** ~1–1.5px stroke at 24px,
     round caps/joins, `currentColor`, editorial metaphors. Generate decorative
     graphics with Canvas, not hand-authored SVG paths.
-11. **Every word on the page runs through `writing:unslop`.** Invoke that skill
+12. **Every word on the page runs through `writing:unslop`.** Invoke that skill
     and write the copy clean as you draft it. Design tokens defeat the visual
     tell; unslop defeats the prose tell. Both or neither.
 
@@ -200,6 +208,7 @@ turn:
 - [ ] Inlined `mammoth.css` into the artifact `<style>`
 - [ ] All colors via `--mm-*` tokens; accent ≤5% of the view
 - [ ] Serif display + humanist sans; `text-wrap: balance` on headings; 68ch measure
+- [ ] Shell width from `--mm-page-max` / `--mm-page-pad` (no hard-coded ~1000px wrap); only prose capped at the measure
 - [ ] Per-property transitions on the standard easing; reduced-motion respected
 - [ ] One signature texture, applied consistently
 - [ ] Theme toggle button (pill, top of masthead) + flip script before `</body>`

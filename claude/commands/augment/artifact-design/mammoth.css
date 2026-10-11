@@ -385,8 +385,13 @@
   --mm-leading-heading: 1.2;
   --mm-leading-body: 1.6;
 
-  /* Reading measure */
+  /* Reading measure: caps PROSE, never the page shell */
   --mm-measure: 68ch;
+
+  /* Page shell: width: min(100% - 2 * var(--mm-page-pad), var(--mm-page-max)).
+     Tables, grids, code and dashboards fill it; a ~1000px wrap wastes large screens. */
+  --mm-page-max: 1720px;
+  --mm-page-pad: clamp(18px, 3vw, 56px);
 
   /* Off-grid spacing (5/9/14/22... breaks the mechanical 4/8 grid on purpose) */
   --mm-space-3xs: 5px;

@@ -71,7 +71,7 @@ Print the file path and what changed: counts that moved, cases that closed, case
 
 ## Publishing
 
-The page is a private artifact, not a local file, once published; publishing is his call, so offer it as a numbered option and wait. On a redeploy pass the existing artifact URL so it updates in place instead of claiming a new one, and keep the title and favicon stable across runs. Register or update the row in the Obsidian artifacts manifest on any publish, per `augment:artifact-design`.
+Publish (or redeploy) every refresh without asking first, then report what changed in chat afterward. On a redeploy pass the existing artifact URL so it updates in place instead of claiming a new one, and keep the title and favicon stable across runs. Register or update the row in the Obsidian artifacts manifest on any publish, per `augment:artifact-design`.
 
 ## Gotchas
 
