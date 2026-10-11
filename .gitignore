@@ -19,4 +19,4 @@ artifacts/
 # repo); this pattern is a belt-and-suspenders guard in case a copy is dropped in.
 attacksurface.md
 attacksurface.*
-**/attacksurface.md
+**/attacksurface.md.playwright-mcp/
