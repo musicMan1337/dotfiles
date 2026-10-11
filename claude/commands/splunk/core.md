@@ -2,7 +2,7 @@
 name: splunk:core
 description: Fetch Core API logs (GCP Cloud Run → Splunk HEC sink) from Splunk. Triggers on: core logs, core api logs, coreapi logs, core errors, gcp logs, cloud run logs, trace through core
 model: haiku
-allowed-tools: mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query, ToolSearch
+allowed-tools: mcp__splunk-direct__splunk_run_query, ToolSearch
 ---
 
 ## What "Core" is here
@@ -29,7 +29,7 @@ index=gcp_app_log sourcetype=gcp_sink_coreAPI
 
 ## Tool to use
 
-Call `mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing — that information is right here.
+Call `mcp__splunk-direct__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing; that information is right here.
 
 ## Field structure (Serilog → jsonPayload)
 

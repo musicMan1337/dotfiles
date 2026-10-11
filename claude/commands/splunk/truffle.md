@@ -2,7 +2,7 @@
 name: splunk:truffle
 description: Fetch Truffle (HashiCorp Vault POC) audit logs from Splunk. Triggers on: truffle logs, vault audit, vault logs, truffle audit, what did truffle do
 model: haiku
-allowed-tools: mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query, ToolSearch
+allowed-tools: mcp__splunk-direct__splunk_run_query, ToolSearch
 ---
 
 ## What "Truffle" is
@@ -30,7 +30,7 @@ Pin the time range explicitly — see gotcha #1.
 
 ## Tool to use
 
-Call `mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing — that information is right here.
+Call `mcp__splunk-direct__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing; that information is right here.
 
 ## Useful field paths (events are JSON)
 

@@ -31,7 +31,7 @@ The checklist also runs a **Dependabot review queue** check (read-only PR count,
 
 ### Step 1: pull the latest snapshots from Splunk
 
-Use `mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query` (load via ToolSearch if not already in scope). One query gets both event types:
+Use `mcp__splunk-direct__splunk_run_query` (load via ToolSearch if not already in scope). One query gets both event types:
 
 ```
 index=file_logs source="/servicesLogs/truffle/vault-health.logg" | head 2

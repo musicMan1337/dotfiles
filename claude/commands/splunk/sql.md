@@ -2,7 +2,7 @@
 name: splunk:sql
 description: Fetch SQL Server logs (MSSQL engine + Agent) from Splunk. Triggers on: sql logs, sqlprod logs, mssql logs, sql failed logins, sql backups, sql deadlocks, sql agent failures
 model: haiku
-allowed-tools: mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query, ToolSearch
+allowed-tools: mcp__splunk-direct__splunk_run_query, ToolSearch
 ---
 
 ## What's in scope
@@ -35,7 +35,7 @@ Drop the `host=` clause to span all three; add `LevelDisplayName=Error` to narro
 
 ## Tool to use
 
-Call `mcp__plugin_splunk-mcp-plugin_splunk-mcp__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing — that information is right here.
+Call `mcp__splunk-direct__splunk_run_query` (load via `ToolSearch` first if not in scope). Skip `get_context` / metadata probing; that information is right here.
 
 ## Auto-extracted fields
 
